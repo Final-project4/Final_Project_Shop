@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: strapi
+      MYSQL_USER: strapiuser
+      MYSQL_PASSWORD: strapipassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql-data:/var/lib/mysql  
+    networks:
+      - strapi-network
+
+networks:
+  strapi-network:
+    driver: bridge
