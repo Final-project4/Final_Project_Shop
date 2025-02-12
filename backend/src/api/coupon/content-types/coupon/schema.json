@@ -4,10 +4,11 @@
   "info": {
     "singularName": "coupon",
     "pluralName": "coupons",
-    "displayName": "coupon"
+    "displayName": "coupon",
+    "description": ""
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {

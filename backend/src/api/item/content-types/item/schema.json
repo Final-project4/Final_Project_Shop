@@ -4,10 +4,11 @@
   "info": {
     "singularName": "item",
     "pluralName": "items",
-    "displayName": "item"
+    "displayName": "item",
+    "description": ""
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
@@ -16,6 +17,11 @@
     },
     "discription": {
       "type": "text"
+    },
+    "price": {
+      "type": "integer",
+      "required": true,
+      "default": 0
     }
   }
 }
