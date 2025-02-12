@@ -10,23 +10,23 @@ function CartPage() {
     {
       id: 1,
       name: "Bracer of Strength",
-      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-2DB4Sh9jqWkKi2xlMMBRZQz1cQ7ji3.png",
+      image: "/bracer.png",
       quantity: 1,
       price: 29.99,
       selected: false,
     },
     {
       id: 2,
-      name: "Banshee shirt",
-      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-2DB4Sh9jqWkKi2xlMMBRZQz1cQ7ji3.png",
+      name: "Sunglasses",
+      image: "/glasses.png",
       quantity: 1,
       price: 19.99,
       selected: false,
     },
     {
       id: 3,
-      name: "Mafia's style",
-      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-2DB4Sh9jqWkKi2xlMMBRZQz1cQ7ji3.png",
+      name: "Mel necklace",
+      image: "/necklace.png",
       quantity: 1,
       price: 24.99,
       selected: false,
@@ -107,10 +107,10 @@ function CartPage() {
       </div>
 
       {/* Cart Content */}
-      <div className="container mx-auto pb-16">
+      <div className="container mx-auto pb-16" style={{ marginTop: '4rem',transform: 'translateX(5rem)' }}>
         <div className="flex flex-col lg:flex-row gap-16 justify-between">
           {/* Cart Items */}
-          <div style={{ width: '800px', flexShrink: 0 }}>
+          <div style={{ width: '760px', flexShrink: 0 }}>
             <Card className="bg-white shadow-sm">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-8">
@@ -191,7 +191,7 @@ function CartPage() {
           </div>
 
           {/* Order Summary */}
-          <div className="lg:w-[300px]">
+          <div className="lg:w-[300px]" style={{ transform: 'translateX(-11rem)' }}>
             <Card className="bg-gray-50 sticky top-4">
               <CardContent className="p-8">
                 <div className="bg-gray-100 p-6 rounded-lg space-y-8">
