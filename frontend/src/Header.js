@@ -33,7 +33,9 @@ const Header = () => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A9 9 0 1118.88 6.197M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </Link>
+          <Link to="/Login">
           <Button gradientDuoTone="purpleToBlue">Login</Button>
+          </Link>
         </div>
       </div>
     </Navbar>
