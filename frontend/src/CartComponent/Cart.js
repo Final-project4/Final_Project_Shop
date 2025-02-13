@@ -98,8 +98,8 @@ function CartPage() {
               alt="Fashion Shop Logo"
               className="w-24 h-24"
             />
-            <div className="text-4xl font-bold">
-              <span style={{ color: '#DAA520', opacity: '0.45' }}>FASHION</span>
+            <div className="text-5xl font-bold" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.3)' }}>
+              <span style={{ color: '#C8A36E', opacity: '0.85' }}>FASHION</span>
               <span className="text-gray-800"> SHOP</span>
             </div>
           </div>
