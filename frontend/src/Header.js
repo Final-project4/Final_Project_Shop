@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
-    <Navbar fluid className="bg-blue-700 text-white py-4 px-6">
+    <Navbar fluid className="bg-gradient-to-r from-blue-700 to-cyan-400 text-white py-4 px-6">
       <Navbar.Brand as={Link} to="/">
         <span className="self-center text-xl font-semibold whitespace-nowrap">
           MyShop
