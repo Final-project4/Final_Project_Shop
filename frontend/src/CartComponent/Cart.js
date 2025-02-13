@@ -107,7 +107,7 @@ function CartPage() {
       </div>
 
       {/* Cart Content */}
-      <div className="container mx-auto pb-16" style={{ marginTop: '4rem',transform: 'translateX(5rem)' }}>
+      <div className="container mx-auto pb-16" style={{ marginTop: '4rem', transform: 'translateX(5rem)' }}>
         <div className="flex flex-col lg:flex-row gap-16 justify-between">
           {/* Cart Items */}
           <div style={{ width: '760px', flexShrink: 0 }}>
@@ -129,50 +129,52 @@ function CartPage() {
                   {cartItems.length > 0 ? (
                     <div className="divide-y h-full">
                       {cartItems.map((item) => (
-                        <div key={item.id} className="flex items-center py-6 w-full gap-6">
-                          {/* Checkbox */}
-                          <Checkbox
-                            checked={item.selected}
-                            onChange={() => toggleItemSelection(item.id)}
-                          />
-
-                          {/* Product Image */}
-                          <div className="w-24 h-24 flex-shrink-0">
-                            <img
-                              src={item.image}
-                              alt={item.name}
-                              className="w-full h-full object-cover rounded"
+                        <div key={item.id} className="bg-gray-100 p-10 rounded-lg mb-4">
+                          <div className="flex items-center py-6 w-full gap-6">
+                            {/* Checkbox */}
+                            <Checkbox
+                              checked={item.selected}
+                              onChange={() => toggleItemSelection(item.id)}
                             />
-                          </div>
 
-                          {/* Product Info */}
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-medium text-lg truncate">{item.name}</h3>
-                            <div className="text-sm text-gray-500 mt-2">• • •</div>
-                          </div>
-
-                          {/* Quantity Controls */}
-                          <div className="flex items-center gap-4">
-                            <div className="flex items-center border rounded">
-                              <button
-                                className="w-8 h-8 flex items-center justify-center hover:bg-gray-50 text-lg"
-                                onClick={() => updateQuantity(item.id, -1)}
-                              >
-                                -
-                              </button>
-                              <span className="w-12 text-center text-lg">{item.quantity}</span>
-                              <button
-                                className="w-8 h-8 flex items-center justify-center hover:bg-gray-50 text-lg"
-                                onClick={() => updateQuantity(item.id, 1)}
-                              >
-                                +
-                              </button>
+                            {/* Product Image */}
+                            <div className="w-24 h-24 flex-shrink-0">
+                              <img
+                                src={item.image}
+                                alt={item.name}
+                                className="w-full h-full object-cover rounded"
+                              />
                             </div>
-                            <Trash2
-                              size={20}
-                              className="text-gray-400 cursor-pointer hover:text-gray-600"
-                              onClick={() => removeItem(item.id)}
-                            />
+
+                            {/* Product Info */}
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-medium text-lg truncate">{item.name}</h3>
+                              <div className="text-sm text-gray-500 mt-2">• • •</div>
+                            </div>
+
+                            {/* Quantity Controls */}
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center border rounded">
+                                <button
+                                  className="w-8 h-8 flex items-center justify-center hover:bg-gray-50 text-lg"
+                                  onClick={() => updateQuantity(item.id, -1)}
+                                >
+                                  -
+                                </button>
+                                <span className="w-12 text-center text-lg">{item.quantity}</span>
+                                <button
+                                  className="w-8 h-8 flex items-center justify-center hover:bg-gray-50 text-lg"
+                                  onClick={() => updateQuantity(item.id, 1)}
+                                >
+                                  +
+                                </button>
+                              </div>
+                              <Trash2
+                                size={20}
+                                className="text-gray-400 cursor-pointer hover:text-gray-600"
+                                onClick={() => removeItem(item.id)}
+                              />
+                            </div>
                           </div>
                         </div>
                       ))}
