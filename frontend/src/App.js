@@ -12,7 +12,7 @@ function App() {
       <>
         <Header />
         <Routes>
-        <Route path="/" element={<AdminPage />} />
+        <Route path="/" element={<AdminPage/>} />
         <Route path="/admin/add-item" element={<AdminPage/>} />
         <Route path="/admin/add-coupons" element={<AddCoupons />} />
         <Route path="/admin/order-list" element={<OrderList />} />
