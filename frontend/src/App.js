@@ -2,9 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Header from "./Header";
 import HomePage from "./HomeComponent/HomePage";
-import ItemDetail from "./ItemDetail";
-import Products from "./ProductList/Products";
-
+import AppRoutes from "./Route";
 function App() {
   return (
     <Router>

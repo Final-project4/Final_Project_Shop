@@ -13,12 +13,12 @@ const Header = () => {
       <div className="flex items-center gap-6">
         <Navbar.Collapse>
           <Navbar.Link as={Link} to="/" className="text-white hover:text-gray-200">
-            หน้าแรก
+            หน้าแรก  
           </Navbar.Link>
           <Navbar.Link as={Link} to="/products" className="text-white hover:text-gray-200">
             รายการสินค้า
           </Navbar.Link>
-          <Navbar.Link as={Link} to="/contact" className="text-white hover:text-gray-200">
+          <Navbar.Link as={Link} to="/adminpage" className="text-white hover:text-gray-200">
             ติดต่อ
           </Navbar.Link>
         </Navbar.Collapse>
