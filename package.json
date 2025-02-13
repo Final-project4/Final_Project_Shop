@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@radix-ui/react-checkbox": "^1.1.4",
+    "lucide-react": "^0.475.0"
+  }
+}
