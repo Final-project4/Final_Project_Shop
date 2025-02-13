@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import Img1 from "/Users/zlannoysg/Desktop/ZLannoysG/Final_Project_Shop/frontend/src/Picture/s1.png";
-import Img2 from "/Users/zlannoysg/Desktop/ZLannoysG/Final_Project_Shop/frontend/src/Picture/s2.png";
-import Img3 from "/Users/zlannoysg/Desktop/ZLannoysG/Final_Project_Shop/frontend/src/Picture/c1.png";
-import Img4 from "/Users/zlannoysg/Desktop/ZLannoysG/Final_Project_Shop/frontend/src/Picture/d2.png";
-import Img5 from "/Users/zlannoysg/Desktop/ZLannoysG/Final_Project_Shop/frontend/src/Picture/e2.png";
-import Img6 from "/Users/zlannoysg/Desktop/ZLannoysG/Final_Project_Shop/frontend/src/Picture/f2.png";
-import Img7 from "/Users/zlannoysg/Desktop/ZLannoysG/Final_Project_Shop/frontend/src/Picture/a2.png";
-import Img8 from "/Users/zlannoysg/Desktop/ZLannoysG/Final_Project_Shop/frontend/src/Picture/g2.png";
+import Img1 from "../Picture/s1.png";
+import Img2 from "../Picture/s2.png";
+import Img3 from "../Picture/c1.png";
+import Img4 from "../Picture/d2.png";
+import Img5 from "../Picture/e2.png";
+import Img6 from "../Picture/f2.png";
+import Img7 from "../Picture/a2.png";
+import Img8 from "../Picture/g2.png";
 import { FaStar } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 
