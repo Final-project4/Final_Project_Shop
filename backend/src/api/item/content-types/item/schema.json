@@ -22,6 +22,21 @@
       "type": "integer",
       "required": true,
       "default": 0
+    },
+    "categories": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::category.category",
+      "mappedBy": "items"
+    },
+    "img": {
+      "allowedTypes": [
+        "images",
+        "videos"
+      ],
+      "type": "media",
+      "multiple": false,
+      "required": true
     }
   }
 }
