@@ -51,7 +51,7 @@ export default function HomePage() {
 
       {/* Banner */}
       <div className="my-8 text-center relative">
-        <img src="/banner.png" alt="Banner" className="w-full h-60 object-cover" />
+        <img src="/baner.jpg" alt="Banner" className="w-full h-60 object-cover" />
         <button className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-orange-500 text-white p-3 rounded">Shop Now</button>
       </div>
 
