@@ -2,13 +2,18 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Header from "./Header";
 import HomePage from "./HomeComponent/HomePage";
-import AppRoutes from "./Route";
+import LoginScreen from "./LoginComponent/LoginPage";
+
+
 function App() {
   return (
     <Router>
       <>
         <Header />
-        <AppRoutes/>
+        <Routes>
+          <Route path="/" element={<HomePage/>} />
+          <Route path="/login" element={<LoginScreen />} />
+        </Routes>
       </>
     </Router>
   );
