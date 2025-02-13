@@ -5,7 +5,7 @@ import Products from "./ProductList/Products.jsx";
 import AdminPage from "./AdminPages/AdminPageAddItem.js";
 import AddCoupons from "./AdminPages/ADD_COUPONS.js";
 import OrderList from "./AdminPages/Order_List.js";
-
+import CartPage from "./CartComponent/Cart.js";
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<HomePage />} />
@@ -14,6 +14,7 @@ const AppRoutes = () => (
     <Route path="/productlist" element={<Products />} />
     <Route path="/addcoupon" element={<AddCoupons/>}/>
     <Route path="/order" element={<OrderList/>}/>
+    <Route path="/cart" element={<CartPage/>}/>
   </Routes>
 );
 
