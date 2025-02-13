@@ -2,6 +2,9 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Header from "./Header";
 import HomePage from "./HomeComponent/HomePage";
+import AdminPage from "./AdminPages/AdminPageAddItem";
+import AddCoupons from "./AdminPages/ADD_COUPONS"; 
+import OrderList from "./AdminPages/Order_List";
 
 function App() {
   return (
@@ -9,7 +12,10 @@ function App() {
       <>
         <Header />
         <Routes>
-          <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<AdminPage />} />
+        <Route path="/admin/add-item" element={<AdminPage/>} />
+        <Route path="/admin/add-coupons" element={<AddCoupons />} />
+        <Route path="/admin/order-list" element={<OrderList />} />
         </Routes>
       </>
     </Router>
