@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Search } from "lucide-react";
 import { TextInput } from "flowbite-react";
 import axios from "axios";
+import PopularProducts from "./poppular";
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
@@ -11,32 +12,32 @@ export default function HomePage() {
     axios
       .get("http://localhost:1337/api/items?populate=*")
       .then((response) => {
-        console.log("API Response:", response.data);
-        setProducts(response.data.data || []); 
+        setProducts(response.data.data || []);
       })
       .catch((error) => {
         console.error("Error fetching products:", error);
       });
   }, []);
-  console.log("data:::::", products);
+
   return (
     <div className="min-h-screen bg-[#faf7f7]">
       {/* Header */}
-      <div className="container mx-auto py-8 text-center">
-        <Link to="/" className="inline-block">
-          <div className="relative w-32 h-32 mx-auto">
-            <div className="absolute inset-0 rounded-full border-2 border-[#c4a484] flex items-center justify-center">
-              <span className="text-2xl font-serif text-[#c4a484]">FS</span>
-            </div>
-          </div>
+      <div className="container mx-auto py-8 flex items-center justify-center space-x-4 text-center">
+        <Link to="/">
+          <img
+            src="/fs-logo.png"
+            alt="Fashion Shop Logo"
+            className="max-h-12 w-20 rounded-full object-contain shadow-md"
+          />
         </Link>
+
         <h1 className="mt-4 text-3xl font-serif">
           <span className="text-[#c4a484]">FASHION</span> SHOP
         </h1>
       </div>
 
       {/* Search */}
-      <div className="container mx-auto px-4 mb-12">
+      <div className="container mx-auto px-4 mb-12 text-center py-12">
         <div className="relative max-w-md mx-auto">
           <TextInput
             type="search"
@@ -47,54 +48,46 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Popular Products */}
-      <section className="container mx-auto px-4 text-center">
-        <h2 className="text-2xl italic">Popular products</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-          {products.map((product) => (
-            <div key={product.id} className="bg-white p-4 shadow rounded">
-              <img
-                src={product.img.url}
-                alt={product.name}
-                className="w-full h-40 object-cover"
-              />
-              <p className="mt-2">{product.name}</p>
-              <p>{product.price} บาท</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* Popular Products - Carousel */}
+      <PopularProducts products={products} />
 
       {/* Banner */}
       <div className="my-8 text-center relative">
         <img
           src="/baner.jpg"
           alt="Banner"
-          className="w-full h-60 object-cover"
+          className="w-full h-auto object-cover rounded-lg shadow-md"
         />
-        <button className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-orange-500 text-white p-3 rounded">
-          Shop Now
-        </button>
+        <Link
+          to="/productlist"
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#dea82a] text-white px-6 py-3 rounded-full shadow-lg hover:bg-[#dea82a] transition"
+        >
+          🛒 Shop Now
+        </Link>
       </div>
 
       {/* Collection */}
       <section className="container mx-auto px-4 text-center">
-        <h2 className="text-2xl italic">COLLECTION</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
-          {(products || []).map((product) => (
-            <div key={product.id} className="bg-white p-4 shadow rounded">
+        <h2 className="text-2xl italic mt-8">🎨 Collection</h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
+          {products.map((product) => (
+            <div
+              key={product.id}
+              className="bg-white p-4 shadow rounded-lg hover:shadow-lg transition transform hover:scale-105"
+            >
               <img
-                src={
-                  product.attributes?.image?.data?.attributes?.url ||
-                  "/placeholder.jpg"
-                }
-                alt={product.attributes?.title || "No Title"}
-                className="w-full h-40 object-cover"
+                src={`http://localhost:1337${
+                  product.img?.url || "/placeholder.jpg"
+                }`}
+                alt={product.name || "No Title"}
+                className="w-full h-48 object-cover rounded-md"
               />
-              <p>{product.attributes?.title || "No Title"}</p>
-              <p>{product.attributes?.price || "N/A"} บาท</p>
-              <button className="bg-blue-500 text-white px-4 py-2 mt-2 rounded">
-                สั่งซื้อ
+              <p className="mt-2 font-medium text-lg">
+                {product.name || "No Title"}
+              </p>
+              <p className="text-gray-600">{product.price ?? "N/A"} บาท</p>
+              <button className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-2 mt-3 rounded-full shadow-md transition-all duration-300 hover:from-purple-600 hover:to-blue-600">
+                🛍 สั่งซื้อ
               </button>
             </div>
           ))}
@@ -102,7 +95,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#1e2a4a] text-white py-4 mt-16">
+      <footer className="bg-[#1e2a4a] text-white py-6 mt-16">
         <div className="container mx-auto px-4 text-center">
           <p>© 2025 FashionShop. All rights reserved.</p>
         </div>
