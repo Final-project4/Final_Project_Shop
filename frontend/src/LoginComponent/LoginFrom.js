@@ -1,15 +1,42 @@
 import React, { useState } from "react";
 import InputField from "./InputField";
 import SocialLogin from "./SocialLogin";
+import Cookies from "js-cookie";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [color, setColor] = useState('#ffffff');
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Logging in with:", { email, password });
+    setError("");
+    
+    try {
+      const response = await fetch("http://localhost:1337/api/auth/local", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          identifier: email,
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error?.message || "Login failed");
+      }
+
+      console.log("Logged in successfully:", data);
+      Cookies.set("authToken", data.jwt, { expires: 7, secure: true });
+      alert("Login successful!");
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
   return (
@@ -18,7 +45,8 @@ const LoginForm = () => {
       style={{ backgroundColor: color }}
     >
       <h1 className="text-2xl font-light tracking-wider text-center mb-6">LOGIN</h1>
-
+      {error && <p className="text-red-500 text-center">{error}</p>}
+      
       <form onSubmit={handleSubmit} className="space-y-6">
         <InputField
           label="Email address"
@@ -41,7 +69,7 @@ const LoginForm = () => {
         <div>
           <button
             type="submit"
-            className="flex w-full justify-center rounded-md bg-yellow-400 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg--500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-500"
+            className="flex w-full justify-center rounded-md bg-yellow-400 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-yellow-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-500"
           >
             Sign in
           </button>

@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Trash2, Search, ShoppingCart, User } from "lucide-react"
+
 import Input from "../components/ui/input"
 import { Card, CardContent } from "../components/ui/card"
 import Checkbox from "../components/ui/checkbox"
