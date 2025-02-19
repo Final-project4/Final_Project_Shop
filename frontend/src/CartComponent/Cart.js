@@ -1,37 +1,14 @@
-import { useState } from "react"
+import React, { useEffect, useState,useContext } from 'react';
 import { Trash2, Search, ShoppingCart, User } from "lucide-react"
-
+import axios from "axios"
 import Input from "../components/ui/input"
 import { Card, CardContent } from "../components/ui/card"
 import Checkbox from "../components/ui/checkbox"
+import { AuthContext } from "../context/AuthContext"
 
-function CartPage() {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Bracer of Strength",
-      image: "/bracer.png",
-      quantity: 1,
-      price: 29.99,
-      selected: false,
-    },
-    {
-      id: 2,
-      name: "Sunglasses",
-      image: "/glasses.png",
-      quantity: 1,
-      price: 19.99,
-      selected: false,
-    },
-    {
-      id: 3,
-      name: "Mel necklace",
-      image: "/necklace.png",
-      quantity: 1,
-      price: 24.99,
-      selected: false,
-    },
-  ])
+const Cart = () => {
+  const { userInfo } = useContext(AuthContext)
+  const [cartItems, setCartItems] = useState([])
   const [isApplyButtonActive, setIsApplyButtonActive] = useState(false);
   const [isCheckoutButtonActive, setIsCheckoutButtonActive] = useState(false);
 
@@ -86,6 +63,23 @@ function CartPage() {
     setTimeout(() => setIsCheckoutButtonActive(false), 200); // คืนค่าเดิมหลังจาก 200ms
     console.log('Proceed to checkout clicked');
   };
+
+  useEffect(() => {
+    const fetchCartItems = async () => {
+        if (!userInfo) return;
+        try {
+            const response = await axios.get(`http://localhost:1337/api/carts?filters[user][id][$eq]=${userInfo.id}&populate=cart_items`);
+            console.log(response.data); // เพิ่มการตรวจสอบข้อมูลที่ได้รับ
+            const items = response.data.data[0]?.cart_items || []; // ปรับโครงสร้างข้อมูลให้ถูกต้อง
+            console.log(items); // ตรวจสอบว่า items มีข้อมูลหรือไม่
+            setCartItems(items);
+        } catch (error) {
+            console.error("Error fetching cart items:", error);
+        }
+    };
+
+    fetchCartItems();
+  }, [userInfo]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -259,4 +253,4 @@ function CartPage() {
   )
 }
 
-export default CartPage
+export default Cart
