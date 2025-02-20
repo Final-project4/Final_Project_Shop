@@ -528,8 +528,8 @@ export interface ApiItemItem extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    discription: Schema.Attribute.Text;
-    img: Schema.Attribute.Media<'images' | 'videos'> &
+    description: Schema.Attribute.Text;
+    img: Schema.Attribute.Media<'images' | 'videos', true> &
       Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::item.item'> &

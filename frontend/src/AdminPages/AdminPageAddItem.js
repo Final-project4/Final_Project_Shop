@@ -1,58 +1,190 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
+import axios from "axios";
+import { useActionData } from "react-router-dom";
+
 const AdminPage = () => {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [price, setPrice] = useState("");
+  const [images, setImages] = useState([]);
+  const [categories, setCategories] = useState([]);
+  
+  useEffect(() => {
+    fetch("http://localhost:1337/api/categories?populate=*")
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Data from API:", data); // เช็คโครงสร้างของ API
+  
+        // ตรวจสอบว่า data.data มีอยู่จริง
+        if (data && data.data) {
+          const formattedCategories = data.data.map(cat => ({
+            id: cat.id - 1 ,
+            name: cat.name || "Unknown" // ป้องกัน undefined
+          }));
+          setCategories(formattedCategories);
+        } else {
+          console.error("Invalid API response:", data);
+          setCategories([]);
+        }
+      })
+      .catch(err => {
+        console.error("Fetch error:", err);
+        setCategories([]);
+      });
+  }, []);
+
+
+  const toggleCategory = (category) => {
+    console.log("Selected Category:", category);
+    setSelectedCategories((prev) =>
+      prev.some((item) => item.id === category.id)
+        ? prev.filter((item) => item.id !== category.id)
+        : [...prev, category]
+    );
+  };
+
+  const uploadImage = async (file) => {
+    const formData = new FormData();
+    formData.append("files", file);
+
+    try {
+      const response = await axios.post("http://localhost:1337/api/upload", formData);
+      console.log("Uploaded Image Response:", response.data);
+
+      if (response.data && response.data.length > 0) {
+        return response.data[0].id;
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+    }
+    return null;
+  };
+  
+  const handleImageUpload = (event) => {
+    const files = Array.from(event.target.files);
+    setImages((prevImages) => [...prevImages, ...files]);
+  };
+
+  const handleAddItem = async () => {
+    try {
+      if (!name || !description || selectedCategories.length === 0 || !price) {
+        alert("กรอกข้อมูลให่ครบ");
+        return;
+    }
+    
+    const imageIds = await Promise.all(images.map(uploadImage));
+    //ตรวจสอบว่าอัปสำเร็จหรือไม่
+    if (imageIds.includes(null)) {
+      alert("บางรูปอัปโหลดไม่สำเร็จ")
+      return;
+    }
+  
+    const postData = {
+      data: {
+        name: name,
+        description: description,
+        price: parseFloat(price),
+        categories: selectedCategories.map(cat => cat.id),
+        img: imageIds.map(id => ({ id }))
+      },
+    };
+    
+    console.log("Sending data:", JSON.stringify(postData, null, 2));
+
+    const response = await axios.post(
+      "http://localhost:1337/api/items",
+      postData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("Response:", response.data);
+
+    if (response.status === 200 || response.status === 201) {
+      alert("Item added succesful");
+    } else {
+      alert("Failed")
+    }
+  } catch (error) {
+    console.error("Error adding item:", error);
+    if (error.response) {
+      console.log("Response Data:", error.response.data);
+      alert(`❌ ไม่สามารถเพิ่มสินค้าได้: ${error.response.data.error.message}`);
+    } else {
+      alert("❌ ไม่สามารถเพิ่มสินค้าได้ กรุณาตรวจสอบ backend");
+    }
+  }
+  };
+    
+
   return (
     <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <Sidebar /> {/*ใช้ sidebar /*}
+      <Sidebar />
 
-      {/* Main Content */}
       <div className="flex-1 p-10 flex flex-col items-center">
-        {/* Title */}
-        <div className="flex items-center space-x-3 mb-5">
-          <div className="w-10 h-10 border-2 rounded-full flex items-center justify-center text-lg font-bold">
-            FS
-          </div>
-          <h1 className="text-3xl font-bold">
-            <span className="text-[#daa520]">FASHION</span> SHOP
-          </h1>
-        </div>
+        <h1 className="text-3xl font-bold mb-5">
+          <span className="text-[#daa520]">FASHION</span> SHOP
+        </h1>
 
-        {/* Content Box */}
         <div className="bg-white p-10 rounded-lg shadow-lg flex space-x-10">
-          {/* Image Upload Section */}
-          <div className="relative w-40 md:w-64 bg-gray-200 rounded-lg flex items-center justify-center">
-            {/* ปุ่มเลื่อนซ้าย */}
-            <button className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-              ◀
-            </button>
-
-            {/* ปุ่มกดเพิ่มรูป */}
-            <div className="text-4xl text-gray-500 cursor-pointer">+</div>
-
-            {/* ปุ่มเลื่อนขวา */}
-            <button className="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-              ▶
-            </button>
+          <div className="relative w-40 md:w-64 bg-gray-200 rounded-lg flex flex-col items-center justify-center p-4">
+            <input type="file" multiple onChange={handleImageUpload} className="hidden" id="imageUpload" />
+            <label htmlFor="imageUpload" className="text-2xl text-gray-500 cursor-pointer border border-gray-400 rounded-md px-4 py-2 mt-2">
+              Add Picture
+            </label>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {images.map((image, index) => (
+                <img key={index} src={URL.createObjectURL(image)} alt="Uploaded Preview" className="w-16 h-16 object-cover rounded-md border" />
+              ))}
+            </div>
           </div>
 
-          {/* Form Section */}
           <div className="flex flex-col space-y-4">
+            <input type="text" placeholder="name" value={name} onChange={(e) => setName(e.target.value)} className="p-3 w-72 border border-gray-300 rounded-md bg-[#f7ead1] text-gray-700" />
+            <textarea placeholder="description" value={description} onChange={(e) => setDescription(e.target.value)} className="p-3 w-72 h-24 border border-gray-300 rounded-md bg-[#f7ead1] text-gray-700"></textarea>
+
+            <div className="relative w-72">
+              <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="px-4 py-2 bg-gray-300 rounded-md text-lg w-full text-left">
+                Select Category ▼
+              </button>
+              {isDropdownOpen && (
+                <ul className="absolute left-0 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10">
+                  {categories.map((category) => (
+                    <li key={category.id} onClick={() => toggleCategory(category)} className={`px-4 py-2 cursor-pointer hover:bg-gray-200 ${selectedCategories.some(item => item.id === categories.id) ? 'bg-gray-300' : ''}`}>
+                      {category.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div className="flex items-center space-x-2">
             <input
-              type="text"
-              placeholder="name"
-              className="p-3 w-72 border border-gray-300 rounded-md bg-[#f7ead1] text-gray-700"
-            />
-            <textarea
-              placeholder="description"
-              className="p-3 w-72 h-24 border border-gray-300 rounded-md bg-[#f7ead1] text-gray-700"
-            ></textarea>
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="Price"
+              className="p-3 w-64 border border-gray-300 rounded-md bg-[#f7ead1] text-gray-700"
+              />
+              <span className="text-lg font-semibold">Baht</span>
+            </div>
 
-            {/* ปุ่มเพิ่มข้อมูล */}
-            <button className="px-4 py-2 bg-gray-300 rounded-md text-lg">+</button>
+            <div className="flex flex-wrap gap-2">
+              {selectedCategories.map((category) => (
+                <div key={category.id} className="flex items-center bg-gray-300 px-3 py-1 rounded-md">
+                  {category.name}
+                  <button onClick={() => toggleCategory(category)} className="ml-2 text-red-600 font-bold">×</button>
+                </div>
+              ))}
+            </div>
 
-            {/* ปุ่ม ADD */}
-            <button className="px-6 py-3 bg-[#daa520] text-black font-bold rounded-lg shadow-md hover:bg-yellow-600 transition">
+            <button onClick={handleAddItem} className="px-6 py-3 bg-[#d4af37] text-black font-bold rounded-lg shadow-md hover:bg-[#b9972b] transition">
               ADD
             </button>
           </div>
