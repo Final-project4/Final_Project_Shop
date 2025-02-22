@@ -378,7 +378,7 @@ export interface ApiCartItemCartItem extends Struct.CollectionTypeSchema {
     singularName: 'cart-item';
   };
   options: {
-    draftAndPublish: false;
+    draftAndPublish: true;
   };
   attributes: {
     amount: Schema.Attribute.Integer;
@@ -386,7 +386,7 @@ export interface ApiCartItemCartItem extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    item: Schema.Attribute.Relation<'manyToOne', 'api::item.item'>;
+    item: Schema.Attribute.Relation<'oneToOne', 'api::item.item'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -455,7 +455,7 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
       'api::category.category'
     > &
       Schema.Attribute.Private;
-    name: Schema.Attribute.String & Schema.Attribute.Required;
+    name: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -504,8 +504,8 @@ export interface ApiItemItem extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
-    cart_items: Schema.Attribute.Relation<
-      'oneToMany',
+    cart_item: Schema.Attribute.Relation<
+      'oneToOne',
       'api::cart-item.cart-item'
     >;
     categories: Schema.Attribute.Relation<
