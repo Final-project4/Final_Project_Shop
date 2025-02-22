@@ -153,6 +153,7 @@ const Cart = () => {
     if (userInfo) {
       console.log("Fetching cart items for user:", userInfo.id);
       const fetchCartItems = async () => {
+        console.log(userInfo)
         try {
           const token = Cookies.get("authToken");
           if (!token) {
