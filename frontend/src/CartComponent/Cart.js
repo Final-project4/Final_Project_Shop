@@ -1,13 +1,27 @@
-import React, { useEffect, useState,useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Trash2, Search, ShoppingCart, User } from "lucide-react"
 import axios from "axios"
 import Input from "../components/ui/input"
 import { Card, CardContent } from "../components/ui/card"
 import Checkbox from "../components/ui/checkbox"
 import { AuthContext } from "../context/AuthContext"
+import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
 
 const Cart = () => {
-  const { userInfo } = useContext(AuthContext)
+  const [userInfo, setUserInfo] = useState(() => {
+    const token = Cookies.get("authToken");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        return decoded;
+      } catch (error) {
+        console.error("Error decoding token:", error);
+        return null;
+      }
+    }
+    return null;
+  });
   const [cartItems, setCartItems] = useState([])
   const [isApplyButtonActive, setIsApplyButtonActive] = useState(false);
   const [isCheckoutButtonActive, setIsCheckoutButtonActive] = useState(false);
@@ -20,17 +34,88 @@ const Cart = () => {
   const shippingFee = subtotal > 50 ? 0 : 4.99
   const total = subtotal + shippingFee
 
-  const updateQuantity = (id, change) => {
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, item.quantity + change) } : item
-      ),
-    )
-  }
+  const updateQuantity = async (id, change) => {
+    const updatedItems = cartItems.map((item) =>
+      item.id === id ? { ...item, quantity: Math.max(1, item.quantity + change) } : item
+    );
 
-  const removeItem = (id) => {
-    setCartItems(cartItems.filter(item => item.id !== id))
-  }
+    const itemToUpdate = updatedItems.find(item => item.id === id);
+    
+    if (itemToUpdate) {
+      try {
+        const token = Cookies.get("authToken");
+        if (!token) {
+          console.error("No authToken found");
+          return;
+        }
+
+        // เรียก API PUT เพื่ออัปเดตจำนวนสินค้า
+        const response = await axios.put(`http://localhost:1337/api/cart-items/${itemToUpdate.item_cart_id}`, {
+          amount: itemToUpdate.quantity // ส่งจำนวนที่อัปเดต
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // ตรวจสอบสถานะการตอบกลับ
+        if (response.status === 200) {
+          setCartItems(updatedItems);
+        } else {
+          console.error("Failed to update item quantity:", response.data);
+          alert("เกิดข้อผิดพลาดในการอัปเดตจำนวนสินค้า กรุณาลองใหม่อีกครั้ง");
+        }
+      } catch (error) {
+        console.error("Error updating item quantity:", error.response?.data || error);
+        alert("เกิดข้อผิดพลาดในการอัปเดตจำนวนสินค้า กรุณาลองใหม่อีกครั้ง");
+      }
+    }
+  };
+
+  const removeItem = async (itemCartId) => {
+    try {
+      const token = Cookies.get("authToken");
+      if (!token) {
+        console.error("No authToken found");
+        return;
+      }
+
+      // เรียก API DELETE เพื่อลบสินค้า
+      const response = await axios.delete(`http://localhost:1337/api/cart-items/${itemCartId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // ตรวจสอบสถานะการตอบกลับ
+      if (response.status === 200 || response.status === 204) { // รองรับทั้ง 200 และ 204
+        // ลบสินค้าใน state ทันที
+        setCartItems(prevItems => prevItems.filter(item => item.item_cart_id !== itemCartId)); // ใช้ item_cart_id แทน id
+      } else {
+        console.error("Failed to remove item:", response.data);
+        alert("เกิดข้อผิดพลาดในการลบสินค้า กรุณาลองใหม่อีกครั้ง");
+      }
+    } catch (error) {
+      console.error("Error removing item:", error.response?.data || error);
+      console.error("Detailed error:", error); // เพิ่มการแสดงผลข้อผิดพลาดที่ละเอียดขึ้น
+      console.error("API Response:", error.response); // แสดงข้อมูลที่ตอบกลับจาก API
+
+      // แสดงข้อความแจ้งเตือนผู้ใช้เกี่ยวกับข้อผิดพลาด
+      alert("เกิดข้อผิดพลาดในการลบสินค้า กรุณาลองใหม่อีกครั้ง");
+    }
+  };
+
+  const removeSelectedItems = async () => {
+    const selectedItems = cartItems.filter(item => item.selected);
+    if (selectedItems.length === 0) {
+      alert("กรุณาเลือกสินค้าอย่างน้อยหนึ่งชิ้นเพื่อลบ");
+      return;
+    }
+
+    for (const item of selectedItems) {
+      await removeItem(item.item_cart_id);
+    }
+  };
 
   const toggleItemSelection = (id) => {
     setCartItems(cartItems.map(item =>
@@ -65,20 +150,50 @@ const Cart = () => {
   };
 
   useEffect(() => {
-    const fetchCartItems = async () => {
-        if (!userInfo) return;
+    if (userInfo) {
+      console.log("Fetching cart items for user:", userInfo.id);
+      const fetchCartItems = async () => {
         try {
-            const response = await axios.get(`http://localhost:1337/api/carts?filters[user][id][$eq]=${userInfo.id}&populate=cart_items`);
-            console.log(response.data); // เพิ่มการตรวจสอบข้อมูลที่ได้รับ
-            const items = response.data.data[0]?.cart_items || []; // ปรับโครงสร้างข้อมูลให้ถูกต้อง
-            console.log(items); // ตรวจสอบว่า items มีข้อมูลหรือไม่
-            setCartItems(items);
-        } catch (error) {
-            console.error("Error fetching cart items:", error);
-        }
-    };
+          const token = Cookies.get("authToken");
+          if (!token) {
+            console.error("No authToken found");
+            return;
+          }
+          const response = await axios.get(
+            `http://localhost:1337/api/carts?filters[user][id][$eq]=${userInfo.id}&populate=cart_items.item.img`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          console.log("API Response:", response.data);
 
-    fetchCartItems();
+          // ตรวจสอบโครงสร้างของข้อมูล
+          if (response.data.data && Array.isArray(response.data.data)) {
+            const items = response.data.data.flatMap(cart => 
+              cart.cart_items && Array.isArray(cart.cart_items) ? 
+                cart.cart_items.map(cartItem => ({
+                  ...cartItem.item, // ดึงข้อมูลจาก item
+                  quantity: cartItem.amount, // ใช้ amount เป็น quantity
+                  selected: false, // เพิ่มค่าเริ่มต้นสำหรับ selected
+                  item_cart_id: cartItem.id // เพิ่ม item_cart_id ที่ตรงกับ id ของ cartItem
+                })) : []
+            );
+            console.log("Fetched items:", items); // ตรวจสอบข้อมูลผลิตภัณฑ์ที่ดึงมา
+            setCartItems(items);
+          } else {
+            console.error("Invalid data structure:", response.data);
+          }
+        } catch (error) {
+          console.error("Error fetching cart items:", error.response?.data || error);
+        }
+      };
+
+      fetchCartItems();
+    } else {
+      console.log("No user info available to fetch cart items");
+    }
   }, [userInfo]);
 
   return (
@@ -115,7 +230,7 @@ const Cart = () => {
                   <Trash2
                     size={24}
                     className="text-gray-400 cursor-pointer"
-                    onClick={() => setCartItems(cartItems.filter(item => !item.selected))}
+                    onClick={removeSelectedItems}
                   />
                 </div>
 
@@ -134,16 +249,19 @@ const Cart = () => {
                             {/* Product Image */}
                             <div className="w-24 h-24 flex-shrink-0">
                               <img
-                                src={item.image}
-                                alt={item.name}
+                                src={`http://localhost:1337${
+                                  item.img?.formats?.small?.url ||
+                                  item.img?.url ||
+                                  "/placeholder.jpg"}`}
+                                alt={item.name || "Product Image"}
                                 className="w-full h-full object-cover rounded"
                               />
                             </div>
 
                             {/* Product Info */}
                             <div className="flex-1 min-w-0">
-                              <h3 className="font-medium text-lg truncate">{item.name}</h3>
-                              <div className="text-sm text-gray-500 mt-2">• • •</div>
+                              <h3 className="font-medium text-lg truncate">{item.name || "Unknown Product"}</h3>
+                              <p className="text-sm text-gray-500 mt-2">${(item.price || 0).toFixed(2)}</p>
                             </div>
 
                             {/* Quantity Controls */}
@@ -166,7 +284,7 @@ const Cart = () => {
                               <Trash2
                                 size={20}
                                 className="text-gray-400 cursor-pointer hover:text-gray-600"
-                                onClick={() => removeItem(item.id)}
+                                onClick={() => removeItem(item.item_cart_id)}
                               />
                             </div>
                           </div>
@@ -241,7 +359,7 @@ const Cart = () => {
                     }}
                     className="w-full text-white py-4 rounded-lg font-medium text-lg shadow-lg transition-colors duration-200 cursor-pointer"
                   >
-                    PROCEED TO CHECKOUT ({cartItems.length})
+                    PROCEED TO CHECKOUT ({cartItems.filter(item => item.selected).length})
                   </button>
                 </div>
               </CardContent>
