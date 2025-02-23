@@ -36,7 +36,22 @@
       "allowedTypes": [
         "images",
         "videos"
-      ]
+      ],
+      "type": "media",
+      "multiple": false,
+      "required": true
+    },
+    "order_item": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::order-item.order-item",
+      "mappedBy": "item"
+    },
+    "cart_items": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::cart-item.cart-item",
+      "mappedBy": "item"
     }
   }
 }
