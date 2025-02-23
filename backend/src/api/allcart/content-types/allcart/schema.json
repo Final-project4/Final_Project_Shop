@@ -4,7 +4,8 @@
   "info": {
     "singularName": "allcart",
     "pluralName": "allcarts",
-    "displayName": "allcart"
+    "displayName": "allcart",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -12,7 +13,7 @@
   "pluginOptions": {},
   "attributes": {
     "name": {
-      "type": "string"
+      "type": "text"
     }
   }
 }

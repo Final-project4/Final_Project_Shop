@@ -12,6 +12,26 @@
   },
   "pluginOptions": {},
   "attributes": {
+    "code": {
+      "type": "uid",
+      "minLength": 1
+    },
+    "is_active": {
+      "type": "boolean"
+    },
+    "discount": {
+      "type": "integer"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "percentage",
+        "fixed_amount"
+      ]
+    },
+    "expiration_date": {
+      "type": "datetime"
+    },
     "name": {
       "type": "string"
     }
