@@ -9,7 +9,7 @@ function App() {
     <AuthProvider>
     <Router>
       <Header />
-      <AppRoutes /> {/* ✅ ไม่ต้องมี <Routes> ซ้อนอีก */}
+      <AppRoutes /> 
     </Router>
     </AuthProvider>
   );
