@@ -8,6 +8,9 @@
   import CartPage from "./CartComponent/Cart.js";
   import LoginScreen from "./LoginComponent/LoginPage.js";
   import ItemDetail from "./ItemDetail/ItemDetail.js";
+  import SignUpPage from "./LoginComponent/SignUpPage.js";
+  import AccountPage from "./LoginComponent/AccountPage.js";
+
 
   const AppRoutes = () => (
   <Routes>
@@ -19,6 +22,8 @@
     <Route path="/cart" element={<CartPage />} />
     <Route path="/login" element={<LoginScreen />} />
     <Route path="/product/:id" element={<ItemDetail />} />
+    <Route path="/signup" element={<SignUpPage />} />
+    <Route path="/account" element={<AccountPage />} />
   </Routes>
 );
 
