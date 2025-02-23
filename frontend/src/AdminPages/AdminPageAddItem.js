@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import axios from "axios";
-import { useActionData } from "react-router-dom";
 
 const AdminPage = () => {
   const [name, setName] = useState("");
@@ -16,13 +15,11 @@ const AdminPage = () => {
     fetch("http://localhost:1337/api/categories?populate=*")
       .then((res) => res.json())
       .then((data) => {
-        console.log("Data from API:", data); // เช็คโครงสร้างของ API
-  
-        // ตรวจสอบว่า data.data มีอยู่จริง
+        console.log("Data from API:", data);
         if (data && data.data) {
           const formattedCategories = data.data.map(cat => ({
-            id: cat.id - 1 ,
-            name: cat.name || "Unknown" // ป้องกัน undefined
+            id: cat.id - 1,
+            name: cat.name || "Unknown"
           }));
           setCategories(formattedCategories);
         } else {
@@ -35,16 +32,6 @@ const AdminPage = () => {
         setCategories([]);
       });
   }, []);
-
-
-  const toggleCategory = (category) => {
-    console.log("Selected Category:", category);
-    setSelectedCategories((prev) =>
-      prev.some((item) => item.id === category.id)
-        ? prev.filter((item) => item.id !== category.id)
-        : [...prev, category]
-    );
-  };
 
   const uploadImage = async (file) => {
     const formData = new FormData();
@@ -63,6 +50,14 @@ const AdminPage = () => {
     return null;
   };
   
+  const toggleCategory = (category) => {
+    setSelectedCategories((prev) =>
+      prev.some((item) => item.id === category.id)
+        ? prev.filter((item) => item.id !== category.id)
+        : [...prev, category]
+    );
+  };
+
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
     setImages((prevImages) => [...prevImages, ...files]);
@@ -74,14 +69,14 @@ const AdminPage = () => {
         alert("กรอกข้อมูลให่ครบ");
         return;
     }
-    
+
     const imageIds = await Promise.all(images.map(uploadImage));
     //ตรวจสอบว่าอัปสำเร็จหรือไม่
     if (imageIds.includes(null)) {
       alert("บางรูปอัปโหลดไม่สำเร็จ")
       return;
     }
-  
+
     const postData = {
       data: {
         name: name,
@@ -121,58 +116,46 @@ const AdminPage = () => {
     }
   }
   };
-    
 
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
 
-      <div className="flex-1 p-10 flex flex-col items-center">
+      <div className="flex-1 p-10 flex flex-col items-center overflow-auto">
         <h1 className="text-3xl font-bold mb-5">
           <span className="text-[#daa520]">FASHION</span> SHOP
         </h1>
 
-        <div className="bg-white p-10 rounded-lg shadow-lg flex space-x-10">
-          <div className="relative w-40 md:w-64 bg-gray-200 rounded-lg flex flex-col items-center justify-center p-4">
-            <input type="file" multiple onChange={handleImageUpload} className="hidden" id="imageUpload" />
-            <label htmlFor="imageUpload" className="text-2xl text-gray-500 cursor-pointer border border-gray-400 rounded-md px-4 py-2 mt-2">
-              Add Picture
-            </label>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {images.map((image, index) => (
-                <img key={index} src={URL.createObjectURL(image)} alt="Uploaded Preview" className="w-16 h-16 object-cover rounded-md border" />
-              ))}
-            </div>
-          </div>
-
+        <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-4xl">
           <div className="flex flex-col space-y-4">
-            <input type="text" placeholder="name" value={name} onChange={(e) => setName(e.target.value)} className="p-3 w-72 border border-gray-300 rounded-md bg-[#f7ead1] text-gray-700" />
-            <textarea placeholder="description" value={description} onChange={(e) => setDescription(e.target.value)} className="p-3 w-72 h-24 border border-gray-300 rounded-md bg-[#f7ead1] text-gray-700"></textarea>
+            <div className="relative bg-gray-200 rounded-lg p-4 flex flex-col items-center">
+              <input type="file" multiple onChange={handleImageUpload} className="hidden" id="imageUpload" />
+              <label htmlFor="imageUpload" className="text-gray-500 cursor-pointer border border-gray-400 rounded-md px-4 py-2 mt-2">
+                Add Picture
+              </label>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {images.map((image, index) => (
+                  <img key={index} src={URL.createObjectURL(image)} alt="Uploaded Preview" className="w-24 h-24 object-cover rounded-md border" />
+                ))}
+              </div>
+            </div>
 
-            <div className="relative w-72">
+            <input type="text" placeholder="name" value={name} onChange={(e) => setName(e.target.value)} className="p-3 w-full border border-gray-300 rounded-md bg-[#f7ead1] text-gray-700" />
+            <textarea placeholder="description" value={description} onChange={(e) => setDescription(e.target.value)} className="p-3 w-full h-24 border border-gray-300 rounded-md bg-[#f7ead1] text-gray-700"></textarea>
+
+            <div className="relative">
               <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="px-4 py-2 bg-gray-300 rounded-md text-lg w-full text-left">
                 Select Category ▼
               </button>
               {isDropdownOpen && (
                 <ul className="absolute left-0 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10">
                   {categories.map((category) => (
-                    <li key={category.id} onClick={() => toggleCategory(category)} className={`px-4 py-2 cursor-pointer hover:bg-gray-200 ${selectedCategories.some(item => item.id === categories.id) ? 'bg-gray-300' : ''}`}>
+                    <li key={category.id} onClick={() => toggleCategory(category)} className={`px-4 py-2 cursor-pointer hover:bg-gray-200 ${selectedCategories.some(item => item.id === category.id) ? 'bg-gray-300' : ''}`}>
                       {category.name}
                     </li>
                   ))}
                 </ul>
               )}
-            </div>
-
-            <div className="flex items-center space-x-2">
-            <input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="Price"
-              className="p-3 w-64 border border-gray-300 rounded-md bg-[#f7ead1] text-gray-700"
-              />
-              <span className="text-lg font-semibold">Baht</span>
             </div>
 
             <div className="flex flex-wrap gap-2">
@@ -182,6 +165,17 @@ const AdminPage = () => {
                   <button onClick={() => toggleCategory(category)} className="ml-2 text-red-600 font-bold">×</button>
                 </div>
               ))}
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <input
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="Price"
+                className="p-3 w-full border border-gray-300 rounded-md bg-[#f7ead1] text-gray-700"
+              />
+              <span className="text-lg font-semibold">Baht</span>
             </div>
 
             <button onClick={handleAddItem} className="px-6 py-3 bg-[#d4af37] text-black font-bold rounded-lg shadow-md hover:bg-[#b9972b] transition">
