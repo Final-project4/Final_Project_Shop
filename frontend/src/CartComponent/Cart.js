@@ -57,7 +57,7 @@ const Cart = () => {
     );
 
     const itemToUpdate = updatedItems.find(item => item.id === id);
-    
+
     if (itemToUpdate) {
       try {
         const token = Cookies.get("authToken");
@@ -122,17 +122,100 @@ const Cart = () => {
     }
   };
 
-  const removeSelectedItems = async () => {
-    const selectedItems = cartItems.filter(item => item.selected);
-    if (selectedItems.length === 0) {
-      alert("กรุณาเลือกสินค้าอย่างน้อยหนึ่งชิ้นเพื่อลบ");
+  const handleCheckout = async (slipFile) => {
+    if (!userInfo) {
+      alert("กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อ");
       return;
     }
-
-    for (const item of selectedItems) {
-      await removeItem(item.item_cart_id);
+  
+    const selectedItems = cartItems.filter(item => item.selected);
+    if (selectedItems.length === 0) {
+      alert("กรุณาเลือกสินค้าอย่างน้อย 1 ชิ้น");
+      return;
+    }
+  
+    try {
+      const token = Cookies.get("authToken");
+      
+      // 1️⃣ ดึง order ของ user ที่ login อยู่
+      const orderResponse = await axios.get(`http://localhost:1337/api/orders?filters[user][id][$eq]=${userInfo.id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (orderResponse.data.data.length === 0) {
+        console.error("ไม่พบ Order ของ User ที่ login อยู่");
+        alert("ไม่พบคำสั่งซื้อของคุณ กรุณาลองใหม่อีกครั้ง");
+        return;
+      }
+      
+      const orderId = orderResponse.data.data[0].id;
+      const totalPrice = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  
+      // 2️⃣ สร้าง Order Items และเชื่อมโยงกับ Order ของ user
+      const orderItemRequests = selectedItems.map(item =>
+        axios.post("http://localhost:1337/api/order-items", {
+          data: {
+            item: item.id,
+            quantity: item.quantity,
+            price: item.price,
+            order: orderId
+          }
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      );
+  
+      await Promise.all(orderItemRequests);
+      console.log("สร้าง Order Items สำเร็จ");
+  
+      let slipFileId = null;
+      // 3️⃣ อัปโหลดสลิปการชำระเงิน (ถ้ามี)
+      if (slipFile) {
+        const formData = new FormData();
+        formData.append("files", slipFile);
+        
+        const uploadResponse = await axios.post("http://localhost:1337/api/upload", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`
+          }
+        });
+  
+        if (uploadResponse.data.length > 0) {
+          slipFileId = uploadResponse.data[0].id;
+        } else {
+          console.error("ไม่สามารถอัปโหลดไฟล์ได้");
+          alert("เกิดข้อผิดพลาดในการอัปโหลดสลิป กรุณาลองใหม่อีกครั้ง");
+        }
+      }
+  
+      // 4️⃣ อัปเดต Order ให้มี payment_slip และ total_price
+      await axios.put(`http://localhost:1337/api/orders/${orderId}`, {
+        data: {
+          slip: slipFileId,
+          total_price: totalPrice
+        }
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+  
+      // 5️⃣ ลบสินค้าออกจากตะกร้า
+      const removeCartRequests = selectedItems.map(item =>
+        axios.delete(`http://localhost:1337/api/cart-items/${item.item_cart_id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      );
+      await Promise.all(removeCartRequests);
+  
+      alert("สั่งซื้อสำเร็จ! กำลังดำเนินการตรวจสอบ");
+      setIsCheckoutPopupOpen(false);
+      setCartItems([]);
+    } catch (error) {
+      console.error("Error processing checkout:", error.response?.data || error);
+      alert("เกิดข้อผิดพลาดในการสั่งซื้อ กรุณาลองใหม่อีกครั้ง");
     }
   };
+  
 
   const toggleItemSelection = (id) => {
     setCartItems(cartItems.map(item =>
@@ -183,6 +266,39 @@ const Cart = () => {
     setIsCheckoutPopupOpen(true); // เปิด popup
   };
 
+  const removeSelectedItems = async () => {
+    const selectedItems = cartItems.filter(item => item.selected);
+    if (selectedItems.length === 0) {
+      alert("กรุณาเลือกสินค้าอย่างน้อย 1 ชิ้นเพื่อลบ");
+      return;
+    }
+
+    const confirmation = window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบสินค้าที่เลือก?");
+    if (!confirmation) return;
+
+    try {
+      const token = Cookies.get("authToken");
+      if (!token) {
+        console.error("No authToken found");
+        return;
+      }
+
+      // สร้างคำขอลบสินค้าทั้งหมดที่เลือก
+      await Promise.all(selectedItems.map(item => 
+        axios.delete(`http://localhost:1337/api/cart-items/${item.item_cart_id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ));
+
+      // อัปเดต state เพื่อลบสินค้าที่ถูกลบออกจาก cartItems
+      setCartItems(prevItems => prevItems.filter(item => !item.selected));
+      alert("ลบสินค้าที่เลือกเรียบร้อยแล้ว");
+    } catch (error) {
+      console.error("Error removing selected items:", error.response?.data || error);
+      alert("เกิดข้อผิดพลาดในการลบสินค้า กรุณาลองใหม่อีกครั้ง");
+    }
+  };
+
   useEffect(() => {
     if (userInfo) {
       console.log("Fetching cart items for user:", userInfo.id);
@@ -205,8 +321,8 @@ const Cart = () => {
 
           // ตรวจสอบโครงสร้างของข้อมูล
           if (response.data.data && Array.isArray(response.data.data)) {
-            const items = response.data.data.flatMap(cart => 
-              cart.cart_items && Array.isArray(cart.cart_items) ? 
+            const items = response.data.data.flatMap(cart =>
+              cart.cart_items && Array.isArray(cart.cart_items) ?
                 cart.cart_items.map(cartItem => ({
                   ...cartItem.item, // ดึงข้อมูลจาก item
                   quantity: cartItem.amount, // ใช้ amount เป็น quantity
@@ -311,12 +427,12 @@ const Cart = () => {
                   {cartItems.length > 0 ? (
                     <div className="divide-y h-full">
                       {cartItems.map((item) => (
-                        <CartItem 
-                          key={item.id} 
-                          item={item} 
-                          updateQuantity={updateQuantity} 
-                          removeItem={removeItem} 
-                          toggleItemSelection={toggleItemSelection} 
+                        <CartItem
+                          key={item.id}
+                          item={item}
+                          updateQuantity={updateQuantity}
+                          removeItem={removeItem}
+                          toggleItemSelection={toggleItemSelection}
                         />
                       ))}
                     </div>
@@ -334,7 +450,7 @@ const Cart = () => {
           </div>
 
           {/* Order Summary */}
-          <OrderSummary 
+          <OrderSummary
             userAddress={userAddress}
             subtotal={subtotal}
             shippingFee={shippingFee}
@@ -356,7 +472,7 @@ const Cart = () => {
           total={calculateTotal()}
           discountAmount={discountAmount}
           onClose={() => setIsCheckoutPopupOpen(false)}
-          cartItems={cartItems}
+          handleCheckout={handleCheckout}
         />
       )}
     </div>

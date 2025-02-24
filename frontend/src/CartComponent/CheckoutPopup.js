@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { QRCodeCanvas } from "qrcode.react";
 import generatePayload from "promptpay-qr";
-import Cookies from 'js-cookie';
 
-const CheckoutPopup = ({ items, total, discountAmount, onClose, cartItems }) => {
+const CheckoutPopup = ({ items, total, discountAmount, onClose, handleCheckout }) => {
   const [showQR, setShowQR] = useState(false);
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-  
-  const promptPayID = "0922567600"; // หรือใช้เลขบัญชีธนาคารเช่น "1234567890123"
+
+  const promptPayID = "0922567600"; // หรือใช้เลขบัญชีธนาคาร เช่น "1234567890123"
 
   const generatePromptPayQR = (promptPayID, amount) => {
     if (!promptPayID) {
@@ -26,15 +25,30 @@ const CheckoutPopup = ({ items, total, discountAmount, onClose, cartItems }) => 
     setFile(event.target.files[0]);
   };
 
-  const handleUpload = async () => {
-    // ... (โค้ดการอัปโหลดไฟล์)
+  const handleUploadAndCheckout = async () => {
+    setUploading(true);
+  
+    // Create the JSON body in the specified format
+    const orderItems = items.map(item => ({
+      quantity: item.quantity,
+      price: item.price,
+      order: 2, // Replace with the actual order ID if available
+      item: item.id // Assuming item.id corresponds to the item ID
+    }));
+  
+    const jsonBody = {
+      data: orderItems.length === 1 ? orderItems[0] : orderItems // Adjust for single item
+    };
+  
+    await handleCheckout(file, jsonBody); // ✅ Send the JSON body along with the file
+    setUploading(false);
   };
-
+  
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-95 z-50 backdrop-blur-sm">
       <div className="bg-white p-6 rounded-lg shadow-lg relative">
-        <button 
-          onClick={onClose} 
+        <button
+          onClick={onClose}
           className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
           aria-label="Close"
         >
@@ -72,18 +86,18 @@ const CheckoutPopup = ({ items, total, discountAmount, onClose, cartItems }) => 
               <p className="text-red-500">Error: ไม่สามารถสร้าง QR ได้</p>
             )}
             <input type="file" onChange={handleFileChange} className="mt-4" />
-            <button 
-              onClick={handleUpload} 
-              disabled={uploading} 
+            <button
+              onClick={handleUploadAndCheckout}
+              disabled={uploading}
               className={`mt-2 ${uploading ? "bg-gray-400" : "bg-blue-500"} text-white px-4 py-2 rounded`}
             >
-              {uploading ? "กำลังอัปโหลด..." : "อัปโหลดไฟล์"}
+              {uploading ? "กำลังอัปโหลด..." : "อัปโหลดและยืนยันคำสั่งซื้อ"}
             </button>
           </div>
         ) : (
           <div className="mt-4">
             <button onClick={onClose} className="bg-gray-300 px-4 py-2 rounded mr-2">Cancel</button>
-            <button 
+            <button
               className="bg-blue-500 text-white px-4 py-2 rounded"
               onClick={() => setShowQR(true)}
             >
@@ -96,4 +110,4 @@ const CheckoutPopup = ({ items, total, discountAmount, onClose, cartItems }) => 
   );
 };
 
-export default CheckoutPopup; 
+export default CheckoutPopup;

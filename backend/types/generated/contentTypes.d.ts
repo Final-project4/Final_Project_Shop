@@ -535,6 +535,10 @@ export interface ApiItemItem extends Struct.CollectionTypeSchema {
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::item.item'> &
       Schema.Attribute.Private;
     name: Schema.Attribute.String;
+    order_items: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::order-item.order-item'
+    >;
     price: Schema.Attribute.Integer &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<0>;
@@ -560,7 +564,7 @@ export interface ApiOrderItemOrderItem extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    item: Schema.Attribute.JSON;
+    item: Schema.Attribute.Relation<'manyToOne', 'api::item.item'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -570,7 +574,7 @@ export interface ApiOrderItemOrderItem extends Struct.CollectionTypeSchema {
     order: Schema.Attribute.Relation<'manyToOne', 'api::order.order'>;
     price: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
-    slip: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    quantity: Schema.Attribute.Integer;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -586,7 +590,7 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
     singularName: 'order';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
@@ -600,9 +604,11 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
       'api::order-item.order-item'
     >;
     publishedAt: Schema.Attribute.DateTime;
+    slip: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     step: Schema.Attribute.Enumeration<
       ['pendding', 'paid', 'completed', 'cancelled']
     >;
+    total_price: Schema.Attribute.Decimal;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
