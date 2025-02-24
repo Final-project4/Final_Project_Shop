@@ -8,6 +8,9 @@ const Sidebar = () => {
         <Link to="/adminpage" className="block py-2 text-lg hover:text-[#daa520] transition-colors">
           ADD ITEM
         </Link>
+        <Link to="/admin/items" className="block py-2 text-lg hover:text-[#daa520] transition-colors">
+          ITEM LIST
+        </Link>
         <Link to="/addcoupon" className="block py-2 text-lg hover:text-[#daa520] transition-colors">
           ADD COUPONS
         </Link>

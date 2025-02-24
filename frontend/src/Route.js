@@ -7,6 +7,8 @@ import AddCoupons from "./AdminPages/ADD_COUPONS.js";
 import OrderList from "./AdminPages/Order_List.js";
 import CartPage from "./CartComponent/Cart.js";
 import LoginScreen from "./LoginComponent/LoginPage.js";
+import AdminItemList from "./AdminPages/AdminItemList.js";
+import AdminEditItem from "./AdminPages/AdminEditItem.js"
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<HomePage />} />
@@ -17,6 +19,8 @@ const AppRoutes = () => (
     <Route path="/order" element={<OrderList/>}/>
     <Route path="/cart" element={<CartPage/>}/>
     <Route path="/Login" element={<LoginScreen/>}/>
+    <Route path="/admin/items" element={<AdminItemList />} />
+    <Route path="/admin/items/edit/:id" element={<AdminEditItem />} />
   </Routes>
 );
 
