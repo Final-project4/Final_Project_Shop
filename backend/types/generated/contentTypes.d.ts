@@ -504,17 +504,6 @@ export interface ApiCouponCoupon extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
-<<<<<<< HEAD
-    code: Schema.Attribute.UID &
-      Schema.Attribute.SetMinMaxLength<{
-        minLength: 1;
-      }>;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    discount: Schema.Attribute.Integer;
-    expiration_date: Schema.Attribute.DateTime;
-=======
     code: Schema.Attribute.String & Schema.Attribute.Unique;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -523,7 +512,6 @@ export interface ApiCouponCoupon extends Struct.CollectionTypeSchema {
       ['Percentage', 'fixed_amount', 'free_shiping']
     >;
     discount_value: Schema.Attribute.Integer;
->>>>>>> cart
     is_active: Schema.Attribute.Boolean;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -534,7 +522,6 @@ export interface ApiCouponCoupon extends Struct.CollectionTypeSchema {
     max_discount: Schema.Attribute.Integer;
     minimum_order: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
-    type: Schema.Attribute.Enumeration<['percentage', 'fixed_amount']>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

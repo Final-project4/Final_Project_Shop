@@ -1,10 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Trash2, Search, ShoppingCart, User } from "lucide-react"
 import axios from "axios"
-import Input from "../components/ui/input"
 import { Card, CardContent } from "../components/ui/card"
 import Checkbox from "../components/ui/checkbox"
-import { AuthContext } from "../context/AuthContext"
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
 import CheckoutPopup from './CheckoutPopup';

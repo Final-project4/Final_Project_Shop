@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { QRCodeCanvas } from "qrcode.react";
 import generatePayload from "promptpay-qr";
-import Cookies from 'js-cookie';
 
 const CheckoutPopup = ({ items, total, discountAmount, onClose, cartItems }) => {
   const [showQR, setShowQR] = useState(false);

@@ -21,6 +21,9 @@ const Header = () => {
           <Navbar.Link as={Link} to="/adminpage" className="text-white hover:text-gray-200">
             ติดต่อ
           </Navbar.Link>
+          <Navbar.Link as={Link} to="/status" className="text-white hover:text-gray-200">
+            สถานะคำสั่งชื้อ
+          </Navbar.Link>
         </Navbar.Collapse>
         <div className="flex items-center gap-4">
           <Link to="/cart">
