@@ -8,7 +8,7 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
@@ -18,14 +18,20 @@
       "target": "api::order.order",
       "inversedBy": "order_items"
     },
-    "item": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::item.item",
-      "inversedBy": "order_item"
-    },
-    "amount": {
+    "price": {
       "type": "integer"
+    },
+    "slip": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "item": {
+      "type": "json",
+      "required": false
     }
   }
 }

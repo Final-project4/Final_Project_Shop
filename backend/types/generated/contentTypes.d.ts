@@ -504,6 +504,7 @@ export interface ApiCouponCoupon extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
+<<<<<<< HEAD
     code: Schema.Attribute.UID &
       Schema.Attribute.SetMinMaxLength<{
         minLength: 1;
@@ -513,6 +514,16 @@ export interface ApiCouponCoupon extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     discount: Schema.Attribute.Integer;
     expiration_date: Schema.Attribute.DateTime;
+=======
+    code: Schema.Attribute.String & Schema.Attribute.Unique;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    discount_type: Schema.Attribute.Enumeration<
+      ['Percentage', 'fixed_amount', 'free_shiping']
+    >;
+    discount_value: Schema.Attribute.Integer;
+>>>>>>> cart
     is_active: Schema.Attribute.Boolean;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -520,12 +531,19 @@ export interface ApiCouponCoupon extends Struct.CollectionTypeSchema {
       'api::coupon.coupon'
     > &
       Schema.Attribute.Private;
-    name: Schema.Attribute.String;
+    max_discount: Schema.Attribute.Integer;
+    minimum_order: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
     type: Schema.Attribute.Enumeration<['percentage', 'fixed_amount']>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    user_restrictions: Schema.Attribute.Relation<
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
+    valid_from: Schema.Attribute.DateTime;
+    valid_until: Schema.Attribute.DateTime;
   };
 }
 
@@ -559,10 +577,6 @@ export interface ApiItemItem extends Struct.CollectionTypeSchema {
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::item.item'> &
       Schema.Attribute.Private;
     name: Schema.Attribute.String;
-    order_item: Schema.Attribute.Relation<
-      'oneToOne',
-      'api::order-item.order-item'
-    >;
     price: Schema.Attribute.Integer &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<0>;
@@ -582,14 +596,13 @@ export interface ApiOrderItemOrderItem extends Struct.CollectionTypeSchema {
     singularName: 'order-item';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
-    amount: Schema.Attribute.Integer;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    item: Schema.Attribute.Relation<'oneToOne', 'api::item.item'>;
+    item: Schema.Attribute.JSON;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -597,7 +610,9 @@ export interface ApiOrderItemOrderItem extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     order: Schema.Attribute.Relation<'manyToOne', 'api::order.order'>;
+    price: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
+    slip: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -630,7 +645,6 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
     step: Schema.Attribute.Enumeration<
       ['pendding', 'paid', 'completed', 'cancelled']
     >;
-    total: Schema.Attribute.Integer;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1103,6 +1117,7 @@ export interface PluginUsersPermissionsUser
     cart: Schema.Attribute.Relation<'oneToOne', 'api::cart.cart'>;
     confirmationToken: Schema.Attribute.String & Schema.Attribute.Private;
     confirmed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    coupons: Schema.Attribute.Relation<'manyToMany', 'api::coupon.coupon'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

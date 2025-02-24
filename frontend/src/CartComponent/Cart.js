@@ -7,6 +7,9 @@ import Checkbox from "../components/ui/checkbox"
 import { AuthContext } from "../context/AuthContext"
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
+import CheckoutPopup from './CheckoutPopup';
+import CartItem from './CartItem';
+import OrderSummary from './OrderSummary';
 
 const Cart = () => {
   const [userInfo, setUserInfo] = useState(() => {
@@ -25,14 +28,28 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState([])
   const [isApplyButtonActive, setIsApplyButtonActive] = useState(false);
   const [isCheckoutButtonActive, setIsCheckoutButtonActive] = useState(false);
-
+  const [isCheckoutPopupOpen, setIsCheckoutPopupOpen] = useState(false);
   const [selectAll, setSelectAll] = useState(false)
+
+  const [userAddress, setUserAddress] = useState("");
+  const [coupons, setCoupons] = useState([]);
+  const [selectedCoupon, setSelectedCoupon] = useState("");
+  const [discountAmount, setDiscountAmount] = useState(0);
 
   const subtotal = cartItems
     .filter(item => item.selected)
     .reduce((sum, item) => sum + item.price * item.quantity, 0)
   const shippingFee = subtotal > 50 ? 0 : 4.99
   const total = subtotal + shippingFee
+
+  const calculateTotal = () => {
+    const subtotal = cartItems
+      .filter(item => item.selected)
+      .reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const shippingFee = subtotal > 50 ? 0 : 4.99;
+    const total = subtotal + shippingFee - discountAmount;
+    return total < 0 ? 0 : total;
+  };
 
   const updateQuantity = async (id, change) => {
     const updatedItems = cartItems.map((item) =>
@@ -139,14 +156,31 @@ const Cart = () => {
     e.preventDefault();
     setIsApplyButtonActive(true); // เปลี่ยนสีเมื่อคลิก
     setTimeout(() => setIsApplyButtonActive(false), 200); // คืนค่าเดิมหลังจาก 200ms
-    console.log('Apply voucher clicked');
+
+    // ตรวจสอบว่าคูปองที่เลือกคือ "เลือกคูปอง" หรือไม่
+    if (selectedCoupon === "") {
+      setDiscountAmount(0); // ยกเลิกการใช้งานคูปอง
+    } else {
+      // คำนวณจำนวนเงินที่ลดจากคูปอง
+      const coupon = coupons.find(c => c.code === selectedCoupon);
+      if (coupon) {
+        if (coupon.discount_type === "Percentage") {
+          const discount = (subtotal * coupon.discount_value) / 100;
+          setDiscountAmount(discount);
+        } else if (coupon.discount_type === "fixed_amount") {
+          setDiscountAmount(coupon.discount_value);
+        }
+      } else {
+        alert("คูปองไม่ถูกต้อง");
+      }
+    }
   };
 
   const handleProceedToCheckout = (e) => {
     e.preventDefault();
     setIsCheckoutButtonActive(true); // เปลี่ยนสีเมื่อคลิก
     setTimeout(() => setIsCheckoutButtonActive(false), 200); // คืนค่าเดิมหลังจาก 200ms
-    console.log('Proceed to checkout clicked');
+    setIsCheckoutPopupOpen(true); // เปิด popup
   };
 
   useEffect(() => {
@@ -197,6 +231,45 @@ const Cart = () => {
     }
   }, [userInfo]);
 
+  useEffect(() => {
+    if (userInfo) {
+      const fetchUserAddressAndCoupons = async () => {
+        try {
+          const token = Cookies.get("authToken");
+          if (!token) {
+            console.error("No authToken found");
+            return;
+          }
+          // เรียก API เพื่อดึงข้อมูลที่อยู่ของผู้ใช้
+          const addressResponse = await axios.get(`http://localhost:1337/api/users/${userInfo.id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          setUserAddress(addressResponse.data.address); // สมมติว่า address อยู่ใน response.data.address
+
+          // เรียก API เพื่อดึงข้อมูลคูปองของผู้ใช้
+          const couponsResponse = await axios.get(`http://localhost:1337/api/coupons?userId=${userInfo.id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          // ตรวจสอบว่าข้อมูลที่ได้รับเป็น array หรือไม่
+          if (Array.isArray(couponsResponse.data.data)) {
+            setCoupons(couponsResponse.data.data); // เข้าถึง data ของคูปอง
+          } else {
+            console.error("Coupons data is not an array:", couponsResponse.data);
+            setCoupons([]); // ตั้งค่าเป็น array ว่างถ้าข้อมูลไม่ถูกต้อง
+          }
+        } catch (error) {
+          console.error("Error fetching user address or coupons:", error);
+        }
+      };
+
+      fetchUserAddressAndCoupons();
+    }
+  }, [userInfo]);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Logo */}
@@ -239,57 +312,13 @@ const Cart = () => {
                   {cartItems.length > 0 ? (
                     <div className="divide-y h-full">
                       {cartItems.map((item) => (
-                        <div key={item.id} className="bg-gray-100 p-10 rounded-lg mb-4">
-                          <div className="flex items-center py-6 w-full gap-6">
-                            {/* Checkbox */}
-                            <Checkbox
-                              checked={item.selected}
-                              onChange={() => toggleItemSelection(item.id)}
-                            />
-
-                            {/* Product Image */}
-                            <div className="w-24 h-24 flex-shrink-0">
-                              <img
-                                src={`http://localhost:1337${
-                                  item.img?.formats?.small?.url ||
-                                  item.img?.url ||
-                                  "/placeholder.jpg"}`}
-                                alt={item.name || "Product Image"}
-                                className="w-full h-full object-cover rounded"
-                              />
-                            </div>
-
-                            {/* Product Info */}
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-medium text-lg truncate">{item.name || "Unknown Product"}</h3>
-                              <p className="text-sm text-gray-500 mt-2">${(item.price * item.quantity || 0).toFixed(2)}</p>
-                            </div>
-
-                            {/* Quantity Controls */}
-                            <div className="flex items-center gap-4">
-                              <div className="flex items-center border rounded">
-                                <button
-                                  className="w-8 h-8 flex items-center justify-center hover:bg-gray-50 text-lg"
-                                  onClick={() => updateQuantity(item.id, -1)}
-                                >
-                                  -
-                                </button>
-                                <span className="w-12 text-center text-lg">{item.quantity}</span>
-                                <button
-                                  className="w-8 h-8 flex items-center justify-center hover:bg-gray-50 text-lg"
-                                  onClick={() => updateQuantity(item.id, 1)}
-                                >
-                                  +
-                                </button>
-                              </div>
-                              <Trash2
-                                size={20}
-                                className="text-gray-400 cursor-pointer hover:text-gray-600"
-                                onClick={() => removeItem(item.item_cart_id)}
-                              />
-                            </div>
-                          </div>
-                        </div>
+                        <CartItem 
+                          key={item.id} 
+                          item={item} 
+                          updateQuantity={updateQuantity} 
+                          removeItem={removeItem} 
+                          toggleItemSelection={toggleItemSelection} 
+                        />
                       ))}
                     </div>
                   ) : (
@@ -306,68 +335,31 @@ const Cart = () => {
           </div>
 
           {/* Order Summary */}
-          <div className="lg:w-[300px]" style={{ transform: 'translateX(-11rem)' }}>
-            <Card className="bg-gray-50 sticky top-4">
-              <CardContent className="p-8">
-                <div className="bg-gray-100 p-6 rounded-lg space-y-8">
-                  <div className="flex items-center gap-4">
-                    <span className="text-gray-600 text-lg">Location</span>
-                    <span className="text-lg">.....</span>
-                  </div>
-
-                  <div>
-                    <h2 className="font-medium text-xl mb-6">Order Summary</h2>
-                    <div className="space-y-4">
-                      <div className="flex justify-between text-lg">
-                        <span className="text-gray-600">Subtotal({cartItems.length} items)</span>
-                        <span>${subtotal.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between text-lg">
-                        <span className="text-gray-600">Shipping Fee</span>
-                        <span>${shippingFee.toFixed(2)}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3">
-                    <Input
-                      placeholder="  Enter Voucher Code"
-                      className="flex-1 bg-white border border-gray-200 py-3 text-lg"
-                    />
-                    <button
-                      type="button"
-                      onClick={(e) => handleApplyVoucher(e)}
-                      style={{
-                        backgroundColor: isApplyButtonActive ? '#8B4513' : '#DAA520', // เปลี่ยนสีเมื่อคลิก
-                        opacity: '0.45',
-                      }}
-                      className="text-white px-8 py-3 rounded-lg font-medium text-lg shadow-lg transition-colors duration-200 cursor-pointer"
-                    >
-                      APPLY
-                    </button>
-                  </div>
-
-                  <div className="flex justify-between font-medium text-xl">
-                    <span>Total</span>
-                    <span>${total.toFixed(2)}</span>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={(e) => handleProceedToCheckout(e)}
-                    style={{
-                      backgroundColor: isCheckoutButtonActive ? '#800000' : '#AF2C02', // เปลี่ยนสีเมื่อคลิก
-                    }}
-                    className="w-full text-white py-4 rounded-lg font-medium text-lg shadow-lg transition-colors duration-200 cursor-pointer"
-                  >
-                    PROCEED TO CHECKOUT ({cartItems.filter(item => item.selected).length})
-                  </button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <OrderSummary 
+            userAddress={userAddress}
+            subtotal={subtotal}
+            shippingFee={shippingFee}
+            discountAmount={discountAmount}
+            calculateTotal={calculateTotal}
+            coupons={coupons}
+            selectedCoupon={selectedCoupon}
+            setSelectedCoupon={setSelectedCoupon}
+            handleApplyVoucher={handleApplyVoucher}
+            isApplyButtonActive={isApplyButtonActive}
+            handleProceedToCheckout={handleProceedToCheckout}
+            isCheckoutButtonActive={isCheckoutButtonActive}
+          />
         </div>
       </div>
+      {isCheckoutPopupOpen && (
+        <CheckoutPopup
+          items={cartItems.filter(item => item.selected)}
+          total={calculateTotal()}
+          discountAmount={discountAmount}
+          onClose={() => setIsCheckoutPopupOpen(false)}
+          cartItems={cartItems}
+        />
+      )}
     </div>
   )
 }

@@ -18,9 +18,6 @@
       "target": "plugin::users-permissions.user",
       "inversedBy": "order"
     },
-    "total": {
-      "type": "integer"
-    },
     "step": {
       "type": "enumeration",
       "enum": [

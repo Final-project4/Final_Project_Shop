@@ -1,20 +1,27 @@
-// import type { Core } from '@strapi/strapi';
+export default async ({ strapi }: { strapi: any }) => {
+  console.log("🚀 Strapi is booting up...");
 
-export default {
-  /**
-   * An asynchronous register function that runs before
-   * your application is initialized.
-   *
-   * This gives you an opportunity to extend code.
-   */
-  register(/* { strapi }: { strapi: Core.Strapi } */) {},
+  strapi.db.lifecycles.subscribe({
+    models: ["plugin::users-permissions.user"], // ฟัง event การสร้าง User
 
-  /**
-   * An asynchronous bootstrap function that runs before
-   * your application gets started.
-   *
-   * This gives you an opportunity to set up your data model,
-   * run jobs, or perform some special logic.
-   */
-  bootstrap(/* { strapi }: { strapi: Core.Strapi } */) {},
+    async afterCreate(event: any) {
+      console.log("🔥 Lifecycle Hook Triggered: afterCreate User");
+
+      const { result } = event;
+      console.log("👀 New user created:", result);
+
+      try {
+        const newCart = await strapi.db.query("api::cart.cart").create({
+          data: {
+            user: result.id, // เชื่อม Cart กับ User
+            cart_items: [], // ค่าเริ่มต้นของ cart_items
+          },
+        });
+
+        console.log("✅ Cart created successfully:", newCart);
+      } catch (error) {
+        console.error("❌ Error creating cart:", error);
+      }
+    },
+  });
 };

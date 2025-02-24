@@ -72,13 +72,19 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::cart.cart",
-      "mappedBy": "user"
+      "inversedBy": "user"
     },
     "order": {
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::order.order",
       "mappedBy": "user"
+    },
+    "coupons": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::coupon.coupon",
+      "mappedBy": "user_restrictions"
     }
   }
 }
