@@ -18,26 +18,35 @@ const ItemList = () => {
   }, []);
 
   return (
-    <div className="grid grid-cols-3 gap-4 p-4">
+    <div className="grid grid-cols-3 gap-6 p-6">
       {items.length > 0 ? (
         items.map((item) => {
           const imageUrl = item.img && item.img.length > 0 
             ? `${BASE_URL}${item.img[0].url}` 
-            : "/default-image.jpg"; // ถ้าไม่มีรูปใช้ default image
+            : "/default-image.jpg"; 
 
           return (
-            <div key={item.id} className="card">
+            <div key={item.id} className="bg-white shadow-md rounded-lg p-4 flex flex-col items-center">
               {/* แสดงรูปสินค้า */}
-              <img src={imageUrl} alt={item.name || "No Name"} />
+              <img src={imageUrl} alt={item.name || "No Name"} className="w-full h-48 object-cover rounded-md" />
               {/* ชื่อสินค้า */}
-              <h3>{item.name || "No Name"}</h3>
+              <h3 className="text-lg font-semibold mt-3">{item.name || "No Name"}</h3>
               {/* ราคา */}
-              <p>ราคา: {item.price ? `${item.price} Baht` : "N/A Baht"}</p>
+              <p className="text-gray-600 mt-1">ราคา: {item.price ? `${item.price} Baht` : "N/A Baht"}</p>
+              {/* ปุ่ม Edit */}
+              <button 
+                onClick={() => navigate(`/admin/edit/${item.id}`)}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+              >
+              
+                Edit
+              </button>
+
             </div>
           );
         })
       ) : (
-        <p>กำลังโหลดข้อมูล...</p>
+        <p className="text-center col-span-3">กำลังโหลดข้อมูล...</p>
       )}
     </div>
   );
