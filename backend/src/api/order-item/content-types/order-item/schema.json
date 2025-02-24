@@ -21,17 +21,14 @@
     "price": {
       "type": "integer"
     },
-    "slip": {
-      "type": "media",
-      "multiple": false,
-      "required": true,
-      "allowedTypes": [
-        "images"
-      ]
-    },
     "item": {
-      "type": "json",
-      "required": false
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::item.item",
+      "inversedBy": "order_items"
+    },
+    "quantity": {
+      "type": "integer"
     }
   }
 }
