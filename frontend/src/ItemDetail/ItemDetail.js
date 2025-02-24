@@ -1,59 +1,95 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { FaArrowLeft, FaStar, FaShoppingCart } from "react-icons/fa";
-import Img1 from "../Picture/s1.png";
-import Img2 from "../Picture/s2.png";
-import Img3 from "../Picture/c1.png";
-import Img4 from "../Picture/d2.png";
-import Img5 from "../Picture/e2.png";
-import Img6 from "../Picture/f2.png";
-import Img7 from "../Picture/a2.png";
-import Img8 from "../Picture/g2.png";
-
-const ProductsData = [
-    { id: 1, img: Img1, title: "เสื้อสีขาว", rating: 5.0, price: "฿250", category: "ชุดเดรส" },
-    { id: 2, img: Img2, title: "เสื้อสีดำ", rating: 5.0, price: "฿300", category: "ชุดเดรส" },
-    { id: 3, img: Img3, title: "เสื้อสีเทา", rating: 4.8, price: "฿280", category: "หมวก" },
-    { id: 4, img: Img4, title: "เสื้อสีน้ำเงิน", rating: 4.9, price: "฿320", category: "ชุดเดรส" },
-    { id: 5, img: Img5, title: "เสื้อสีขาว", rating: 5.0, price: "฿250", category: "รองเท้า" },
-    { id: 6, img: Img6, title: "เสื้อสีดำ", rating: 5.0, price: "฿300", category: "แว่นตา" },
-    { id: 7, img: Img7, title: "เสื้อสีเทา", rating: 4.8, price: "฿280", category: "นาฬิกา" },
-    { id: 8, img: Img8, title: "เสื้อสีน้ำเงิน", rating: 4.9, price: "฿320", category: "คอสเพลย์" },
-  ];
+import { FaArrowLeft, FaShoppingCart } from "react-icons/fa";
+import axios from "axios";
 
 const ItemDetail = () => {
   const { id } = useParams();
-  const product = ProductsData.find((item) => item.id === parseInt(id));
+  const [item, setProduct] = useState(null);
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
+  console.log(id);
 
-  if (!product) {
+  useEffect(() => {
+    axios
+      .get(`http://localhost:1337/api/items?filters[id][$eq]=${id}&populate=*`)
+      .then((response) => {
+        console.log("API Response:", response.data); // ตรวจสอบข้อมูลที่ได้รับจาก API
+        setProduct(response.data.data[0]); // ตรวจสอบว่า response.data.data[0] มีค่าหรือไม่
+      })
+      .catch((error) => {
+        console.error("Error fetching product:", error);
+      });
+  }, [id]);
+
+  if (!item) {
     return <div className="text-center text-red-500 text-2xl mt-10">สินค้าไม่พบ!</div>;
   }
+
+  // ตรวจสอบว่า img มีค่าหรือไม่
+  const imageUrl = item?.attributes?.img?.formats?.small?.url
+    ? `http://localhost:1337${item.attributes.img.formats.small.url}`
+    : item?.attributes?.img?.url
+      ? `http://localhost:1337${item.attributes.img.url}`
+      : "/placeholder.jpg"; // ถ้าไม่มีรูปให้ใช้ placeholder
+
+  const sizes = ["S", "M", "L", "XL", "2XL"];
+  const colors = ["ดำ", "ขาว", "แดง", "น้ำเงิน"];
 
   return (
     <div className="min-h-screen bg-gray-200 text-gray-900 py-12 px-6">
       <div className="max-w-4xl mx-auto bg-white text-gray-900 rounded-lg shadow-xl p-6">
-        {/* Back button */}
         <Link to="/products" className="flex items-center text-blue-600 hover:text-blue-800 mb-4">
           <FaArrowLeft className="mr-2" /> ย้อนกลับ
         </Link>
 
-        {/* Product Detail Section */}
         <div className="flex flex-col md:flex-row gap-6">
-          {/* Image */}
           <div className="flex-1">
-            <img src={product.img} alt={product.title} className="w-full h-[300px] object-cover rounded-md shadow-md" />
+            <img
+              src={`http://localhost:1337${item.img?.formats?.small?.url || item.img?.url || "/placeholder.jpg"
+                }`}
+              alt={item.name}
+              className="w-full aspect-square object-cover rounded-lg mb-4"
+            />
+
           </div>
 
-          {/* Details */}
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-gray-800">{product.title}</h1>
-            <p className="text-yellow-500 flex items-center mt-2">
-              <FaStar className="mr-1" /> {product.rating} / 5.0
-            </p>
-            <p className="text-gray-600 text-lg mt-2">สี: {product.color}</p>
-            <p className="text-blue-600 text-2xl font-bold mt-4">{product.price} บาท</p>
+            <h1 className="text-3xl font-bold text-gray-800">{item.name}</h1>
+            <p className="text-blue-600 text-2xl font-bold mt-4">{item.price} บาท</p>
 
-            {/* Buy Button */}
+            <div className="mt-4">
+              <h2 className="text-lg font-medium text-gray-700">ขนาด (Size)</h2>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {sizes.map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    className={`px-4 py-2 border rounded-lg ${selectedSize === size ? "bg-blue-500 text-white" : "bg-white text-gray-700"
+                      } hover:bg-blue-500 hover:text-white transition duration-300`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <h2 className="text-lg font-medium text-gray-700">สี (Color)</h2>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {colors.map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => setSelectedColor(color)}
+                    className={`px-4 py-2 border rounded-lg ${selectedColor === color ? "bg-blue-500 text-white" : "bg-white text-gray-700"
+                      } hover:bg-blue-500 hover:text-white transition duration-300`}
+                  >
+                    {color}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <button className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center shadow-md hover:shadow-lg transition duration-300 ease-in-out">
               <FaShoppingCart className="mr-2" /> เพิ่มลงตะกร้า
             </button>

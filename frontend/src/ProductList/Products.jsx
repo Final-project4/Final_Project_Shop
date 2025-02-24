@@ -1,84 +1,195 @@
-import React, { useState } from "react";
-import Img1 from "../Picture/s1.png";
-import Img2 from "../Picture/s2.png";
-import Img3 from "../Picture/c1.png";
-import Img4 from "../Picture/d2.png";
-import Img5 from "../Picture/e2.png";
-import Img6 from "../Picture/f2.png";
-import Img7 from "../Picture/a2.png";
-import Img8 from "../Picture/g2.png";
-import { FaStar } from "react-icons/fa6";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-
-const ProductsData = [
-  { id: 1, img: Img1, title: "เสื้อสีขาว", rating: 5.0, price: "฿250", category: "ชุดเดรส" },
-  { id: 2, img: Img2, title: "เสื้อสีดำ", rating: 5.0, price: "฿300", category: "ชุดเดรส" },
-  { id: 3, img: Img3, title: "เสื้อสีเทา", rating: 4.8, price: "฿280", category: "หมวก" },
-  { id: 4, img: Img4, title: "เสื้อสีน้ำเงิน", rating: 4.9, price: "฿320", category: "ชุดเดรส" },
-  { id: 5, img: Img5, title: "เสื้อสีขาว", rating: 5.0, price: "฿250", category: "รองเท้า" },
-  { id: 6, img: Img6, title: "เสื้อสีดำ", rating: 5.0, price: "฿300", category: "แว่นตา" },
-  { id: 7, img: Img7, title: "เสื้อสีเทา", rating: 4.8, price: "฿280", category: "นาฬิกา" },
-  { id: 8, img: Img8, title: "เสื้อสีน้ำเงิน", rating: 4.9, price: "฿320", category: "คอสเพลย์" },
-];
-
-const categories = ["นาฬิกา", "หมวก", "ชุดเดรส", "รองเท้า", "แว่นตา", "คอสเพลย์"];
+import axios from "axios";
+import { FaSpinner } from "react-icons/fa";
 
 const Products = () => {
-  const [selectedCategory, setSelectedCategory] = useState("ชุดเดรส");
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [maxPrice, setMaxPrice] = useState(500);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [sortOrder, setSortOrder] = useState("asc");
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:1337/api/categories")
+      .then((response) => {
+        setCategories(response.data.data || []);
+      })
+      .catch((error) => {
+        console.error("Error fetching categories:", error);
+        setError("Error fetching categories");
+      });
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:1337/api/items?populate=*")
+      .then((response) => {
+        setProducts(response.data.data || []);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching products:", error);
+        setError("Error fetching products");
+        setLoading(false);
+      });
+  }, []);
+
+  const toggleCategory = (category) => {
+    setSelectedCategories((prev) => {
+      const newCategories = prev.includes(category)
+        ? prev.filter((c) => c !== category)
+        : [...prev, category];
+      return newCategories;
+    });
+  };
+
+  const filterByCategory = (categories) => {
+    if (categories.length > 0) {
+      return products.filter((item) => {
+        return item.categories && item.categories.some(cat => categories.includes(cat.name));
+      });
+    }
+    return products;
+  };
+
+  const filteredProducts = filterByCategory(selectedCategories).filter(
+    (item) =>
+      item.price <= maxPrice &&
+      (!searchQuery || (item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase())))
+  );
+
+  const sortedProducts = filteredProducts.sort((a, b) => {
+    if (sortOrder === "asc") {
+      return a.price - b.price;
+    } else {
+      return b.price - a.price;
+    }
+  });
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = sortedProducts.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <FaSpinner className="animate-spin text-blue-500 text-4xl" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="text-center text-red-500 text-2xl mt-10">{error}</div>;
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-6">
-      {/* OUR PRODUCT */}
-      <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 py-16 px-8">
-  {/* OUR PRODUCT */}
-  <div className="text-center mb-10">
-    <h1 className="text-5xl font-extrabold text-gray-800 tracking-wide uppercase relative inline-block">
-      SHOPPING
-      <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-orange-500 rounded-full"></span>
-    </h1>
-    <p className="text-xl text-gray-700 mt-4 italic">
-      ✨ เลือกสินค้าตามหมวดหมู่ที่คุณชื่นชอบ ✨
-    </p>
-    <div className="mt-6 flex justify-center">
-      <div className="w-16 h-1 bg-orange-400 rounded-full mx-1"></div>
-      <div className="w-10 h-1 bg-orange-300 rounded-full mx-1"></div>
-      <div className="w-6 h-1 bg-orange-200 rounded-full mx-1"></div>
-    </div>
-  </div>
-</div>
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
+      <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* Sidebar */}
+        <div className="bg-white shadow-xl p-6 rounded-lg">
+          <h2 className="text-xl font-semibold mb-4">หมวดหมู่</h2>
+          <ul>
+            {categories.map((category) => (
+              <li
+                key={category.id}
+                className={`cursor-pointer p-2 rounded-lg transition-all duration-300 ${
+                  selectedCategories.includes(category.name)
+                    ? "bg-blue-500 text-white"
+                    : "hover:bg-gray-200"
+                }`}
+                onClick={() => toggleCategory(category.name)}
+              >
+                {category.name}
+              </li>
+            ))}
+          </ul>
 
-      {/* Tab Navigation */}
-      <div className="flex justify-center gap-4 mb-6 bg-gray-200 p-3 rounded-lg shadow-md">
-        {categories.map((category) => (
-          <button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
-            className={`px-4 py-2 rounded-lg font-medium transition-all 
-              ${selectedCategory === category ? "bg-orange-500 text-white shadow-md" : "bg-white text-gray-700 hover:bg-gray-300"}`}
-          >
-            {category}
-          </button>
-        ))}
-      </div>
+          <h2 className="text-xl font-semibold mt-6">กำหนดราคา</h2>
+          <input
+            type="range"
+            min="100"
+            max="10000"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(Number(e.target.value))}
+            className="w-full mt-2"
+          />
+          <p className="text-center mt-2">ราคาสูงสุด: {maxPrice} บาท</p>
 
-      {/* Products Display */}
-      <div className="container mx-auto">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          {ProductsData.filter((item) => item.category === selectedCategory).map((item) => (
-            <div key={item.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:scale-105 transition-transform">
-              <img src={item.img} alt={item.title} className="h-[180px] w-full object-cover" />
-              <div className="p-4">
-                <h2 className="text-gray-800 font-semibold text-lg">{item.title}</h2>
-                <p className="flex items-center text-yellow-500 text-sm mt-1">
-                  <FaStar className="mr-1" /> {item.rating}
-                </p>
-                <p className="text-red-500 font-bold mt-2">{item.price}</p>
-                <Link to={`/product/${item.id}`}>
-                  <button className="mt-3 w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg">ดูรายละเอียด</button>
-                </Link>
+          <h2 className="text-xl font-semibold mt-6">จัดเรียงตาม</h2>
+          <div className="flex items-center space-x-4 mt-2">
+            <select
+              id="sortOrder"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+            >
+              <option value="asc">ราคาต่ำสุด</option>
+              <option value="desc">ราคาสูงสุด</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="col-span-3">
+          <div className="w-full mb-6 flex justify-center">
+            <input
+              type="text"
+              placeholder="ค้นหาสินค้า..."
+              className="w-2/3 md:w-1/2 lg:w-1/3 px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            {currentItems.map((item) => (
+              <div key={item.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:scale-105 transition-transform">
+                <div className="p-4 text-center">
+                  <img
+                    src={`http://localhost:1337${item.img?.formats?.small?.url || item.img?.url || "/placeholder.jpg"}`}
+                    alt={item.name}
+                    className="w-full h-48 object-cover rounded-lg mb-4"
+                  />
+                  <h2 className="text-gray-800 font-semibold text-lg">{item.name}</h2>
+                  <p className="text-red-500 font-bold mt-2">{item.price} บาท</p>
+                  <Link to={`/product/${item.id}`}>
+                    <button className="mt-3 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg">
+                      ดูรายละเอียด
+                    </button>
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          {/* Pagination */}
+          <div className="flex justify-center mt-6">
+            <nav>
+              <ul className="flex list-none">
+                {Array.from({ length: Math.ceil(sortedProducts.length / itemsPerPage) }, (_, i) => (
+                  <li key={i} className="mx-1">
+                    <button
+                      onClick={() => paginate(i + 1)}
+                      className={`px-4 py-2 rounded-lg ${
+                        currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-white text-blue-500"
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
         </div>
       </div>
     </div>
