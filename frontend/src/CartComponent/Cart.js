@@ -137,13 +137,20 @@ const Cart = () => {
     try {
       const token = Cookies.get("authToken");
       
+      // Log the user ID and token for debugging
+      console.log("User ID:", userInfo.id);
+      console.log("Authorization Token:", token);
+
       // 1️⃣ ดึง order ของ user ที่ login อยู่
-      const orderResponse = await axios.get(`http://localhost:1337/api/orders?filters[user][id][$eq]=${userInfo.id}`, {
+      const orderResponse = await axios.get(`http://localhost:1337/api/orders?user=${userInfo.id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
+      // Log the response for debugging
+      console.log("Order Response:", orderResponse.data);
+
       if (orderResponse.data.data.length === 0) {
-        console.error("ไม่พบ Order ของ User ที่ login อยู่");
+        console.error("No orders found for the user.");
         alert("ไม่พบคำสั่งซื้อของคุณ กรุณาลองใหม่อีกครั้ง");
         return;
       }
@@ -211,8 +218,8 @@ const Cart = () => {
       setIsCheckoutPopupOpen(false);
       setCartItems([]);
     } catch (error) {
-      console.error("Error processing checkout:", error.response?.data || error);
-      alert("เกิดข้อผิดพลาดในการสั่งซื้อ กรุณาลองใหม่อีกครั้ง");
+      console.error("Error fetching orders:", error.response?.data || error);
+      alert("เกิดข้อผิดพลาดในการดึงคำสั่งซื้อ กรุณาลองใหม่อีกครั้ง");
     }
   };
   
