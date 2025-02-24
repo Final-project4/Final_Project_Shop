@@ -12,8 +12,41 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "name": {
-      "type": "string"
+    "code": {
+      "type": "string",
+      "unique": true
+    },
+    "discount_type": {
+      "type": "enumeration",
+      "enum": [
+        "Percentage",
+        "fixed_amount",
+        "free_shiping"
+      ]
+    },
+    "discount_value": {
+      "type": "integer"
+    },
+    "minimum_order": {
+      "type": "integer"
+    },
+    "max_discount": {
+      "type": "integer"
+    },
+    "valid_from": {
+      "type": "datetime"
+    },
+    "valid_until": {
+      "type": "datetime"
+    },
+    "is_active": {
+      "type": "boolean"
+    },
+    "user_restrictions": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "coupons"
     }
   }
 }
