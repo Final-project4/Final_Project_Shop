@@ -1,10 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
-
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [userInfo, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const fetchUser = async () => {
@@ -20,7 +19,7 @@ export const AuthProvider = ({ children }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-
+      console.log(response)
       if (!response.ok) {
         throw new Error("Failed to fetch user data");
       }
@@ -29,6 +28,7 @@ export const AuthProvider = ({ children }) => {
       setUser(userData);
     } catch (error) {
       console.error("Error fetching user:", error);
+      setUser(null); // Reset user state to null on error
       Cookies.remove("authToken");
     } finally {
       setLoading(false);
@@ -39,10 +39,10 @@ export const AuthProvider = ({ children }) => {
     fetchUser();
   }, []);
 
-  const login = (token) => {
+  const login = async (token) => {
     Cookies.set("authToken", token, { expires: 7, secure: true });
     setLoading(true);
-    fetchUser(); // ✅ สามารถเรียกใช้ fetchUser() ได้
+    await fetchUser(); 
   };
 
   const logout = () => {
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAdmin: user?.role?.name === "Administrator", loading }}>
+    <AuthContext.Provider value={{ userInfo, login, logout, isAdmin: userInfo?.role?.name === "Admin", loading }}>
       {children}
     </AuthContext.Provider>
   );
