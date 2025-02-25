@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import InputField from "./InputField";
 import SocialLogin from "./SocialLogin";
 import Cookies from "js-cookie";
@@ -8,6 +9,7 @@ const LoginForm = () => {
   const [password, setPassword] = useState("");
   const [color, setColor] = useState("#ffffff");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,10 +33,10 @@ const LoginForm = () => {
 
       console.log("Logged in successfully:", data);
 
-      // เก็บเฉพาะ jwt ใน Cookies
       Cookies.set("authToken", data.jwt, { expires: 7, secure: true });
-
       alert("Login successful!");
+      // Redirect to homepage
+      navigate("/");
     } catch (error) {
       setError(error.message);
     }

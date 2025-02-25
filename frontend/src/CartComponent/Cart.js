@@ -21,7 +21,7 @@ const Cart = () => {
   const [coupons, setCoupons] = useState([]);
   const [selectedCoupon, setSelectedCoupon] = useState("");
   const [discountAmount, setDiscountAmount] = useState(0);
-
+  console.log(userInfo  )
   const subtotal = cartItems
     .filter((item) => item.selected)
     .reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -389,49 +389,13 @@ const Cart = () => {
 
   useEffect(() => {
     if (userInfo) {
-      const fetchUserAddressAndCoupons = async () => {
-        try {
-          const token = Cookies.get("authToken");
-          if (!token) {
-            console.error("No authToken found");
-            return;
-          }
-          // เรียก API เพื่อดึงข้อมูลที่อยู่ของผู้ใช้
-          const addressResponse = await axios.get(
-            `http://localhost:1337/api/users/${userInfo.id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          setUserAddress(addressResponse.data.address); // สมมติว่า address อยู่ใน response.data.address
-
-          // เรียก API เพื่อดึงข้อมูลคูปองของผู้ใช้
-          const couponsResponse = await axios.get(
-            `http://localhost:1337/api/coupons?userId=${userInfo.id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          // ตรวจสอบว่าข้อมูลที่ได้รับเป็น array หรือไม่
-          if (Array.isArray(couponsResponse.data.data)) {
-            setCoupons(couponsResponse.data.data); // เข้าถึง data ของคูปอง
-          } else {
-            console.error(
-              "Coupons data is not an array:",
-              couponsResponse.data
-            );
-            setCoupons([]); // ตั้งค่าเป็น array ว่างถ้าข้อมูลไม่ถูกต้อง
-          }
-        } catch (error) {
-          console.error("Error fetching user address or coupons:", error);
-        }
-      };
-
-      fetchUserAddressAndCoupons();
+      setUserAddress(userInfo.address);
+      if (Array.isArray(userInfo.coupons)) {
+        setCoupons(userInfo.coupons);
+      } else {
+        console.error("Coupons data is not an array:", userInfo.coupons);
+        setCoupons([]);
+      }
     }
   }, [userInfo]);
 
