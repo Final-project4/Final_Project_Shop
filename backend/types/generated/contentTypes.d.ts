@@ -604,7 +604,7 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
       'api::order-item.order-item'
     >;
     publishedAt: Schema.Attribute.DateTime;
-    slip: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    slip: Schema.Attribute.Media<'images' | 'files', true>;
     step: Schema.Attribute.Enumeration<
       ['pendding', 'paid', 'completed', 'cancelled']
     >;
