@@ -11,21 +11,43 @@ import ItemDetail from "./ItemDetail/ItemDetail.js";
 import SignUpPage from "./LoginComponent/SignUpPage.js";
 import AccountPage from "./LoginComponent/AccountPage.js";
 import OrderStatus from "./StatusPage/Status.js";
+import ProtectedRoute from "./ProtectedRoute";
 
 const AppRoutes = () => (
-<Routes>
-  <Route path="/" element={<HomePage />} />
-  <Route path="/products" element={<Products />} />
-  <Route path="/adminpage" element={<AdminPage />} />
-  <Route path="/addcoupon" element={<AddCoupons />} />
-  <Route path="/order" element={<OrderList />} />
-  <Route path="/cart" element={<CartPage />} />
-  <Route path="/login" element={<LoginScreen />} />
-  <Route path="/product/:id" element={<ItemDetail />} />
-  <Route path="/signup" element={<SignUpPage />} />
-  <Route path="/account" element={<AccountPage />} />
-  <Route path="/status" element={<OrderStatus />} />
-</Routes>
+  <Routes>
+    <Route path="/" element={<HomePage />} />
+    <Route path="/products" element={<Products />} />
+    <Route path="/cart" element={<CartPage />} />
+    <Route path="/login" element={<LoginScreen />} />
+    <Route path="/signup" element={<SignUpPage />} />
+    <Route path="/account" element={<AccountPage />} />
+    <Route path="/status" element={<OrderStatus />} />
+    <Route path="/product/:id" element={<ItemDetail />} />
+    <Route
+      path="/adminpage"
+      element={
+        <ProtectedRoute adminOnly>
+          <AdminPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/addcoupon"
+      element={
+        <ProtectedRoute adminOnly>
+          <AddCoupons />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/order"
+      element={
+        <ProtectedRoute adminOnly>
+          <OrderList />
+        </ProtectedRoute>
+      }
+    />
+  </Routes>
 );
 
 export default AppRoutes;

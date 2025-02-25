@@ -4,41 +4,31 @@ import axios from "axios"
 import { Card, CardContent } from "../components/ui/card"
 import Checkbox from "../components/ui/checkbox"
 import Cookies from 'js-cookie';
-import { jwtDecode } from 'jwt-decode';
 import CheckoutPopup from './CheckoutPopup';
 import CartItem from './CartItem';
 import OrderSummary from './OrderSummary';
+import { AuthContext } from "../context/AuthContext"
+
 
 const Cart = () => {
-  const [userInfo, setUserInfo] = useState(() => {
-    const token = Cookies.get("authToken");
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        return decoded;
-      } catch (error) {
-        console.error("Error decoding token:", error);
-        return null;
-      }
-    }
-    return null;
-  });
+  const { userInfo } = useContext(AuthContext);
   const [cartItems, setCartItems] = useState([])
   const [isApplyButtonActive, setIsApplyButtonActive] = useState(false);
   const [isCheckoutButtonActive, setIsCheckoutButtonActive] = useState(false);
   const [isCheckoutPopupOpen, setIsCheckoutPopupOpen] = useState(false);
   const [selectAll, setSelectAll] = useState(false)
-
   const [userAddress, setUserAddress] = useState("");
   const [coupons, setCoupons] = useState([]);
   const [selectedCoupon, setSelectedCoupon] = useState("");
   const [discountAmount, setDiscountAmount] = useState(0);
+
 
   const subtotal = cartItems
     .filter(item => item.selected)
     .reduce((sum, item) => sum + item.price * item.quantity, 0)
   const shippingFee = subtotal > 50 ? 0 : 4.99
   const total = subtotal + shippingFee
+
 
   const calculateTotal = () => {
     const subtotal = cartItems

@@ -7,10 +7,10 @@ import { AuthProvider } from "./context/AuthContext";
 function App() {
   return (
     <AuthProvider>
-    <Router>
-      <Header />
-      <AppRoutes /> 
-    </Router>
+      <Router>
+        <Header />
+        <AppRoutes />
+      </Router>
     </AuthProvider>
   );
 }

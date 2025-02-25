@@ -23,7 +23,7 @@ const Products = () => {
       })
       .catch((error) => {
         console.error("Error fetching categories:", error);
-        setError("Error fetching categories");
+        setError("Error fetching categories");    
       });
   }, []);
 
