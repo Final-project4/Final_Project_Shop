@@ -12,9 +12,12 @@ import SignUpPage from "./LoginComponent/SignUpPage.js";
 import AccountPage from "./LoginComponent/AccountPage.js";
 import OrderStatus from "./StatusPage/Status.js";
 import ProtectedRoute from "./ProtectedRoute";
+import AdminItemList from "./AdminPages/AdminItemList.js";
+import AdminEditItem from "./AdminPages/AdminEditItem.js";
 
 const AppRoutes = () => (
   <Routes>
+    {/* Public Routes */}
     <Route path="/" element={<HomePage />} />
     <Route path="/products" element={<Products />} />
     <Route path="/cart" element={<CartPage />} />
@@ -23,6 +26,8 @@ const AppRoutes = () => (
     <Route path="/account" element={<AccountPage />} />
     <Route path="/status" element={<OrderStatus />} />
     <Route path="/product/:id" element={<ItemDetail />} />
+
+    {/* Admin Routes */}
     <Route
       path="/adminpage"
       element={
@@ -44,6 +49,22 @@ const AppRoutes = () => (
       element={
         <ProtectedRoute adminOnly>
           <OrderList />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/admin/items"
+      element={
+        <ProtectedRoute adminOnly>
+          <AdminItemList />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/admin/items/edit/:documentId"
+      element={
+        <ProtectedRoute adminOnly>
+          <AdminEditItem />
         </ProtectedRoute>
       }
     />
