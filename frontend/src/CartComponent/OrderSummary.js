@@ -1,10 +1,23 @@
-import React from 'react';
+import React from "react";
 import { Card, CardContent } from "../components/ui/card";
 
-const OrderSummary = ({ userAddress, subtotal, shippingFee, discountAmount, calculateTotal, coupons, selectedCoupon, setSelectedCoupon, handleApplyVoucher, isApplyButtonActive, handleProceedToCheckout, isCheckoutButtonActive }) => {
+const OrderSummary = ({
+  userAddress,
+  subtotal,
+  shippingFee,
+  discountAmount,
+  calculateTotal,
+  coupons,
+  selectedCoupon,
+  setSelectedCoupon,
+  handleApplyVoucher,
+  isApplyButtonActive,
+  handleProceedToCheckout,
+  isCheckoutButtonActive,
+}) => {
   return (
-    <div className="lg:w-[300px]" style={{ transform: 'translateX(-11rem)' }}>
-      <Card className="bg-gray-50 sticky top-4">
+    <div className="lg:w-[40%] " >
+      <Card className="bg-gray-50 top-4">
         <CardContent className="p-8">
           <div className="bg-gray-100 p-6 rounded-lg space-y-8">
             <div className="flex items-center gap-4">
@@ -35,16 +48,19 @@ const OrderSummary = ({ userAddress, subtotal, shippingFee, discountAmount, calc
                 className="flex-1 bg-white border border-gray-200 py-3 text-lg"
               >
                 <option value="">เลือกคูปอง</option>
-                {Array.isArray(coupons) && coupons.map(coupon => (
-                  <option key={coupon.id} value={coupon.code}>{coupon.code}</option>
-                ))}
+                {Array.isArray(coupons) &&
+                  coupons.map((coupon) => (
+                    <option key={coupon.id} value={coupon.code}>
+                      {coupon.code}
+                    </option>
+                  ))}
               </select>
               <button
                 type="button"
                 onClick={(e) => handleApplyVoucher(e)}
                 style={{
-                  backgroundColor: isApplyButtonActive ? '#8B4513' : '#DAA520',
-                  opacity: '0.45',
+                  backgroundColor: isApplyButtonActive ? "#8B4513" : "#DAA520",
+                  opacity: "0.45",
                 }}
                 className="text-white px-8 py-3 rounded-lg font-medium text-lg shadow-lg transition-colors duration-200 cursor-pointer"
               >
@@ -59,7 +75,7 @@ const OrderSummary = ({ userAddress, subtotal, shippingFee, discountAmount, calc
               type="button"
               onClick={(e) => handleProceedToCheckout(e)}
               style={{
-                backgroundColor: isCheckoutButtonActive ? '#800000' : '#AF2C02',
+                backgroundColor: isCheckoutButtonActive ? "#800000" : "#AF2C02",
               }}
               className="w-full text-white py-4 rounded-lg font-medium text-lg shadow-lg transition-colors duration-200 cursor-pointer"
             >

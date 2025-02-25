@@ -11,7 +11,7 @@ import { useAuth } from "../context/AuthContext";
 
 const Cart = () => {
   const { userInfo } = useAuth();
-  console.log("user",userInfo)
+  console.log("user", userInfo);
   const [cartItems, setCartItems] = useState([]);
   const [isApplyButtonActive, setIsApplyButtonActive] = useState(false);
   const [isCheckoutButtonActive, setIsCheckoutButtonActive] = useState(false);
@@ -436,7 +436,7 @@ const Cart = () => {
   }, [userInfo]);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen max-w bg-white ">
       {/* Logo */}
       <div className="container mx-auto py-8">
         <div className="flex flex-col items-center">
@@ -456,88 +456,88 @@ const Cart = () => {
           </div>
         </div>
       </div>
-
+<div className="disabled">
       {/* Cart Content */}
-      <div
-        className="container mx-auto pb-16"
-        style={{ marginTop: "4rem", transform: "translateX(5rem)" }}
-      >
-        <div className="flex flex-col lg:flex-row gap-16 justify-between">
-          {/* Cart Items */}
-          <div style={{ width: "760px", flexShrink: 0 }}>
-            <Card className="bg-white shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-8">
-                  <div className="flex items-center gap-3">
-                    <Checkbox
-                      id="select-all"
-                      checked={selectAll}
-                      onChange={toggleSelectAll}
+        <div className="container mx-auto pb-16" style={{ marginTop: "4rem" }}>
+          <div className="container flex flex-col lg:flex-row gap-16 ">
+            {/* Cart Items */}
+            <div className="w-full mx-10">
+              <Card className="bg-white shadow-sm w-full">
+                <CardContent className="p-6 w-full">
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-3">
+                      <Checkbox
+                        id="select-all"
+                        checked={selectAll}
+                        onChange={toggleSelectAll}
+                      />
+                      <label htmlFor="select-all" className="text-lg">
+                        Select all
+                      </label>
+                    </div>
+                    <Trash2
+                      size={24}
+                      className="text-gray-400 cursor-pointer"
+                      onClick={removeSelectedItems}
                     />
-                    <label htmlFor="select-all" className="text-lg">
-                      Select all
-                    </label>
                   </div>
-                  <Trash2
-                    size={24}
-                    className="text-gray-400 cursor-pointer"
-                    onClick={removeSelectedItems}
-                  />
-                </div>
 
-                <div className="h-[400px] border-t overflow-y-auto">
-                  {cartItems.length > 0 ? (
-                    <div className="divide-y h-full">
-                      {cartItems.map((item) => (
-                        <CartItem
-                          key={item.id}
-                          item={item}
-                          updateQuantity={updateQuantity}
-                          removeItem={removeItem}
-                          toggleItemSelection={toggleItemSelection}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center h-full pt-32">
-                      <div className="text-center text-gray-500">
-                        <ShoppingCart size={48} className="mx-auto mb-4" />
-                        <p className="text-lg">Your cart is empty</p>
+                  <div className="h-[400px] border-t overflow-y-auto">
+                    {cartItems.length > 0 ? (
+                      <div className="divide-y h-full">
+                        {cartItems.map((item) => (
+                          <CartItem
+                            key={item.id}
+                            item={item}
+                            updateQuantity={updateQuantity}
+                            removeItem={removeItem}
+                            toggleItemSelection={toggleItemSelection}
+                          />
+                        ))}
                       </div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                    ) : (
+                      <div className="flex items-center justify-center h-full pt-32">
+                        <div className="text-center text-gray-500">
+                          <ShoppingCart size={48} className="mx-auto mb-4" />
+                          <p className="text-lg">Your cart is empty</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-          {/* Order Summary */}
-          <OrderSummary
-            userAddress={userAddress}
-            subtotal={subtotal}
-            shippingFee={shippingFee}
-            discountAmount={discountAmount}
-            calculateTotal={calculateTotal}
-            coupons={coupons}
-            selectedCoupon={selectedCoupon}
-            setSelectedCoupon={setSelectedCoupon}
-            handleApplyVoucher={handleApplyVoucher}
-            isApplyButtonActive={isApplyButtonActive}
-            handleProceedToCheckout={handleProceedToCheckout}
-            isCheckoutButtonActive={isCheckoutButtonActive}
-          />
+            {/* Order Summary */}
+            <div className="w-[40%] mx-10">
+              <OrderSummary
+                userAddress={userAddress}
+                subtotal={subtotal}
+                shippingFee={shippingFee}
+                discountAmount={discountAmount}
+                calculateTotal={calculateTotal}
+                coupons={coupons}
+                selectedCoupon={selectedCoupon}
+                setSelectedCoupon={setSelectedCoupon}
+                handleApplyVoucher={handleApplyVoucher}
+                isApplyButtonActive={isApplyButtonActive}
+                handleProceedToCheckout={handleProceedToCheckout}
+                isCheckoutButtonActive={isCheckoutButtonActive}
+              />
+            </div>
+          </div>
         </div>
+        </div>
+        {isCheckoutPopupOpen && (
+          <CheckoutPopup
+            items={cartItems.filter((item) => item.selected)}
+            total={calculateTotal()}
+            discountAmount={discountAmount}
+            onClose={() => setIsCheckoutPopupOpen(false)}
+            handleCheckout={handleCheckout}
+          />
+        )}
       </div>
-      {isCheckoutPopupOpen && (
-        <CheckoutPopup
-          items={cartItems.filter((item) => item.selected)}
-          total={calculateTotal()}
-          discountAmount={discountAmount}
-          onClose={() => setIsCheckoutPopupOpen(false)}
-          handleCheckout={handleCheckout}
-        />
-      )}
-    </div>
   );
 };
 
