@@ -138,42 +138,39 @@ const Cart = () => {
     try {
       const token = Cookies.get("authToken");
 
-      // 1️⃣ ดึง order ของ user ที่ login อยู่
-      const orderResponse = await axios.get(
-        `http://localhost:1337/api/orders?filters[user][id][$eq]=${userInfo.id}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      // Log the user ID and token for debugging
+      console.log("User ID:", userInfo.id);
+      console.log("Authorization Token:", token);
 
+      // 1️⃣ ดึง order ของ user ที่ login อยู่
+      const orderResponse = await axios.get(`http://localhost:1337/api/orders?user=${userInfo.id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      // Log the response for debugging
+      console.log("Order Response:", orderResponse.data);
+      
       if (orderResponse.data.data.length === 0) {
-        console.error("ไม่พบ Order ของ User ที่ login อยู่");
+        console.error("No orders found for the user.");
         alert("ไม่พบคำสั่งซื้อของคุณ กรุณาลองใหม่อีกครั้ง");
         return;
       }
 
       const orderId = orderResponse.data.data[0].id;
-      const totalPrice = selectedItems.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0
-      );
+      const totalPrice = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
       // 2️⃣ สร้าง Order Items และเชื่อมโยงกับ Order ของ user
-      const orderItemRequests = selectedItems.map((item) =>
-        axios.post(
-          "http://localhost:1337/api/order-items",
-          {
-            data: {
-              item: item.id,
-              quantity: item.quantity,
-              price: item.price,
-              order: orderId,
-            },
-          },
-          {
-            headers: { Authorization: `Bearer ${token}` },
+      const orderItemRequests = selectedItems.map(item =>
+        axios.post("http://localhost:1337/api/order-items", {
+          data: {
+            item: item.id,
+            quantity: item.quantity,
+            price: item.price,
+            order: orderId
           }
-        )
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
       );
 
       await Promise.all(orderItemRequests);
@@ -185,38 +182,47 @@ const Cart = () => {
         const formData = new FormData();
         formData.append("files", slipFile);
 
-        const uploadResponse = await axios.post(
-          "http://localhost:1337/api/upload",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${token}`,
-            },
+        const uploadResponse = await axios.post("http://localhost:1337/api/upload", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`
           }
-        );
+        });
+
+        console.log("Upload Response:", uploadResponse.data); // ✅ Debugging
 
         if (uploadResponse.data.length > 0) {
-          slipFileId = uploadResponse.data[0].id;
+          slipFileId = uploadResponse.data[0].id; // ✅ ดึงค่า id ของไฟล์
         } else {
           console.error("ไม่สามารถอัปโหลดไฟล์ได้");
           alert("เกิดข้อผิดพลาดในการอัปโหลดสลิป กรุณาลองใหม่อีกครั้ง");
+          return;
         }
       }
 
-      // 4️⃣ อัปเดต Order ให้มี payment_slip และ total_price
-      await axios.put(
-        `http://localhost:1337/api/orders/${orderId}`,
-        {
-          data: {
-            slip: slipFileId,
-            total_price: totalPrice,
-          },
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
+      // ✅ ตรวจสอบว่าค่า slipFileId ถูกต้องก่อน PUT
+      if (!slipFileId) {
+        console.error("slipFileId เป็น undefined หรือ null:", slipFileId);
+        alert("เกิดข้อผิดพลาดในการอัปโหลดสลิป กรุณาลองใหม่อีกครั้ง");
+        return;
+      }
+
+      const putData = {
+        data: {
+          slip: slipFileId, // ✅ ใส่ ID ของไฟล์ให้ถูกต้อง
+          total_price: totalPrice
         }
-      );
+      };
+
+      console.log("PUT Data:", putData); // ✅ Debugging ก่อน PUT
+
+      await axios.put(`http://localhost:1337/api/orders/${orderId}`, putData, {
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(response => {
+        console.log("PUT Response:", response.data); // ✅ ตรวจสอบ Response ที่ได้กลับมา
+      }).catch(error => {
+        console.error("PUT Error:", error.response?.data || error.message);
+      });
 
       // 5️⃣ ลบสินค้าออกจากตะกร้า
       const removeCartRequests = selectedItems.map((item) =>
@@ -229,15 +235,59 @@ const Cart = () => {
       );
       await Promise.all(removeCartRequests);
 
+      // ✅ Refetch cart items after checkout
+      fetchCartItems(); // Call the function to fetch cart items again
+
       alert("สั่งซื้อสำเร็จ! กำลังดำเนินการตรวจสอบ");
       setIsCheckoutPopupOpen(false);
       setCartItems([]);
     } catch (error) {
-      console.error(
-        "Error processing checkout:",
-        error.response?.data || error
-      );
-      alert("เกิดข้อผิดพลาดในการสั่งซื้อ กรุณาลองใหม่อีกครั้ง");
+      console.error("Error fetching orders:", error.response?.data || error);
+      alert("เกิดข้อผิดพลาดในการดึงคำสั่งซื้อ กรุณาลองใหม่อีกครั้ง");
+    }
+  };
+
+  // Function to fetch cart items
+  const fetchCartItems = async () => {
+    if (userInfo) {
+      console.log("Fetching cart items for user:", userInfo.id);
+      try {
+        const token = Cookies.get("authToken");
+        if (!token) {
+          console.error("No authToken found");
+          return;
+        }
+        const response = await axios.get(
+          `http://localhost:1337/api/carts?filters[user][id][$eq]=${userInfo.id}&populate=cart_items.item.img`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log("API Response:", response.data);
+
+        // ตรวจสอบโครงสร้างของข้อมูล
+        if (response.data.data && Array.isArray(response.data.data)) {
+          const items = response.data.data.flatMap(cart =>
+            cart.cart_items && Array.isArray(cart.cart_items) ?
+              cart.cart_items.map(cartItem => ({
+                ...cartItem.item, // ดึงข้อมูลจาก item
+                quantity: cartItem.amount, // ใช้ amount เป็น quantity
+                selected: false, // เพิ่มค่าเริ่มต้นสำหรับ selected
+                item_cart_id: cartItem.id // เพิ่ม item_cart_id ที่ตรงกับ id ของ cartItem
+              })) : []
+          );
+          console.log("Fetched items:", items); // ตรวจสอบข้อมูลผลิตภัณฑ์ที่ดึงมา
+          setCartItems(items);
+        } else {
+          console.error("Invalid data structure:", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching cart items:", error.response?.data || error);
+      }
+    } else {
+      console.log("No user info available to fetch cart items");
     }
   };
 
@@ -314,19 +364,14 @@ const Cart = () => {
       }
 
       // สร้างคำขอลบสินค้าทั้งหมดที่เลือก
-      await Promise.all(
-        selectedItems.map((item) =>
-          axios.delete(
-            `http://localhost:1337/api/cart-items/${item.item_cart_id}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          )
-        )
-      );
+      await Promise.all(selectedItems.map(item =>
+        axios.delete(`http://localhost:1337/api/cart-items/${item.item_cart_id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ));
 
       // อัปเดต state เพื่อลบสินค้าที่ถูกลบออกจาก cartItems
-      setCartItems((prevItems) => prevItems.filter((item) => !item.selected));
+      setCartItems(prevItems => prevItems.filter(item => !selectedItems.some(selected => selected.item_cart_id === item.item_cart_id)));
       alert("ลบสินค้าที่เลือกเรียบร้อยแล้ว");
     } catch (error) {
       console.error(

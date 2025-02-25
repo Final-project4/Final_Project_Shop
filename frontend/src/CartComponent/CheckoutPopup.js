@@ -32,7 +32,6 @@ const CheckoutPopup = ({ items, total, discountAmount, onClose, handleCheckout }
     const orderItems = items.map(item => ({
       quantity: item.quantity,
       price: item.price,
-      order: 2, // Replace with the actual order ID if available
       item: item.id // Assuming item.id corresponds to the item ID
     }));
   
