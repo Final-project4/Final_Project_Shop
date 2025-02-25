@@ -31,12 +31,15 @@
     },
     "img": {
       "type": "media",
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "allowedTypes": [
         "images",
         "videos"
-      ]
+      ],
+      "type": "media",
+      "multiple": false,
+      "required": true
     },
     "cart_items": {
       "type": "relation",
@@ -44,24 +47,11 @@
       "target": "api::cart-item.cart-item",
       "mappedBy": "item"
     },
-    "size": {
-      "type": "enumeration",
-      "enum": [
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL"
-      ]
-    },
-    "color": {
-      "type": "enumeration",
-      "enum": [
-        "black",
-        "white",
-        "red",
-        "blue"
-      ]
+    "order_items": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::order-item.order-item",
+      "mappedBy": "item"
     }
   }
 }

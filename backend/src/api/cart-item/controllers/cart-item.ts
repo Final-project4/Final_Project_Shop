@@ -48,7 +48,7 @@ export default factories.createCoreController('api::cart-item.cart-item', ({ str
     // Fetch the author by ID using Strapi's db query API
     const cartItem = await strapi.db.query('api::cart-item.cart-item').findOne({
       where: { id: cartItemId },
-      populate: ['item'], // Populate related data if needed
+      populate: ['books'], // Populate related data if needed
     });
 
     if (!cartItem) {
@@ -95,29 +95,4 @@ export default factories.createCoreController('api::cart-item.cart-item', ({ str
       return ctx.internalServerError('Something went wrong during update');
     }
   },
-
-  async create(ctx) {
-    const { cart, item, amount } = ctx.request.body;
-    
-    console.log(ctx.request.body);  // เพิ่มการ log เพื่อดูข้อมูลที่ได้รับจาก request body
-  
-    if (!item || !amount) {
-      return ctx.badRequest('Missing item or amount');
-    }
-    
-    try {
-      const newCartItem = await strapi.db.query('api::cart-item.cart-item').create({
-        data: {
-          cart: cart,
-          item: item,
-          amount: amount,
-        },
-      });
-      
-      return ctx.send({ message: 'Item added successfully', data: newCartItem }, 201);
-    } catch (error) {
-      console.error('Error during creation:', error);
-      return ctx.internalServerError('Something went wrong during creation');
-    }
-  }  
 }));

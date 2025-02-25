@@ -92,102 +92,104 @@ const Products = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-      {/* Sidebar */}
-      <div className="w-64 bg-white shadow-xl p-6 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">หมวดหมู่</h2>
-        <ul>
-          {categories.map((category) => (
-            <li
-              key={category.id}
-              className={`cursor-pointer p-2 rounded-lg mb-2 transition-all duration-300 ${
-                selectedCategories.includes(category.name)
-                  ? "bg-blue-500 text-white"
-                  : "hover:bg-gray-200"
-              }`}
-              onClick={() => toggleCategory(category.name)}
-            >
-              {category.name}
-            </li>
-          ))}
-        </ul>
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
+      <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* Sidebar */}
+        <div className="bg-white shadow-xl p-6 rounded-lg">
+          <h2 className="text-xl font-semibold mb-4">หมวดหมู่</h2>
+          <ul>
+            {categories.map((category) => (
+              <li
+                key={category.id}
+                className={`cursor-pointer p-2 rounded-lg transition-all duration-300 ${
+                  selectedCategories.includes(category.name)
+                    ? "bg-blue-500 text-white"
+                    : "hover:bg-gray-200"
+                }`}
+                onClick={() => toggleCategory(category.name)}
+              >
+                {category.name}
+              </li>
+            ))}
+          </ul>
 
-        <h2 className="text-xl font-semibold mt-6">กำหนดราคา</h2>
-        <input
-          type="range"
-          min="100"
-          max="10000"
-          value={maxPrice}
-          onChange={(e) => setMaxPrice(Number(e.target.value))}
-          className="w-full mt-2"
-        />
-        <p className="text-center mt-2">ราคาสูงสุด: {maxPrice} บาท</p>
-
-        <h2 className="text-xl font-semibold mt-6">จัดเรียงตาม</h2>
-        <div className="flex items-center space-x-4 mt-2">
-          <select
-            id="sortOrder"
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
-          >
-            <option value="asc">ราคาต่ำสุด</option>
-            <option value="desc">ราคาสูงสุด</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 p-6">
-        <div className="w-full mb-6 flex justify-center">
+          <h2 className="text-xl font-semibold mt-6">กำหนดราคา</h2>
           <input
-            type="text"
-            placeholder="ค้นหาสินค้า..."
-            className="w-full max-w-[640px] px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            type="range"
+            min="100"
+            max="10000"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(Number(e.target.value))}
+            className="w-full mt-2"
           />
+          <p className="text-center mt-2">ราคาสูงสุด: {maxPrice} บาท</p>
+
+          <h2 className="text-xl font-semibold mt-6">จัดเรียงตาม</h2>
+          <div className="flex items-center space-x-4 mt-2">
+            <select
+              id="sortOrder"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+            >
+              <option value="asc">ราคาต่ำสุด</option>
+              <option value="desc">ราคาสูงสุด</option>
+            </select>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          {currentItems.map((item) => (
-            <div key={item.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:scale-105 transition-transform">
-              <div className="p-4 text-center">
-                <img
-                  src={`http://localhost:1337${item.img?.formats?.small?.url || item.img?.url || "/placeholder.jpg"}`}
-                  alt={item.name}
-                  className="w-full h-48 object-cover rounded-lg mb-4"
-                />
-                <h2 className="text-gray-800 font-semibold text-lg">{item.name}</h2>
-                <p className="text-red-500 font-bold mt-2">{item.price} บาท</p>
-                <Link to={`/product/${item.id}`}>
-                  <button className="mt-3 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg">
-                    ดูรายละเอียด
-                  </button>
-                </Link>
+        {/* Main Content */}
+        <div className="col-span-3">
+          <div className="w-full mb-6 flex justify-center">
+            <input
+              type="text"
+              placeholder="ค้นหาสินค้า..."
+              className="w-2/3 md:w-1/2 lg:w-1/3 px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            {currentItems.map((item) => (
+              <div key={item.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:scale-105 transition-transform">
+                <div className="p-4 text-center">
+                  <img
+                    src={`http://localhost:1337${item.img?.formats?.small?.url || item.img?.url || "/placeholder.jpg"}`}
+                    alt={item.name}
+                    className="w-full h-48 object-cover rounded-lg mb-4"
+                  />
+                  <h2 className="text-gray-800 font-semibold text-lg">{item.name}</h2>
+                  <p className="text-red-500 font-bold mt-2">{item.price} บาท</p>
+                  <Link to={`/product/${item.id}`}>
+                    <button className="mt-3 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg">
+                      ดูรายละเอียด
+                    </button>
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        {/* Pagination */}
-        <div className="flex justify-center mt-6">
-          <nav>
-            <ul className="flex list-none">
-              {Array.from({ length: Math.ceil(sortedProducts.length / itemsPerPage) }, (_, i) => (
-                <li key={i} className="mx-1">
-                  <button
-                    onClick={() => paginate(i + 1)}
-                    className={`px-4 py-2 rounded-lg ${
-                      currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-white text-blue-500"
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          {/* Pagination */}
+          <div className="flex justify-center mt-6">
+            <nav>
+              <ul className="flex list-none">
+                {Array.from({ length: Math.ceil(sortedProducts.length / itemsPerPage) }, (_, i) => (
+                  <li key={i} className="mx-1">
+                    <button
+                      onClick={() => paginate(i + 1)}
+                      className={`px-4 py-2 rounded-lg ${
+                        currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-white text-blue-500"
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
         </div>
       </div>
     </div>

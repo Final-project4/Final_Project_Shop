@@ -13,7 +13,6 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
       return;
     }
-  }, []);
 
     try {
       const response = await fetch("http://localhost:1337/api/users/me?populate=*", {
