@@ -25,6 +25,7 @@ const AppRoutes = () => (
   <Route path="/signup" element={<SignUpPage />} />
   <Route path="/account" element={<AccountPage />} />
   <Route path="/status" element={<OrderStatus />} />
+  <Route path="/item/:id" component={ItemDetail} />
 </Routes>
 );
 

@@ -31,21 +31,37 @@
     },
     "img": {
       "type": "media",
-      "multiple": true,
+      "multiple": false,
       "required": true,
       "allowedTypes": [
         "images",
         "videos"
-      ],
-      "type": "media",
-      "multiple": false,
-      "required": true
+      ]
     },
     "cart_items": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::cart-item.cart-item",
       "mappedBy": "item"
+    },
+    "size": {
+      "type": "enumeration",
+      "enum": [
+        "S",
+        "M",
+        "L",
+        "XL",
+        "XXL"
+      ]
+    },
+    "color": {
+      "type": "enumeration",
+      "enum": [
+        "black",
+        "white",
+        "red",
+        "blue"
+      ]
     }
   }
 }
