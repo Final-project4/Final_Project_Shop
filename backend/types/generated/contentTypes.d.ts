@@ -525,7 +525,6 @@ export interface ApiItemItem extends Struct.CollectionTypeSchema {
       'manyToMany',
       'api::category.category'
     >;
-    color: Schema.Attribute.Enumeration<['black', 'white', 'red', 'blue']>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -544,7 +543,6 @@ export interface ApiItemItem extends Struct.CollectionTypeSchema {
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<0>;
     publishedAt: Schema.Attribute.DateTime;
-    size: Schema.Attribute.Enumeration<['S', 'M', 'L', 'XL', 'XXL']>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
