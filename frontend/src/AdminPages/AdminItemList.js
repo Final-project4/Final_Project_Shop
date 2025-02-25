@@ -41,7 +41,7 @@ const ItemList = () => {
                 <p className="text-gray-600 mt-1">ราคา: {item.price ? `${item.price} Baht` : "N/A Baht"}</p>
                 {/* ปุ่ม Edit */}
                 <button 
-                  onClick={() => navigate(`/admin/items/edit/${item.id}`)}
+                  onClick={() => navigate(`/admin/items/edit/${item.documentId}`)}
                   className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
                 >
                   Edit

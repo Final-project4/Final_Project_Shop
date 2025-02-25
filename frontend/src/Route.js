@@ -20,7 +20,7 @@ const AppRoutes = () => (
     <Route path="/cart" element={<CartPage/>}/>
     <Route path="/Login" element={<LoginScreen/>}/>
     <Route path="/admin/items" element={<AdminItemList />} />
-    <Route path="/admin/items/edit/:id" element={<AdminEditItem />} />
+    <Route path="/admin/items/edit/:documentId" element={<AdminEditItem />} />
   </Routes>
 );
 
