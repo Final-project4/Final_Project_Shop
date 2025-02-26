@@ -33,7 +33,7 @@ const PopularProducts = ({ products }) => {
   return (
     <section className="container mx-auto px-4 text-center">
       <h2 className="text-2xl italic">🔥 Popular Products</h2>
-      <Slider {...sliderSettings} className="mt-40">
+      <Slider {...sliderSettings} className="mt-40 h-30">
         {products.map((product) => (
           <div key={product.id} className="p-4">
             <div className="bg-white p-4 shadow-lg rounded-lg flex flex-col justify-between min-h-[24rem] transition-transform transform hover:scale-105 hover:shadow-2xl">

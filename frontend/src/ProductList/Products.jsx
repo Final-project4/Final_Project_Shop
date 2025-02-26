@@ -23,7 +23,7 @@ const Products = () => {
       })
       .catch((error) => {
         console.error("Error fetching categories:", error);
-        setError("Error fetching categories");    
+        setError("Error fetching categories");
       });
   }, []);
 
@@ -53,7 +53,10 @@ const Products = () => {
   const filterByCategory = (categories) => {
     if (categories.length > 0) {
       return products.filter((item) => {
-        return item.categories && item.categories.some(cat => categories.includes(cat.name));
+        return (
+          item.categories &&
+          item.categories.some((cat) => categories.includes(cat.name))
+        );
       });
     }
     return products;
@@ -62,7 +65,9 @@ const Products = () => {
   const filteredProducts = filterByCategory(selectedCategories).filter(
     (item) =>
       item.price <= maxPrice &&
-      (!searchQuery || (item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase())))
+      (!searchQuery ||
+        (item.name &&
+          item.name.toLowerCase().includes(searchQuery.toLowerCase())))
   );
 
   const sortedProducts = filteredProducts.sort((a, b) => {
@@ -88,7 +93,9 @@ const Products = () => {
   }
 
   if (error) {
-    return <div className="text-center text-red-500 text-2xl mt-10">{error}</div>;
+    return (
+      <div className="text-center text-red-500 text-2xl mt-10">{error}</div>
+    );
   }
 
   return (
@@ -152,21 +159,33 @@ const Products = () => {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             {currentItems.map((item) => (
-              <div key={item.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:scale-105 transition-transform">
-                <div className="p-4 text-center">
-                  <img
-                    src={`http://localhost:1337${item.img?.formats?.small?.url || item.img?.url || "/placeholder.jpg"}`}
-                    alt={item.name}
-                    className="w-full h-48 object-cover rounded-lg mb-4"
-                  />
-                  <h2 className="text-gray-800 font-semibold text-lg">{item.name}</h2>
-                  <p className="text-red-500 font-bold mt-2">{item.price} บาท</p>
-                  <Link to={`/product/${item.id}`}>
-                    <button className="mt-3 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg">
-                      ดูรายละเอียด
-                    </button>
-                  </Link>
-                </div>
+              <div
+                key={item.id}
+                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300"
+              >
+                <Link to={`/product/${item.id}`}>
+                  <div className="p-4 text-center">
+                    <img
+                      src={`http://localhost:1337${
+                        item.img?.formats?.small?.url ||
+                        item.img?.url ||
+                        "/placeholder.jpg"
+                      }`}
+                      alt={item.name}
+                      className="w-full h-48 object-cover rounded-lg mb-4"
+                    />
+                    <div className="h-18">
+                      <h2 className="text-gray-900 font-medium text-sm">
+                        {item.name}
+                      </h2>
+                    </div>
+                    <div className="flex flex-col">
+                      <p className="text-[#C9A36B] font-bold text-xl mt-2">
+                        {item.price} บาท
+                      </p>
+                    </div>
+                  </div>
+                </Link>
               </div>
             ))}
           </div>
@@ -175,18 +194,23 @@ const Products = () => {
           <div className="flex justify-center mt-6">
             <nav>
               <ul className="flex list-none">
-                {Array.from({ length: Math.ceil(sortedProducts.length / itemsPerPage) }, (_, i) => (
-                  <li key={i} className="mx-1">
-                    <button
-                      onClick={() => paginate(i + 1)}
-                      className={`px-4 py-2 rounded-lg ${
-                        currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-white text-blue-500"
-                      }`}
-                    >
-                      {i + 1}
-                    </button>
-                  </li>
-                ))}
+                {Array.from(
+                  { length: Math.ceil(sortedProducts.length / itemsPerPage) },
+                  (_, i) => (
+                    <li key={i} className="mx-1">
+                      <button
+                        onClick={() => paginate(i + 1)}
+                        className={`px-4 py-2 rounded-lg ${
+                          currentPage === i + 1
+                            ? "bg-blue-500 text-white"
+                            : "bg-white text-blue-500"
+                        }`}
+                      >
+                        {i + 1}
+                      </button>
+                    </li>
+                  )
+                )}
               </ul>
             </nav>
           </div>
