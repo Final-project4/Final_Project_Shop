@@ -1,8 +1,13 @@
-import React from 'react';
+import React from "react";
 import { Trash2 } from "lucide-react";
 import Checkbox from "../components/ui/checkbox";
 
-const CartItem = ({ item, updateQuantity, removeItem, toggleItemSelection }) => {
+const CartItem = ({
+  item,
+  updateQuantity,
+  removeItem,
+  toggleItemSelection,
+}) => {
   return (
     <div className="bg-gray-100 p-10 rounded-lg mb-4">
       <div className="flex items-center py-6 w-full gap-6">
@@ -12,14 +17,22 @@ const CartItem = ({ item, updateQuantity, removeItem, toggleItemSelection }) => 
         />
         <div className="w-24 h-24 flex-shrink-0">
           <img
-            src={`http://localhost:1337${item.img?.formats?.small?.url || item.img?.url || "/placeholder.jpg"}`}
+            src={`http://localhost:1337${
+              item.img?.formats?.small?.url ||
+              item.img?.url ||
+              "/placeholder.jpg"
+            }`}
             alt={item.name || "Product Image"}
             className="w-full h-full object-cover rounded"
           />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-lg truncate">{item.name || "Unknown Product"}</h3>
-          <p className="text-sm text-gray-500 mt-2">${(item.price * item.quantity || 0).toFixed(2)}</p>
+          <h3 className="font-medium text-lg truncate">
+            {item.name || "Unknown Product"}
+          </h3>
+          <p className="text-sm text-gray-500 mt-2">
+            ${(item.price * item.quantity || 0).toFixed(2)}
+          </p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center border rounded">

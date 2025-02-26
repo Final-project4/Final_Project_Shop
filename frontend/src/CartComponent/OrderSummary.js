@@ -16,7 +16,6 @@ const OrderSummary = ({
   isCheckoutButtonActive,
 }) => {
   return (
-    <div className="lg:w-[40%] " >
       <Card className="bg-gray-50 top-4">
         <CardContent className="p-8">
           <div className="bg-gray-100 p-6 rounded-lg space-y-8">
@@ -84,7 +83,6 @@ const OrderSummary = ({
           </div>
         </CardContent>
       </Card>
-    </div>
   );
 };
 

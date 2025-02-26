@@ -27,7 +27,6 @@ export const CartProvider = ({ children }) => {
         console.log("ไม่มีตะกร้าสำหรับผู้ใช้นี้");
         return null;
       } else {
-        console.log("ตะกร้าของผู้ใช้:", response.data.data[0]);
         return response.data.data[0];
       }
     } catch (error) {

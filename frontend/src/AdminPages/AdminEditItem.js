@@ -33,7 +33,7 @@ const AdminEditItem = () => {
           if (item.img && item.img.length > 0) {
             setImages(item.img.map(img => `http://localhost:1337${img.url}`));
           } else {
-            setImages([]); // ถ้าไม่มีรูป ใช้ default หรือปล่อยเป็น array ว่าง
+            setImages([]);
           }
         }
       } catch (error) {

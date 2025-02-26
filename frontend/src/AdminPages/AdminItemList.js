@@ -27,9 +27,9 @@ const ItemList = () => {
       <div className="grid grid-cols-3 gap-6 p-6 flex-1 overflow-auto">
         {items.length > 0 ? (
           items.map((item) => {
-            const imageUrl = item.img && item.img.length > 0 
-              ? `${BASE_URL}${item.img[0].url}` 
-              : "/default-image.jpg"; 
+            const imageUrl = item.img?.formats?.small?.url ||
+            item.img?.url ||
+            "/placeholder.jpg"
 
             return (
               <div key={item.id} className="bg-white shadow-md rounded-lg p-4 flex flex-col items-center">

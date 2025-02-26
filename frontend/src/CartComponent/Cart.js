@@ -399,7 +399,7 @@ const Cart = () => {
               },
             }
           );
-          console.log("API Response:", response.data);
+          // console.log("API Response:", response.data);
 
           // ตรวจสอบโครงสร้างของข้อมูล
           if (response.data.data && Array.isArray(response.data.data)) {
@@ -413,7 +413,7 @@ const Cart = () => {
                   }))
                 : []
             );
-            console.log("Fetched items:", items); // ตรวจสอบข้อมูลผลิตภัณฑ์ที่ดึงมา
+            // console.log("Fetched items:", items); // ตรวจสอบข้อมูลผลิตภัณฑ์ที่ดึงมา
             setCartItems(items);
           } else {
             console.error("Invalid data structure:", response.data);
@@ -428,7 +428,7 @@ const Cart = () => {
 
       fetchCartItems();
     } else {
-      console.log("No user info available to fetch cart items");
+      // console.log("No user info available to fetch cart items");
     }
   }, [userInfo]);
 

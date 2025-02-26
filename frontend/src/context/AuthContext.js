@@ -26,7 +26,6 @@ export const AuthProvider = ({ children }) => {
 
       const userData = await response.json();
       setUser(userData);
-      console.log("userres",userData);
     } catch (error) {
       console.error("Error fetching user:", error);
       setUser(null); // Reset user state to null on error

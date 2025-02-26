@@ -11,8 +11,7 @@ const Header = () => {
     logout();
     navigate("/");
   };
-
-  console.log("userad",isAdmin)
+  
   return (
     <Navbar
       fluid
@@ -52,7 +51,7 @@ const Header = () => {
           {isAdmin && (
             <Navbar.Link
               as={Link}
-              to="/admin"
+              to="/adminpage"
               className="text-white hover:text-gray-200"
             >
               Dashboard Admin
