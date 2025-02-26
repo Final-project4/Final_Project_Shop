@@ -3,39 +3,31 @@ import { useNavigate } from "react-router-dom";
 import InputField from "./InputField";
 import SocialLogin from "./SocialLogin";
 import Cookies from "js-cookie";
+import { useAuth } from "../context/AuthContext"; // นำเข้า useAuth
 
 const LoginForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [color, setColor] = useState("#ffffff");
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+const [email, setEmail] = useState("");
+const [password, setPassword] = useState("");
+const [color, setColor] = useState("#ffffff");
+const [error, setError] = useState("");
+const navigate = useNavigate();
+const {login} =useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
+  
     try {
       const response = await fetch("http://localhost:1337/api/auth/local", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          identifier: email,
-          password: password,
-        }),
+        body: JSON.stringify({ identifier: email, password }),
       });
-
+  
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error?.message || "Login failed");
-      }
-
-      console.log("Logged in successfully:", data);
-
-      Cookies.set("authToken", data.jwt, { expires: 7, secure: true });
-      alert("Login successful!");
-      // Redirect to homepage
+      if (!response.ok) throw new Error(data.error?.message || "Login failed");
+  
+      await login(data.jwt, data.user);
       navigate("/");
     } catch (error) {
       setError(error.message);

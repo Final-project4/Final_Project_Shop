@@ -1,18 +1,19 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [userInfo, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const token = Cookies.get("authToken");
 
   const fetchUser = async () => {
-    const token = Cookies.get("authToken");
     if (!token) {
       setLoading(false);
       return;
     }
-
+  
     try {
       const response = await fetch("http://localhost:1337/api/users/me?populate=*", {
         headers: {
@@ -25,6 +26,7 @@ export const AuthProvider = ({ children }) => {
 
       const userData = await response.json();
       setUser(userData);
+      console.log("userres",userData);
     } catch (error) {
       console.error("Error fetching user:", error);
       setUser(null); // Reset user state to null on error
@@ -36,12 +38,11 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     fetchUser();
-  }, []);
+  }, [token]);
 
-  const login = async (token) => {
+  const login = async (token, userData) => {
     Cookies.set("authToken", token, { expires: 7, secure: true });
-    setLoading(true);
-    await fetchUser(); 
+    setUser(userData); 
   };
 
   const logout = () => {

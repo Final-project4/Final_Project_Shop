@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import generatePayload from "promptpay-qr";
 
-const CheckoutPopup = ({ items, total, discountAmount, onClose, handleCheckout }) => {
+const CheckoutPopup = ({
+  items,
+  total,
+  discountAmount,
+  onClose,
+  handleCheckout,
+}) => {
   const [showQR, setShowQR] = useState(false);
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -27,22 +33,23 @@ const CheckoutPopup = ({ items, total, discountAmount, onClose, handleCheckout }
 
   const handleUploadAndCheckout = async () => {
     setUploading(true);
-  
+
     // Create the JSON body in the specified format
-    const orderItems = items.map(item => ({
+    const orderItems = items.map((item) => ({
       quantity: item.quantity,
       price: item.price,
-      item: item.id // Assuming item.id corresponds to the item ID
+      order: 2, // Replace with the actual order ID if available
+      item: item.id, // Assuming item.id corresponds to the item ID
     }));
-  
+
     const jsonBody = {
-      data: orderItems.length === 1 ? orderItems[0] : orderItems // Adjust for single item
+      data: orderItems.length === 1 ? orderItems[0] : orderItems, // Adjust for single item
     };
-  
+
     await handleCheckout(file, jsonBody); // ✅ Send the JSON body along with the file
     setUploading(false);
   };
-  
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-95 z-50 backdrop-blur-sm">
       <div className="bg-white p-6 rounded-lg shadow-lg relative">
@@ -51,8 +58,19 @@ const CheckoutPopup = ({ items, total, discountAmount, onClose, handleCheckout }
           className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
           aria-label="Close"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
 
@@ -60,7 +78,9 @@ const CheckoutPopup = ({ items, total, discountAmount, onClose, handleCheckout }
         <div className="space-y-2">
           {items.map((item) => (
             <div key={item.id} className="flex justify-between">
-              <span>{item.name} (x{item.quantity})</span>
+              <span>
+                {item.name} (x{item.quantity})
+              </span>
               <span>${(item.price * item.quantity).toFixed(2)}</span>
             </div>
           ))}
@@ -79,7 +99,9 @@ const CheckoutPopup = ({ items, total, discountAmount, onClose, handleCheckout }
             {qrData ? (
               <>
                 <QRCodeCanvas value={qrData} size={200} />
-                <p className="mt-2 text-sm text-gray-500">สแกน QR เพื่อชำระเงินผ่าน PromptPay</p>
+                <p className="mt-2 text-sm text-gray-500">
+                  สแกน QR เพื่อชำระเงินผ่าน PromptPay
+                </p>
               </>
             ) : (
               <p className="text-red-500">Error: ไม่สามารถสร้าง QR ได้</p>
@@ -88,14 +110,21 @@ const CheckoutPopup = ({ items, total, discountAmount, onClose, handleCheckout }
             <button
               onClick={handleUploadAndCheckout}
               disabled={uploading}
-              className={`mt-2 ${uploading ? "bg-gray-400" : "bg-blue-500"} text-white px-4 py-2 rounded`}
+              className={`mt-2 ${
+                uploading ? "bg-gray-400" : "bg-blue-500"
+              } text-white px-4 py-2 rounded`}
             >
               {uploading ? "กำลังอัปโหลด..." : "อัปโหลดและยืนยันคำสั่งซื้อ"}
             </button>
           </div>
         ) : (
           <div className="mt-4">
-            <button onClick={onClose} className="bg-gray-300 px-4 py-2 rounded mr-2">Cancel</button>
+            <button
+              onClick={onClose}
+              className="bg-gray-300 px-4 py-2 rounded mr-2"
+            >
+              Cancel
+            </button>
             <button
               className="bg-blue-500 text-white px-4 py-2 rounded"
               onClick={() => setShowQR(true)}

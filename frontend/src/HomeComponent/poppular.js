@@ -2,7 +2,7 @@ import React from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
+import { Link } from "react-router-dom";
 // ตั้งค่าการเลื่อนแบบ Smooth
 const sliderSettings = {
   infinite: true,
@@ -58,12 +58,11 @@ const PopularProducts = ({ products }) => {
                 <p className="text-gray-600">{product.price ?? "N/A"} บาท</p>
 
                 {/* ปุ่มสั่งซื้อ */}
-                <button
-                  onClick={() => alert(`กำลังซื้อสินค้า: ${product.name}`)}
-                  className="mt-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-2 rounded-full shadow-md hover:from-purple-600 hover:to-blue-600 transition transform hover:scale-110"
-                >
-                  🛍 สั่งซื้อ
-                </button>
+                <Link to={`/product/${product.id}`}>
+                  <button className="mt-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-2 rounded-full shadow-md hover:from-purple-600 hover:to-blue-600 transition transform hover:scale-110">
+                    🛍 สั่งซื้อ
+                  </button>
+                </Link>
               </div>
             </div>
           </div>

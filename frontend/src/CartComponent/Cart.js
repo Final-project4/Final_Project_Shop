@@ -11,7 +11,6 @@ import { useAuth } from "../context/AuthContext";
 
 const Cart = () => {
   const { userInfo } = useAuth();
-  console.log("user", userInfo);
   const [cartItems, setCartItems] = useState([]);
   const [isApplyButtonActive, setIsApplyButtonActive] = useState(false);
   const [isCheckoutButtonActive, setIsCheckoutButtonActive] = useState(false);
@@ -21,7 +20,7 @@ const Cart = () => {
   const [coupons, setCoupons] = useState([]);
   const [selectedCoupon, setSelectedCoupon] = useState("");
   const [discountAmount, setDiscountAmount] = useState(0);
-  console.log(userInfo  )
+
   const subtotal = cartItems
     .filter((item) => item.selected)
     .reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -149,7 +148,7 @@ const Cart = () => {
 
       // Log the response for debugging
       console.log("Order Response:", orderResponse.data);
-      
+
       if (orderResponse.data.data.length === 0) {
         console.error("No orders found for the user.");
         alert("ไม่พบคำสั่งซื้อของคุณ กรุณาลองใหม่อีกครั้ง");
@@ -328,6 +327,7 @@ const Cart = () => {
         if (coupon.discount_type === "Percentage") {
           const discount = (subtotal * coupon.discount_value) / 100;
           setDiscountAmount(discount);
+          console.log("disco",discount)
         } else if (coupon.discount_type === "fixed_amount") {
           setDiscountAmount(coupon.discount_value);
         }

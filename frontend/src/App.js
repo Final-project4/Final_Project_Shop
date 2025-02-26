@@ -3,13 +3,16 @@ import { BrowserRouter as Router } from "react-router-dom";
 import Header from "./Header";
 import AppRoutes from "./Route"; // ต้องตรงกับชื่อไฟล์
 import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "./ItemDetail/CartContext";
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Header />
-        <AppRoutes />
+        <CartProvider>
+          <AppRoutes />
+        </CartProvider>
       </Router>
     </AuthProvider>
   );

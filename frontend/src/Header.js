@@ -1,45 +1,28 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Navbar, Button } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 
 const Header = () => {
-  const { logout } = useAuth();
+  const { userInfo, logout,isAdmin } = useAuth();
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  // ฟังก์ชันตรวจสอบคุกกี้
-  const checkLoginStatus = () => {
-    const cookies = document.cookie.split("; ");
-    const authCookie = cookies.find((row) => row.startsWith("authToken="));
-    setIsLoggedIn(!!authCookie);
-  };
-
-  useEffect(() => {
-    checkLoginStatus(); // ตรวจสอบตอนโหลด Component
-
-    // ตั้งค่าให้ตรวจสอบคุกกี้ทุก 1 วินาที
-    const interval = setInterval(checkLoginStatus, 1000);
-
-    return () => clearInterval(interval); // ล้าง interval เมื่อ component ถูก unmount
-  }, []);
 
   const handleLogout = () => {
     logout();
-    document.cookie =
-      "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    setIsLoggedIn(false);
     navigate("/");
   };
 
+  console.log("userad",isAdmin)
   return (
     <Navbar
       fluid
-      className="bg-gradient-to-r from-blue-700 to-cyan-400 text-white py-4 px-6"
+      className={`bg-gradient-to-r ${
+        isAdmin ? "from-blue-700 to-cyan-400" : "from-green-700 to-yellow-400"
+      } text-white py-4 px-6`}
     >
       <Navbar.Brand as={Link} to="/">
         <span className="self-center text-xl font-semibold whitespace-nowrap">
-          MyShop
+          {isAdmin ? "Admin Dashboard" : "MyShop"}
         </span>
       </Navbar.Brand>
       <div className="flex items-center gap-6">
@@ -65,6 +48,16 @@ const Header = () => {
           >
             สถานะคำสั่งซื้อ
           </Navbar.Link>
+
+          {isAdmin && (
+            <Navbar.Link
+              as={Link}
+              to="/admin"
+              className="text-white hover:text-gray-200"
+            >
+              Dashboard Admin
+            </Navbar.Link>
+          )}
         </Navbar.Collapse>
         <div className="flex items-center gap-4">
           <Link to="/cart">
@@ -98,7 +91,7 @@ const Header = () => {
             </svg>
           </Link>
 
-          {isLoggedIn ? (
+          {userInfo ? (
             <Link to="/login">
               <Button gradientDuoTone="purpleToBlue" onClick={handleLogout}>
                 Logout
