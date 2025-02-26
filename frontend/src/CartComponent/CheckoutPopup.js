@@ -14,7 +14,7 @@ const CheckoutPopup = ({
   const [uploading, setUploading] = useState(false);
 
   const promptPayID = "0922567600"; // หรือใช้เลขบัญชีธนาคาร เช่น "1234567890123"
-
+  console.log("total",total)
   const generatePromptPayQR = (promptPayID, amount) => {
     if (!promptPayID) {
       return "";
@@ -34,19 +34,21 @@ const CheckoutPopup = ({
   const handleUploadAndCheckout = async () => {
     setUploading(true);
 
-    // Create the JSON body in the specified format
+    // สร้าง JSON body ในรูปแบบที่กำหนด
     const orderItems = items.map((item) => ({
       quantity: item.quantity,
       price: item.price,
-      order: 2, // Replace with the actual order ID if available
-      item: item.id, // Assuming item.id corresponds to the item ID
+      order: 2, // แทนที่ด้วย ID คำสั่งซื้อที่แท้จริงถ้ามี
+      item: item.id, // สมมติว่า item.id ตรงกับ ID ของสินค้า
     }));
 
     const jsonBody = {
-      data: orderItems.length === 1 ? orderItems[0] : orderItems, // Adjust for single item
+      data: orderItems.length === 1 ? orderItems[0] : orderItems, // ปรับสำหรับสินค้าชิ้นเดียว
     };
 
-    await handleCheckout(file, jsonBody); // ✅ Send the JSON body along with the file
+    console.log("JSON Body:", jsonBody); // ตรวจสอบ JSON body
+
+    await handleCheckout(file, jsonBody); // ✅ ส่ง JSON body พร้อมกับไฟล์
     setUploading(false);
   };
 

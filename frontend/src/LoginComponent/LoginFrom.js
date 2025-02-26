@@ -4,6 +4,7 @@ import InputField from "./InputField";
 import SocialLogin from "./SocialLogin";
 import Cookies from "js-cookie";
 import { useAuth } from "../context/AuthContext"; // นำเข้า useAuth
+import { Link } from "react-router-dom";
 
 const LoginForm = () => {
 const [email, setEmail] = useState("");
@@ -86,12 +87,14 @@ const {login} =useAuth();
 
       <p className="mt-6 text-center text-sm text-gray-500">
         Don't have an account?{" "}
+        <Link to="/signup">
         <a
           href="#"
           className="font-semibold text-indigo-600 hover:text-indigo-500"
         >
           Sign up
         </a>
+        </Link>
       </p>
     </div>
   );
