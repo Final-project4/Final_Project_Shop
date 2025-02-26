@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { FaSpinner } from "react-icons/fa";
+import ReactSlider from "react-slider";
 
 const Products = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [maxPrice, setMaxPrice] = useState(500);
+  const [priceRange, setPriceRange] = useState([0, 10000]); // ตั้งค่าเป็น array เพื่อเก็บราคาต่ำสุดและสูงสุด
   const [searchQuery, setSearchQuery] = useState("");
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -65,7 +66,7 @@ const Products = () => {
 
   const filteredProducts = filterByCategory(selectedCategories).filter(
     (item) =>
-      item.price <= maxPrice &&
+      item.price >= priceRange[0] && item.price <= priceRange[1] && 
       (!searchQuery ||
         (item.name &&
           item.name.toLowerCase().includes(searchQuery.toLowerCase())))
@@ -98,7 +99,7 @@ const Products = () => {
       <div className="text-center text-red-500 text-2xl mt-10">{error}</div>
     );
   }
-  console.log(currentItems);
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
       <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -122,15 +123,32 @@ const Products = () => {
           </ul>
 
           <h2 className="text-xl font-semibold mt-6">กำหนดราคา</h2>
-          <input
-            type="range"
-            min="100"
-            max="10000"
-            value={maxPrice}
-            onChange={(e) => setMaxPrice(Number(e.target.value))}
+          <ReactSlider
             className="w-full mt-2"
+            value={priceRange}
+            onChange={(newValue) => setPriceRange(newValue)}
+            min={0}
+            max={10000}
+            step={100}
+            renderTrack={(props, state) => (
+              <div
+                {...props}
+                className={`flex-1 h-2 rounded-full bg-blue-200`}
+              />
+            )}
+            renderThumb={(props, state) => (
+              <div
+                {...props}
+                className="w-6 h-6 bg-gray-500 rounded-full cursor-pointer"
+              />
+            )}
+            pearling
+            minDistance={100}
           />
-          <p className="text-center mt-2">ราคาสูงสุด: {maxPrice} บาท</p>
+          <div className="flex justify-between mt-10">
+            <p>ต่ำสุด: {priceRange[0]} บาท</p>
+            <p>สูงสุด: {priceRange[1]} บาท</p>
+          </div>
 
           <h2 className="text-xl font-semibold mt-6">จัดเรียงตาม</h2>
           <div className="flex items-center space-x-4 mt-2">
