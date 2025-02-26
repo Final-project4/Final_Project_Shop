@@ -14,6 +14,7 @@ const Products = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [sortOrder, setSortOrder] = useState("asc");
+  const colors = ["bg-blue-500", "bg-green-500", "bg-red-500", "bg-yellow-500"];
 
   useEffect(() => {
     axios
@@ -97,7 +98,7 @@ const Products = () => {
       <div className="text-center text-red-500 text-2xl mt-10">{error}</div>
     );
   }
-
+  console.log(currentItems);
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
       <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -179,8 +180,20 @@ const Products = () => {
                         {item.name}
                       </h2>
                     </div>
-                    <div className="flex flex-col">
-                      <p className="text-[#C9A36B] font-bold text-xl mt-2">
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      {item.categories.map((category, index) => (
+                        <div
+                          key={index}
+                          className={`px-4 py-2 text-white rounded-full shadow-md text-sm font-medium ${
+                            colors[index % colors.length]
+                          }`}
+                        >
+                          {category.name} 
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex flex-row">
+                      <p className="text-[#C9A36B] font-bold text-base mt-2">
                         {item.price} บาท
                       </p>
                     </div>
