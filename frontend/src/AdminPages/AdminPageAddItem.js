@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import axios from "axios";
+import "./styles.css";
 
 const AdminPage = () => {
   const [name, setName] = useState("");
@@ -118,74 +119,61 @@ const AdminPage = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="admin-container">
       <Sidebar />
+      <div className="content">
+        <h1 className="title">Add Item</h1>
+        <div className="form-container">
+          <div className="section">
+            <h2>General Information</h2>
+            <label>Name Product:</label>
+            <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
 
-      <div className="flex-1 p-10 flex flex-col items-center overflow-auto">
-        <h1 className="text-3xl font-bold mb-5">
-          <span className="text-[#daa520]">FASHION</span> SHOP
-        </h1>
+            <label>Description Product:</label>
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+          </div>
 
-        <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-4xl">
-          <div className="flex flex-col space-y-4">
-            <div className="relative bg-gray-200 rounded-lg p-4 flex flex-col items-center">
-              <input type="file" multiple onChange={handleImageUpload} className="hidden" id="imageUpload" />
-              <label htmlFor="imageUpload" className="text-gray-500 cursor-pointer border border-gray-400 rounded-md px-4 py-2 mt-2">
-                Add Picture
-              </label>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {images.map((image, index) => (
-                  <img key={index} src={URL.createObjectURL(image)} alt="Uploaded Preview" className="w-24 h-24 object-cover rounded-md border" />
-                ))}
-              </div>
-            </div>
-
-            <input type="text" placeholder="name" value={name} onChange={(e) => setName(e.target.value)} className="p-3 w-full border border-gray-300 rounded-md bg-[#f7ead1] text-gray-700" />
-            <textarea placeholder="description" value={description} onChange={(e) => setDescription(e.target.value)} className="p-3 w-full h-24 border border-gray-300 rounded-md bg-[#f7ead1] text-gray-700"></textarea>
-
-            <div className="relative">
-              <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="px-4 py-2 bg-gray-300 rounded-md text-lg w-full text-left">
-                Select Category ▼
-              </button>
-              {isDropdownOpen && (
-                <ul className="absolute left-0 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10">
-                  {categories.map((category) => (
-                    <li key={category.id} onClick={() => toggleCategory(category)} className={`px-4 py-2 cursor-pointer hover:bg-gray-200 ${selectedCategories.some(item => item.id === category.id) ? 'bg-gray-300' : ''}`}>
-                      {category.name}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {selectedCategories.map((category) => (
-                <div key={category.id} className="flex items-center bg-gray-300 px-3 py-1 rounded-md">
-                  {category.name}
-                  <button onClick={() => toggleCategory(category)} className="ml-2 text-red-600 font-bold">×</button>
-                </div>
+          <div className="section">
+            <h2>Upload Img</h2>
+            <input type="file" multiple onChange={handleImageUpload} className="file-input" />
+            <div className="image-preview">
+              {images.map((image, index) => (
+                <img key={index} src={URL.createObjectURL(image)} alt="Preview" className="large-image" />
               ))}
             </div>
-
-            <div className="flex items-center space-x-2">
-              <input
-                type="number"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder="Price"
-                className="p-3 w-full border border-gray-300 rounded-md bg-[#f7ead1] text-gray-700"
-              />
-              <span className="text-lg font-semibold">Baht</span>
-            </div>
-
-            <button onClick={handleAddItem} className="px-6 py-3 bg-[#d4af37] text-black font-bold rounded-lg shadow-md hover:bg-[#b9972b] transition">
-              ADD
-            </button>
           </div>
+
+          <div className="section">
+            <h2>Pricing</h2>
+            <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
+            <span>Baht</span>
+          </div>
+
+          <div className="section">
+            <h2>Category</h2>
+            <button onClick={() => setIsDropdownOpen(!isDropdownOpen)}>Select Category ▼</button>
+            {isDropdownOpen && (
+              <ul className="dropdown">
+                {categories.map((category) => (
+                  <li key={category.id} onClick={() => toggleCategory(category)}>
+                    {category.name}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="selected-categories">
+              {selectedCategories.map((category) => (
+                <span key={category.id} className="selected-category">
+                  {category.name} <button onClick={() => toggleCategory(category)}>✖</button>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <button className="add-button" onClick={handleAddItem}>Add Item</button>
         </div>
       </div>
     </div>
   );
 };
-
 export default AdminPage;
