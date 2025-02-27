@@ -48,10 +48,7 @@ export default function HomePage() {
         </div>
       </div>
 
-
-      <div>
-      <PopularProducts products={products} />
-      </div>
+        <PopularProducts products={products} />
 
       {/* Banner */}
       <div className="my-8 text-center relative">

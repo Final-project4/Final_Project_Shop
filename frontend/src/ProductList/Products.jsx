@@ -15,7 +15,6 @@ const Products = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [sortOrder, setSortOrder] = useState("asc");
-  const colors = ["bg-black-100", "zinc-100", "neutral-100", "teal-900"];
 
   useEffect(() => {
     axios
@@ -211,9 +210,7 @@ const Products = () => {
                       {item.categories.map((category, index) => (
                         <div
                           key={index}
-                          className={`px-4 py-2 text-white rounded-full shadow-md text-sm font-medium ${
-                            colors[index % colors.length]
-                          }`}
+                          className={`px-4 py-2 text-white rounded-full shadow-md text-sm font-medium bg-gray-400 `}
                         >
                           {category.name}
                         </div>

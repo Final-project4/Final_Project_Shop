@@ -11,7 +11,6 @@ const ItemDetail = () => {
   const [selectedColor, setSelectedColor] = useState("");
   const { addToCart } = useCart();
   
-
   useEffect(() => {
     axios
       .get(`http://localhost:1337/api/items?filters[id][$eq]=${id}&populate=*`)
