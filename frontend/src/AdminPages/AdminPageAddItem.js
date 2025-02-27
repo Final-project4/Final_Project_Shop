@@ -12,12 +12,16 @@ const AdminPage = () => {
   const [price, setPrice] = useState("");
   const [images, setImages] = useState([]);
   const [categories, setCategories] = useState([]);
+  const token = localStorage.getItem("jwt");
+
   
   useEffect(() => {
+    
     fetch("http://localhost:1337/api/categories?populate=*")
       .then((res) => res.json())
       .then((data) => {
         console.log("Data from API:", data);
+        console.log("Request Headers:", axios.defaults.headers);
         if (data && data.data) {
           const formattedCategories = data.data.map(cat => ({
             id: cat.id - 1,
@@ -41,7 +45,14 @@ const AdminPage = () => {
 
     try {
       console.log("from",formData)
-      const response = await axios.post("http://localhost:1337/api/upload", formData);
+      const response = await axios.post("http://localhost:1337/api/upload", formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data"
+          }
+        }
+      );
       console.log("Uploaded Image Response:", response.data);
 
       if (response.data && response.data.length > 0) {
@@ -67,6 +78,8 @@ const AdminPage = () => {
   };
 
   const handleAddItem = async () => {
+    
+    console.log("jwt:", token)
     try {
       if (!name || !description || selectedCategories.length === 0 || !price) {
         alert("กรอกข้อมูลให่ครบ");
@@ -98,6 +111,7 @@ const AdminPage = () => {
       {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
         },
       }
     );
