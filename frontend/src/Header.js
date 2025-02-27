@@ -92,13 +92,13 @@ const Header = () => {
 
           {userInfo ? (
             <Link to="/login">
-              <Button gradientDuoTone="purpleToBlue" onClick={handleLogout}>
+              <Button gradientDuoTone="cyanToBlue" onClick={handleLogout}>
                 Logout
               </Button>
             </Link>
           ) : (
             <Link to="/login">
-              <Button gradientDuoTone="purpleToBlue">Login</Button>
+              <Button gradientDuoTone="cyanToBlue">Login</Button>
             </Link>
           )}
         </div>

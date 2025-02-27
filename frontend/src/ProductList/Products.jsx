@@ -13,7 +13,7 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(24);
   const [sortOrder, setSortOrder] = useState("asc");
 
   useEffect(() => {
@@ -135,7 +135,7 @@ const Products = () => {
                 <div
                   key={key}
                   {...restProps}
-                  className={`flex-1 h-2 rounded-full bg-blue-200 ${
+                  className={`flex-1 h-3 rounded-md bg-blue-200 ${
                     state.index === 1 ? "bg-blue-500" : ""
                   }`}
                 />
@@ -147,7 +147,7 @@ const Products = () => {
                 <div
                   key={key}
                   {...restProps}
-                  className="w-6 h-6 bg-gray-500 rounded-full cursor-pointer"
+                  className="w-3 h-3 bg-gray-500 rounded-full cursor-pointer"
                 />
               );
             }}
@@ -178,7 +178,7 @@ const Products = () => {
             <input
               type="text"
               placeholder="ค้นหาสินค้า..."
-              className="w-2/3 md:w-1/2 lg:w-1/3 px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full md:w-1/2 lg:w-1/3 px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -209,11 +209,11 @@ const Products = () => {
                     <div className="flex flex-wrap gap-2 mt-4">
                       {item.categories.map((category, index) => (
                         <div
-                          key={index}
-                          className={`px-4 py-2 text-white rounded-full shadow-md text-sm font-medium bg-gray-400 `}
-                        >
-                          {category.name}
-                        </div>
+                        key={index}
+                        className={`px-2 py-1 text-xs font-medium rounded-md shadow-md border bg-gray-200 border-gray-500 text-gray-100`}
+                      >
+                        {category.name}
+                      </div>
                       ))}
                     </div>
                     <div className="flex flex-row">
