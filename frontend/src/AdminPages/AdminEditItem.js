@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import "./styles.css";
 
 
 const AdminEditItem = () => {
@@ -138,59 +137,71 @@ const AdminEditItem = () => {
   
 
   return (
-    <div className="admin-container">
+    <div className="flex h-screen bg-gray-100">
       <Sidebar />
-      <div className="content">
-        <h1 className="title">Edit Item</h1>
-        <div className="form-container">
-          <div className="section">
-            <h2>General Information</h2>
-            <label>Name Product:</label>
-            <input type="text" className="input-field" value={name} onChange={(e) => setName(e.target.value)} />
-            <label>Description Product:</label>
-            <textarea className="input-field" value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
+      <div className="flex-1 p-10 flex flex-col items-center overflow-auto">
+        <h1 className="text-4xl font-bold mb-6 text-[#daa520]">EDIT ITEM</h1>
+        <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-5xl grid grid-cols-2 gap-6">
+          <div className="bg-gray-100 p-5 rounded-lg">
+            <h2 className="text-lg font-semibold">General Information</h2>
+            <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} className="w-full p-3 mt-3 border rounded-md bg-gray-200" />
+            <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} className="w-full h-28 p-3 mt-3 border rounded-md bg-gray-200"></textarea>
           </div>
+          <div className="bg-gray-100 p-5 rounded-lg">
+            <h2 className="text-lg font-semibold">Upload Image</h2>
+            <input type="file" multiple onChange={handleImageUpload} className="mt-3" />
+            <div className="mt-4 grid grid-cols-3 gap-3">
+              {images.map((image, index) => {
+                // ตรวจสอบว่า image เป็น URL หรือไฟล์ใหม่
+                const imageUrl =
+                  typeof image === "string" ? image : 
+                  image.url ? image.url : 
+                  image instanceof File ? URL.createObjectURL(image) : null;
 
-          <div className="section">
-            <h2>Upload Image</h2>
-            <input type="file" multiple className="file-input" onChange={handleImageUpload} />
-            <div className="image-preview">
-              {images.map((image, index) => (
-                <img key={index} src={typeof image === "string" ? image : URL.createObjectURL(image)} alt={`Uploaded Preview ${index}`} className="preview-img" />
-              ))}
+                return imageUrl ? (
+                  <img key={index} src={imageUrl} alt="Uploaded Preview" className="w-32 h-32 object-cover rounded-md border shadow-sm" />
+                ) : (
+                  <div key={index} className="w-32 h-32 flex items-center justify-center bg-gray-300 rounded-md border">
+                    <span className="text-sm text-gray-500">Invalid Image</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
-
-          <div className="section">
-            <h2>Pricing</h2>
-            <label>Price:</label>
-            <input type="number" className="input-field" value={price} onChange={(e) => setPrice(e.target.value)} />
+          <div className="bg-gray-100 p-5 rounded-lg">
+            <h2 className="text-lg font-semibold">Pricing</h2>
+            <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price" className="w-full p-3 mt-3 border rounded-md bg-gray-200" />
           </div>
-
-          <div className="section">
-            <h2>Category</h2>
-            <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="dropdown-button">Select Category ▼</button>
+          <div className="bg-gray-100 p-5 rounded-lg relative">
+            <h2 className="text-lg font-semibold">Category</h2>
+            <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="w-full p-3 mt-3 bg-gray-300 text-white rounded-md">Select Category ▼</button>
             {isDropdownOpen && (
-              <ul className="dropdown">
+              <ul className="absolute left-0 w-full mt-2 bg-white border rounded-md shadow-lg z-10">
                 {categories.map((category) => (
-                  <li key={category.id} onClick={() => setSelectedCategories([...selectedCategories, category])}>{category.name}</li>
+                  <li key={category.id} onClick={() => toggleCategory(category)} className="p-2 cursor-pointer hover:bg-gray-300">
+                    {category.name}
+                  </li>
                 ))}
               </ul>
             )}
-            <div className="selected-categories">
+            <div className="mt-3 flex flex-wrap gap-2">
               {selectedCategories.map((category) => (
-                <span key={category.id} className="selected-category">
-                  {category.name} <button onClick={() => setSelectedCategories(selectedCategories.filter((c) => c.id !== category.id))}>✖</button>
+                <span key={category.id} className="bg-gray-400 text-white px-3 py-1 rounded-md flex items-center">
+                  {category.name}
+                  <button onClick={() => toggleCategory(category)} className="ml-2 text-red-500">×</button>
                 </span>
               ))}
             </div>
           </div>
-
-          <button className="add-button" onClick={handleSaveItem}>Save Item</button>
+          <button 
+            onClick={handleSaveItem}
+            className="col-span-2 bg-yellow-500 text-black font-bold py-3 rounded-lg shadow-md hover:bg-yellow-600 transition">
+            UPDATE ITEM
+          </button>
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default AdminEditItem;
