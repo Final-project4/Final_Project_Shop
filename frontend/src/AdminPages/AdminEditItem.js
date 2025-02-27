@@ -3,6 +3,7 @@ import Sidebar from "./Sidebar";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 
+
 const AdminEditItem = () => {
   const { documentId } = useParams(); // ใช้ documentId แทน id
   console.log("useParams documentId:", documentId);
@@ -139,73 +140,68 @@ const AdminEditItem = () => {
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
       <div className="flex-1 p-10 flex flex-col items-center overflow-auto">
-        <h1 className="text-3xl font-bold mb-5">
-          <span className="text-[#daa520]">FASHION</span> SHOP
-        </h1>
+        <h1 className="text-4xl font-bold mb-6 text-[#daa520]">EDIT ITEM</h1>
+        <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-5xl grid grid-cols-2 gap-6">
+          <div className="bg-gray-100 p-5 rounded-lg">
+            <h2 className="text-lg font-semibold">General Information</h2>
+            <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} className="w-full p-3 mt-3 border rounded-md bg-gray-200" />
+            <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} className="w-full h-28 p-3 mt-3 border rounded-md bg-gray-200"></textarea>
+          </div>
+          <div className="bg-gray-100 p-5 rounded-lg">
+            <h2 className="text-lg font-semibold">Upload Image</h2>
+            <input type="file" multiple onChange={handleImageUpload} className="mt-3" />
+            <div className="mt-4 grid grid-cols-3 gap-3">
+              {images.map((image, index) => {
+                // ตรวจสอบว่า image เป็น URL หรือไฟล์ใหม่
+                const imageUrl =
+                  typeof image === "string" ? image : 
+                  image.url ? image.url : 
+                  image instanceof File ? URL.createObjectURL(image) : null;
 
-        <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-4xl">
-          <div className="flex flex-col space-y-4">
-            <div className="relative bg-gray-200 rounded-lg p-4 flex flex-col items-center">
-              <input type="file" multiple onChange={handleImageUpload} className="hidden" id="imageUpload" />
-              <label htmlFor="imageUpload" className="text-gray-500 cursor-pointer border border-gray-400 rounded-md px-4 py-2 mt-2">
-                Upload Picture
-              </label>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {images.map((image, index) => {
-                  // ตรวจสอบว่า image เป็น object ที่มาจาก backend หรือเป็นไฟล์ที่อัปโหลด
-                  const imageUrl = typeof image === "string"
-                    ? image // ถ้าเป็น URL จาก backend ให้ใช้เลย
-                    : URL.createObjectURL(image); // ถ้าเป็นไฟล์จาก input ให้สร้าง URL
-
-                  return (
-                    <img
-                      key={index}
-                      src={imageUrl}
-                      alt="Uploaded Preview"
-                      className="w-24 h-24 object-cover rounded-md border"
-                    />
-                  );
-                })}
-              </div>
+                return imageUrl ? (
+                  <img key={index} src={imageUrl} alt="Uploaded Preview" className="w-32 h-32 object-cover rounded-md border shadow-sm" />
+                ) : (
+                  <div key={index} className="w-32 h-32 flex items-center justify-center bg-gray-300 rounded-md border">
+                    <span className="text-sm text-gray-500">Invalid Image</span>
+                  </div>
+                );
+              })}
             </div>
-
-            <input type="text" placeholder="name" value={name} onChange={(e) => setName(e.target.value)} className="p-3 w-full border border-gray-300 rounded-md bg-[#f7ead1] text-gray-700" />
-            <textarea placeholder="description" value={description} onChange={(e) => setDescription(e.target.value)} className="p-3 w-full h-24 border border-gray-300 rounded-md bg-[#f7ead1] text-gray-700"></textarea>
-
-            <div className="relative">
-              <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="px-4 py-2 bg-gray-300 rounded-md text-lg w-full text-left">
-                Select Category ▼
-              </button>
-              {isDropdownOpen && (
-                <ul className="absolute left-0 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10">
-                  {categories.map((category) => (
-                    <li key={category.id} onClick={() => toggleCategory(category)} className={`px-4 py-2 cursor-pointer hover:bg-gray-200 ${selectedCategories.some(item => item.id === category.id) ? 'bg-gray-300' : ''}`}>
-                      {category.name}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            <div className="flex flex-wrap gap-2">
+          </div>
+          <div className="bg-gray-100 p-5 rounded-lg">
+            <h2 className="text-lg font-semibold">Pricing</h2>
+            <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price" className="w-full p-3 mt-3 border rounded-md bg-gray-200" />
+          </div>
+          <div className="bg-gray-100 p-5 rounded-lg relative">
+            <h2 className="text-lg font-semibold">Category</h2>
+            <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="w-full p-3 mt-3 bg-gray-300 text-white rounded-md">Select Category ▼</button>
+            {isDropdownOpen && (
+              <ul className="absolute left-0 w-full mt-2 bg-white border rounded-md shadow-lg z-10">
+                {categories.map((category) => (
+                  <li key={category.id} onClick={() => toggleCategory(category)} className="p-2 cursor-pointer hover:bg-gray-300">
+                    {category.name}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="mt-3 flex flex-wrap gap-2">
               {selectedCategories.map((category) => (
-                <div key={category.id} className="flex items-center bg-gray-300 px-3 py-1 rounded-md">
+                <span key={category.id} className="bg-gray-400 text-white px-3 py-1 rounded-md flex items-center">
                   {category.name}
-                  <button onClick={() => toggleCategory(category)} className="ml-2 text-red-600 font-bold">×</button>
-                </div>
+                  <button onClick={() => toggleCategory(category)} className="ml-2 text-red-500">×</button>
+                </span>
               ))}
             </div>
-
-            <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price" className="p-3 w-full border border-gray-300 rounded-md bg-[#f7ead1] text-gray-700" />
-
-            <button onClick={handleSaveItem} className="px-6 py-3 bg-[#d4af37] text-black font-bold rounded-lg shadow-md hover:bg-[#b9972b] transition">
-              Save
-            </button>
           </div>
+          <button 
+            onClick={handleSaveItem}
+            className="col-span-2 bg-yellow-500 text-black font-bold py-3 rounded-lg shadow-md hover:bg-yellow-600 transition">
+            UPDATE ITEM
+          </button>
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default AdminEditItem;
