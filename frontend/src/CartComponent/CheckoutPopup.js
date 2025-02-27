@@ -13,8 +13,7 @@ const CheckoutPopup = ({
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
 
-  const promptPayID = "0922567600"; // หรือใช้เลขบัญชีธนาคาร เช่น "1234567890123"
-  console.log("total",total)
+  const promptPayID = "0922567600"; // หรือใช้เลขบัญชีธนาคาร เช่น "1234567890123"  
   const generatePromptPayQR = (promptPayID, amount) => {
     if (!promptPayID) {
       return "";
@@ -24,7 +23,7 @@ const CheckoutPopup = ({
     }
     return generatePayload(promptPayID, { amount: parseFloat(amount) });
   };
-
+  console.log("total",total)
   const qrData = generatePromptPayQR(promptPayID, total); // ต้องมีค่าแน่นอน
 
   const handleFileChange = (event) => {

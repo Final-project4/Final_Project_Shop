@@ -15,7 +15,7 @@ const Products = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [sortOrder, setSortOrder] = useState("asc");
-  const colors = ["bg-blue-500", "bg-green-500", "bg-red-500", "bg-yellow-500"];
+  const colors = ["bg-black-100", "zinc-100", "neutral-100", "teal-900"];
 
   useEffect(() => {
     axios
@@ -66,7 +66,8 @@ const Products = () => {
 
   const filteredProducts = filterByCategory(selectedCategories).filter(
     (item) =>
-      item.price >= priceRange[0] && item.price <= priceRange[1] && 
+      item.price >= priceRange[0] &&
+      item.price <= priceRange[1] &&
       (!searchQuery ||
         (item.name &&
           item.name.toLowerCase().includes(searchQuery.toLowerCase())))
@@ -121,7 +122,6 @@ const Products = () => {
               </li>
             ))}
           </ul>
-
           <h2 className="text-xl font-semibold mt-6">กำหนดราคา</h2>
           <ReactSlider
             className="w-full mt-2"
@@ -130,18 +130,28 @@ const Products = () => {
             min={0}
             max={10000}
             step={100}
-            renderTrack={(props, state) => (
-              <div
-                {...props}
-                className={`flex-1 h-2 rounded-full bg-blue-200`}
-              />
-            )}
-            renderThumb={(props, state) => (
-              <div
-                {...props}
-                className="w-6 h-6 bg-gray-500 rounded-full cursor-pointer"
-              />
-            )}
+            renderTrack={(props, state) => {
+              const { key, ...restProps } = props;
+              return (
+                <div
+                  key={key}
+                  {...restProps}
+                  className={`flex-1 h-2 rounded-full bg-blue-200 ${
+                    state.index === 1 ? "bg-blue-500" : ""
+                  }`}
+                />
+              );
+            }}
+            renderThumb={(props) => {
+              const { key, ...restProps } = props;
+              return (
+                <div
+                  key={key}
+                  {...restProps}
+                  className="w-6 h-6 bg-gray-500 rounded-full cursor-pointer"
+                />
+              );
+            }}
             pearling
             minDistance={100}
           />
@@ -149,7 +159,6 @@ const Products = () => {
             <p>ต่ำสุด: {priceRange[0]} บาท</p>
             <p>สูงสุด: {priceRange[1]} บาท</p>
           </div>
-
           <h2 className="text-xl font-semibold mt-6">จัดเรียงตาม</h2>
           <div className="flex items-center space-x-4 mt-2">
             <select
@@ -206,7 +215,7 @@ const Products = () => {
                             colors[index % colors.length]
                           }`}
                         >
-                          {category.name} 
+                          {category.name}
                         </div>
                       ))}
                     </div>

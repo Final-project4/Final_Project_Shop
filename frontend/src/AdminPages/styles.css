@@ -1,5 +1,4 @@
-/* ----- Layout ----- */
-.admin-container {
+/* .admin-container {
     display: flex;
     height: 100vh;
     background-color: #f8f8f8;
@@ -17,7 +16,7 @@
     margin-bottom: 20px;
 }
 
-/* ----- Form Container ----- */
+
 .form-container {
     background: white;
     padding: 25px;
@@ -32,7 +31,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    background: #ececec; /* สีเทาอ่อนกว่าที่ใช้ก่อนหน้า */
+    background: #ececec; 
     padding: 20px;
     border-radius: 10px;
 }
@@ -48,7 +47,7 @@ input, textarea {
     border-radius: 8px;
     width: 100%;
     font-size: 16px;
-    background: #dcdcdc; /* สีเทาอ่อนขึ้นกว่าเดิม */
+    background: #dcdcdc; 
     color: #333;
 }
 
@@ -57,7 +56,6 @@ textarea {
     resize: none;
 }
 
-/* ----- Image Upload ----- */
 .file-input {
     border: none;
 }
@@ -76,7 +74,7 @@ textarea {
     border: 2px solid #cfcfcf;
 }
 
-/* ----- Category Dropdown ----- */
+
 .dropdown {
     background: white;
     border: 1px solid #ccc;
@@ -99,7 +97,7 @@ textarea {
     background: #f0f0f0;
 }
 
-/* ----- Selected Categories ----- */
+
 .selected-categories {
     display: flex;
     flex-wrap: wrap;
@@ -123,9 +121,9 @@ textarea {
     font-weight: bold;
 }
 
-/* ----- Add Button ----- */
+
 .add-button {
-    background: #DAA520; /* เปลี่ยนเป็นสีทอง */
+    background: #DAA520; 
     color: white;
     padding: 14px;
     border: none;
@@ -136,5 +134,5 @@ textarea {
 }
 
 .add-button:hover {
-    background: #b8860b; /* สีทองเข้มขึ้นเมื่อ hover */
-}
+    background: #b8860b; 
+} */

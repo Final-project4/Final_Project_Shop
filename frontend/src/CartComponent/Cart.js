@@ -33,6 +33,7 @@ const Cart = () => {
       .reduce((sum, item) => sum + item.price * item.quantity, 0);
     const shippingFee = subtotal > 50 ? 0 : 4.99;
     const total = subtotal + shippingFee - discountAmount;
+    console.log("taotat",total)
     return total < 0 ? 0 : total;
   };
 
