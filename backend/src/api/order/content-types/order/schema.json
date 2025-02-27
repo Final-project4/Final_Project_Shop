@@ -12,16 +12,10 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "user": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "plugin::users-permissions.user",
-      "inversedBy": "order"
-    },
     "step": {
       "type": "enumeration",
       "enum": [
-        "pendding",
+        "pending",
         "paid",
         "completed",
         "cancelled"
@@ -44,6 +38,12 @@
     },
     "total_price": {
       "type": "decimal"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "orders"
     }
   }
 }

@@ -74,9 +74,9 @@
       "target": "api::cart.cart",
       "inversedBy": "user"
     },
-    "order": {
+    "orders": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "oneToMany",
       "target": "api::order.order",
       "mappedBy": "user"
     },

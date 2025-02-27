@@ -26,6 +26,12 @@
       "relation": "manyToOne",
       "target": "api::item.item",
       "inversedBy": "cart_items"
+    },
+    "size": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string"
     }
   }
 }

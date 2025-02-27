@@ -71,4 +71,28 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
       return ctx.internalServerError('Something went wrong while updating the order');
     }
   },
+  async create(ctx) {
+    try {
+      const { user, total_price, step} = ctx.request.body.data || ctx.request.body;
+
+      if (!user || !total_price || !step) {
+        return ctx.badRequest('Missing required fields: customer, total_price, or items');
+      }
+
+      // ✅ สร้างคำสั่งซื้อ (Order)
+      const order = await strapi.db.query('api::order.order').create({
+        data: {
+          user,
+          total_price,
+          step: 'pending', // ตั้งค่าเริ่มต้นเป็น pending
+        },
+      });
+      
+      console.log('New Order Created:', order);
+      return ctx.send({ message: 'Order created successfully', data: order }, 201);
+    } catch (error) {
+      console.error('Error creating order:', error);
+      return ctx.internalServerError('Something went wrong while creating the order');
+    }
+  },
 }));

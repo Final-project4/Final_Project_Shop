@@ -129,6 +129,7 @@ const Cart = () => {
     }
 
     const selectedItems = cartItems.filter((item) => item.selected);
+    console.log("Selected Items:", selectedItems);
     if (selectedItems.length === 0) {
       alert("กรุณาเลือกสินค้าอย่างน้อย 1 ชิ้น");
       return;
@@ -137,41 +138,41 @@ const Cart = () => {
     try {
       const token = Cookies.get("authToken");
 
-      // Log the user ID and token for debugging
-      console.log("User ID:", userInfo.id);
-      console.log("Authorization Token:", token);
-
-      // 1️⃣ ดึง order ของ user ที่ login อยู่
-      const orderResponse = await axios.get(`http://localhost:1337/api/orders?user=${userInfo.id}`, {
+      // 1️⃣ สร้างออเดอร์ใหม่
+      const orderResponse = await axios.post("http://localhost:1337/api/orders", {
+        data: {
+          user: userInfo.id,
+          total_price: selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+          step: "pending"
+        }
+      }, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      // Log the response for debugging
-      console.log("Order Response:", orderResponse.data);
+      const orderId = orderResponse.data.data.id;
+      console.log("สร้างออเดอร์สำเร็จ ID:", orderId);
+      console.log("cartitem:", cartItems);
 
-      if (orderResponse.data.data.length === 0) {
-        console.error("No orders found for the user.");
-        alert("ไม่พบคำสั่งซื้อของคุณ กรุณาลองใหม่อีกครั้ง");
-        return;
-      }
-
-      const orderId = orderResponse.data.data[0].id;
+      // คำนวณราคาทั้งหมดจาก selectedItems
       const totalPrice = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      console.log("Total Price:", totalPrice);
 
-      // 2️⃣ สร้าง Order Items และเชื่อมโยงกับ Order ของ user
-      const orderItemRequests = selectedItems.map(item =>
-        axios.post("http://localhost:1337/api/order-items", {
+      const orderItemRequests = selectedItems.map(cartItem => {
+        console.log("Creating order item for:", cartItem);
+
+        return axios.post("http://localhost:1337/api/order-items", {
           data: {
-            item: item.id,
-            quantity: item.quantity,
-            price: item.price,
-            order: orderId
+            quantity: cartItem.quantity,
+            price: cartItem.price,  // ใช้ price โดยตรงจาก cartItem
+            size: cartItem.size,    // ใช้ size จาก cartItem
+            color: cartItem.color,  // ใช้ color จาก cartItem
+            order: orderId,
+            cart_item: cartItem.item_cart_id  // ใช้ cart_item ID
           }
-        }, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-      );
+        });
+      });
 
+      // ส่งคำขอทั้งหมดพร้อมกัน
       await Promise.all(orderItemRequests);
       console.log("สร้าง Order Items สำเร็จ");
 
@@ -234,15 +235,14 @@ const Cart = () => {
       );
       await Promise.all(removeCartRequests);
 
-      // ✅ Refetch cart items after checkout
-      fetchCartItems(); // Call the function to fetch cart items again
+      fetchCartItems();
 
       alert("สั่งซื้อสำเร็จ! กำลังดำเนินการตรวจสอบ");
       setIsCheckoutPopupOpen(false);
       setCartItems([]);
     } catch (error) {
-      console.error("Error fetching orders:", error.response?.data || error);
-      alert("เกิดข้อผิดพลาดในการดึงคำสั่งซื้อ กรุณาลองใหม่อีกครั้ง");
+      console.error("Error processing checkout:", error.response?.data || error);
+      alert("เกิดข้อผิดพลาดในการสั่งซื้อ กรุณาลองใหม่อีกครั้ง");
     }
   };
 
@@ -266,18 +266,20 @@ const Cart = () => {
         );
         console.log("API Response:", response.data);
 
-        // ตรวจสอบโครงสร้างของข้อมูล
         if (response.data.data && Array.isArray(response.data.data)) {
           const items = response.data.data.flatMap(cart =>
-            cart.cart_items && Array.isArray(cart.cart_items) ?
-              cart.cart_items.map(cartItem => ({
-                ...cartItem.item, // ดึงข้อมูลจาก item
-                quantity: cartItem.amount, // ใช้ amount เป็น quantity
-                selected: false, // เพิ่มค่าเริ่มต้นสำหรับ selected
-                item_cart_id: cartItem.id // เพิ่ม item_cart_id ที่ตรงกับ id ของ cartItem
-              })) : []
+            cart.cart_items && Array.isArray(cart.cart_items)
+              ? cart.cart_items.map(cartItem => ({
+                  ...cartItem.item,
+                  quantity: cartItem.amount,
+                  selected: false,
+                  item_cart_id: cartItem.id,
+                  size: cartItem.size,
+                  color: cartItem.color
+                }))
+              : []
           );
-          console.log("Fetched items:", items); // ตรวจสอบข้อมูลผลิตภัณฑ์ที่ดึงมา
+          console.log("Fetched items:", items); // ตรวจสอบข้อมูล
           setCartItems(items);
         } else {
           console.error("Invalid data structure:", response.data);
@@ -289,6 +291,7 @@ const Cart = () => {
       console.log("No user info available to fetch cart items");
     }
   };
+
 
   const toggleItemSelection = (id) => {
     setCartItems(
@@ -327,7 +330,7 @@ const Cart = () => {
         if (coupon.discount_type === "Percentage") {
           const discount = (subtotal * coupon.discount_value) / 100;
           setDiscountAmount(discount);
-          console.log("disco",discount)
+          console.log("disco", discount)
         } else if (coupon.discount_type === "fixed_amount") {
           setDiscountAmount(coupon.discount_value);
         }
@@ -406,11 +409,13 @@ const Cart = () => {
             const items = response.data.data.flatMap((cart) =>
               cart.cart_items && Array.isArray(cart.cart_items)
                 ? cart.cart_items.map((cartItem) => ({
-                    ...cartItem.item, // ดึงข้อมูลจาก item
-                    quantity: cartItem.amount, // ใช้ amount เป็น quantity
-                    selected: false, // เพิ่มค่าเริ่มต้นสำหรับ selected
-                    item_cart_id: cartItem.id, // เพิ่ม item_cart_id ที่ตรงกับ id ของ cartItem
-                  }))
+                  ...cartItem.item, // ดึงข้อมูลจาก item
+                  quantity: cartItem.amount, // ใช้ amount เป็น quantity
+                  selected: false, // เพิ่มค่าเริ่มต้นสำหรับ selected
+                  item_cart_id: cartItem.id, // เพิ่ม item_cart_id ที่ตรงกับ id ของ cartItem
+                  size: cartItem.size,
+                  color: cartItem.color
+                }))
                 : []
             );
             // console.log("Fetched items:", items); // ตรวจสอบข้อมูลผลิตภัณฑ์ที่ดึงมา
@@ -465,8 +470,8 @@ const Cart = () => {
           </div>
         </div>
       </div>
-<div className="disabled">
-      {/* Cart Content */}
+      <div className="disabled">
+        {/* Cart Content */}
         <div className="container mx-auto pb-16" style={{ marginTop: "4rem" }}>
           <div className="container flex flex-col lg:flex-row gap-16 ">
             {/* Cart Items */}
@@ -536,17 +541,17 @@ const Cart = () => {
             </div>
           </div>
         </div>
-        </div>
-        {isCheckoutPopupOpen && (
-          <CheckoutPopup
-            items={cartItems.filter((item) => item.selected)}
-            total={calculateTotal()}
-            discountAmount={discountAmount}
-            onClose={() => setIsCheckoutPopupOpen(false)}
-            handleCheckout={handleCheckout}
-          />
-        )}
       </div>
+      {isCheckoutPopupOpen && (
+        <CheckoutPopup
+          items={cartItems.filter((item) => item.selected)}
+          total={calculateTotal()}
+          discountAmount={discountAmount}
+          onClose={() => setIsCheckoutPopupOpen(false)}
+          handleCheckout={handleCheckout}
+        />
+      )}
+    </div>
   );
 };
 
