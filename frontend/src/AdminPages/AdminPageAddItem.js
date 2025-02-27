@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import axios from "axios";
-import "./styles.css";
+
 
 const AdminPage = () => {
   const [name, setName] = useState("");
@@ -119,61 +119,54 @@ const AdminPage = () => {
   };
 
   return (
-    <div className="admin-container">
+    <div className="flex h-screen bg-gray-100">
       <Sidebar />
-      <div className="content">
-        <h1 className="title">Add Item</h1>
-        <div className="form-container">
-          <div className="section">
-            <h2>General Information</h2>
-            <label>Name Product:</label>
-            <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
-
-            <label>Description Product:</label>
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+      <div className="flex-1 p-10 flex flex-col items-center overflow-auto">
+        <h1 className="text-4xl font-bold mb-6 text-[#daa520]">FASHION SHOP</h1>
+        <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-5xl grid grid-cols-2 gap-6">
+          <div className="bg-gray-100 p-5 rounded-lg">
+            <h2 className="text-lg font-semibold">General Information</h2>
+            <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} className="w-full p-3 mt-3 border rounded-md bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#daa520]" />
+            <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} className="w-full h-28 p-3 mt-3 border rounded-md bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#daa520]"></textarea>
           </div>
-
-          <div className="section">
-            <h2>Upload Img</h2>
-            <input type="file" multiple onChange={handleImageUpload} className="file-input" />
-            <div className="image-preview">
+          <div className="bg-gray-100 p-5 rounded-lg">
+            <h2 className="text-lg font-semibold">Upload Image</h2>
+            <input type="file" multiple onChange={handleImageUpload} className="mt-3" />
+            <div className="mt-4 grid grid-cols-3 gap-3">
               {images.map((image, index) => (
-                <img key={index} src={URL.createObjectURL(image)} alt="Preview" className="large-image" />
+                <img key={index} src={URL.createObjectURL(image)} alt="Uploaded Preview" className="w-32 h-32 object-cover rounded-md border shadow-sm" />
               ))}
             </div>
           </div>
-
-          <div className="section">
-            <h2>Pricing</h2>
-            <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
-            <span>Baht</span>
+          <div className="bg-gray-100 p-5 rounded-lg">
+            <h2 className="text-lg font-semibold">Pricing</h2>
+            <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price" className="w-full p-3 mt-3 border rounded-md bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#daa520]" />
           </div>
-
-          <div className="section">
-            <h2>Category</h2>
-            <button onClick={() => setIsDropdownOpen(!isDropdownOpen)}>Select Category ▼</button>
+          <div className="bg-gray-100 p-5 rounded-lg relative">
+            <h2 className="text-lg font-semibold">Category</h2>
+            <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="w-full p-3 mt-3 bg-gray-300 text-white rounded-md focus:outline-none">Select Category ▼</button>
             {isDropdownOpen && (
-              <ul className="dropdown">
+              <ul className="absolute left-0 w-full mt-2 bg-white border rounded-md shadow-lg z-10">
                 {categories.map((category) => (
-                  <li key={category.id} onClick={() => toggleCategory(category)}>
+                  <li key={category.id} onClick={() => setSelectedCategories([...selectedCategories, category])} className="p-2 cursor-pointer hover:bg-gray-300">
                     {category.name}
                   </li>
                 ))}
               </ul>
             )}
-            <div className="selected-categories">
+            <div className="mt-3 flex flex-wrap gap-2">
               {selectedCategories.map((category) => (
-                <span key={category.id} className="selected-category">
-                  {category.name} <button onClick={() => toggleCategory(category)}>✖</button>
+                <span key={category.id} className="bg-gray-400 text-white px-3 py-1 rounded-md flex items-center">
+                  {category.name}
+                  <button onClick={() => setSelectedCategories(selectedCategories.filter(c => c.id !== category.id))} className="ml-2 text-red-500">×</button>
                 </span>
               ))}
             </div>
           </div>
-
-          <button className="add-button" onClick={handleAddItem}>Add Item</button>
+          <button onClick={handleAddItem} className="col-span-2 bg-yellow-500 text-black font-bold py-3 rounded-lg shadow-md hover:bg-yellow-600 transition">ADD ITEM</button>
         </div>
       </div>
     </div>
   );
-};
+}
 export default AdminPage;
