@@ -10,7 +10,7 @@ import OrderSummary from "./OrderSummary";
 import { useAuth } from "../context/AuthContext";
 
 const Cart = () => {
-  const { userInfo } = useAuth();
+  const { userInfo, setUser } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [isApplyButtonActive, setIsApplyButtonActive] = useState(false);
   const [isCheckoutButtonActive, setIsCheckoutButtonActive] = useState(false);
@@ -24,14 +24,14 @@ const Cart = () => {
   const subtotal = cartItems
     .filter((item) => item.selected)
     .reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shippingFee = subtotal > 50 ? 0 : 4.99;
+  const shippingFee = subtotal > 500 ? 0 : 40;
   const total = subtotal + shippingFee;
 
   const calculateTotal = () => {
     const subtotal = cartItems
       .filter((item) => item.selected)
       .reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const shippingFee = subtotal > 50 ? 0 : 4.99;
+    const shippingFee = subtotal > 500 ? 0 : 40;
     const total = subtotal + shippingFee - discountAmount;
     return total < 0 ? 0 : total;
   };
@@ -121,123 +121,147 @@ const Cart = () => {
       alert("เกิดข้อผิดพลาดในการลบสินค้า กรุณาลองใหม่อีกครั้ง");
     }
   };
-
+  const removeUsedVoucher = async (couponCode) => {
+    try {
+      const token = Cookies.get("authToken");
+      if (!token) {
+        console.error("No authToken found");
+        return;
+      }
+  
+      // ส่ง request ไปยัง API เพื่อลบ voucher ที่ใช้แล้ว
+      const response = await axios.put(
+        `http://localhost:1337/api/users/${userInfo.id}?populate=*`,
+        {
+          coupons: userInfo.coupons.filter((coupon) => coupon.code !== couponCode),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      if (response.status === 200) {
+        console.log("Voucher removed successfully");
+        // อัปเดตข้อมูลผู้ใช้ใน state
+        setUser((prevUserInfo) => ({
+          ...prevUserInfo,
+          coupons: prevUserInfo.coupons.filter((coupon) => coupon.code !== couponCode),
+        }));
+      } else {
+        console.error("Failed to remove voucher:", response.data);
+      }
+    } catch (error) {
+      console.error("Error removing voucher:", error.response?.data || error);
+    }
+  };
+  
   const handleCheckout = async (slipFile) => {
     if (!userInfo) {
       alert("กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อ");
       return;
     }
-
+  
     const selectedItems = cartItems.filter((item) => item.selected);
-    console.log("Selected Items:", selectedItems);
     if (selectedItems.length === 0) {
       alert("กรุณาเลือกสินค้าอย่างน้อย 1 ชิ้น");
       return;
     }
-
+  
     try {
       const token = Cookies.get("authToken");
-
-      // 1️⃣ สร้างออเดอร์ใหม่
-      const orderResponse = await axios.post("http://localhost:1337/api/orders", {
-        data: {
-          user: userInfo.id,
-          total_price: selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
-          step: "pending"
-        }
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      const orderId = orderResponse.data.data.id;
-      console.log("สร้างออเดอร์สำเร็จ ID:", orderId);
-      console.log("cartitem:", cartItems);
-
-      // คำนวณราคาทั้งหมดจาก selectedItems
-      const totalPrice = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      console.log("Total Price:", totalPrice);
-
-      const orderItemRequests = selectedItems.map(cartItem => {
-        console.log("Creating order item for:", cartItem);
-
-        return axios.post("http://localhost:1337/api/order-items", {
+  
+      // สร้างออเดอร์ใหม่
+      const orderResponse = await axios.post(
+        "http://localhost:1337/api/orders",
+        {
           data: {
-            quantity: cartItem.quantity,
-            price: cartItem.price,  // ใช้ price โดยตรงจาก cartItem
-            size: cartItem.size,    // ใช้ size จาก cartItem
-            color: cartItem.color,  // ใช้ color จาก cartItem
-            order: orderId,
-            cart_item: cartItem.item_cart_id  // ใช้ cart_item ID
-          }
-        });
-      });
-
-      // ส่งคำขอทั้งหมดพร้อมกัน
-      await Promise.all(orderItemRequests);
-      console.log("สร้าง Order Items สำเร็จ");
-
+            user: userInfo.id,
+            total_price: selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+            step: "pending",
+          },
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+  
+      const orderId = orderResponse.data.data.id;
+  
+      // สร้าง order items
+      await Promise.all(
+        selectedItems.map((cartItem) =>
+          axios.post(
+            "http://localhost:1337/api/order-items",
+            {
+              data: {
+                quantity: cartItem.quantity,
+                price: cartItem.price,
+                size: cartItem.size,
+                color: cartItem.color,
+                order: orderId,
+                cart_item: cartItem.item_cart_id,
+              },
+            },
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          )
+        )
+      );
+  
+      // อัปโหลดสลิปการชำระเงิน (ถ้ามี)
       let slipFileId = null;
-      // 3️⃣ อัปโหลดสลิปการชำระเงิน (ถ้ามี)
       if (slipFile) {
         const formData = new FormData();
         formData.append("files", slipFile);
-
-        const uploadResponse = await axios.post("http://localhost:1337/api/upload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`
+  
+        const uploadResponse = await axios.post(
+          "http://localhost:1337/api/upload",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${token}`,
+            },
           }
-        });
-
-        console.log("Upload Response:", uploadResponse.data); // ✅ Debugging
-
+        );
+  
         if (uploadResponse.data.length > 0) {
-          slipFileId = uploadResponse.data[0].id; // ✅ ดึงค่า id ของไฟล์
-        } else {
-          console.error("ไม่สามารถอัปโหลดไฟล์ได้");
-          alert("เกิดข้อผิดพลาดในการอัปโหลดสลิป กรุณาลองใหม่อีกครั้ง");
-          return;
+          slipFileId = uploadResponse.data[0].id;
         }
       }
-
-      // ✅ ตรวจสอบว่าค่า slipFileId ถูกต้องก่อน PUT
-      if (!slipFileId) {
-        console.error("slipFileId เป็น undefined หรือ null:", slipFileId);
-        alert("เกิดข้อผิดพลาดในการอัปโหลดสลิป กรุณาลองใหม่อีกครั้ง");
-        return;
-      }
-
-      const putData = {
-        data: {
-          slip: slipFileId, // ✅ ใส่ ID ของไฟล์ให้ถูกต้อง
-          total_price: totalPrice
-        }
-      };
-
-      console.log("PUT Data:", putData); // ✅ Debugging ก่อน PUT
-
-      await axios.put(`http://localhost:1337/api/orders/${orderId}`, putData, {
-        headers: { Authorization: `Bearer ${token}` }
-      }).then(response => {
-        console.log("PUT Response:", response.data); // ✅ ตรวจสอบ Response ที่ได้กลับมา
-      }).catch(error => {
-        console.error("PUT Error:", error.response?.data || error.message);
-      });
-
-      // 5️⃣ ลบสินค้าออกจากตะกร้า
-      const removeCartRequests = selectedItems.map((item) =>
-        axios.delete(
-          `http://localhost:1337/api/cart-items/${item.item_cart_id}`,
+  
+      // อัปเดตออเดอร์ด้วยสลิป (ถ้ามี)
+      if (slipFileId) {
+        await axios.put(
+          `http://localhost:1337/api/orders/${orderId}`,
+          {
+            data: {
+              slip: slipFileId,
+            },
+          },
           {
             headers: { Authorization: `Bearer ${token}` },
           }
+        );
+      }
+  
+      // ลบสินค้าออกจากตะกร้า
+      await Promise.all(
+        selectedItems.map((item) =>
+          axios.delete(`http://localhost:1337/api/cart-items/${item.item_cart_id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
         )
       );
-      await Promise.all(removeCartRequests);
-
+      if (selectedCoupon) {
+        await removeUsedVoucher(selectedCoupon);
+      }
+      alert("ชำระเงินสำเร็จ กำลังอยู่ระหว่างรอดำเนินการ");
+      // อัปเดต state และปิด popup
       fetchCartItems();
-
-      alert("สั่งซื้อสำเร็จ! กำลังดำเนินการตรวจสอบ");
       setIsCheckoutPopupOpen(false);
       setCartItems([]);
     } catch (error) {
@@ -270,13 +294,13 @@ const Cart = () => {
           const items = response.data.data.flatMap(cart =>
             cart.cart_items && Array.isArray(cart.cart_items)
               ? cart.cart_items.map(cartItem => ({
-                  ...cartItem.item,
-                  quantity: cartItem.amount,
-                  selected: false,
-                  item_cart_id: cartItem.id,
-                  size: cartItem.size,
-                  color: cartItem.color
-                }))
+                ...cartItem.item,
+                quantity: cartItem.amount,
+                selected: false,
+                item_cart_id: cartItem.id,
+                size: cartItem.size,
+                color: cartItem.color
+              }))
               : []
           );
           console.log("Fetched items:", items); // ตรวจสอบข้อมูล
@@ -542,12 +566,12 @@ const Cart = () => {
           </div>
         </div>
       </div>
-      {isCheckoutPopupOpen && (
+      {isCheckoutPopupOpen &&  (
         <CheckoutPopup
           items={cartItems.filter((item) => item.selected)}
           total={calculateTotal()}
           discountAmount={discountAmount}
-          onClose={() => setIsCheckoutPopupOpen(false)}
+          onClose={() => setIsCheckoutPopupOpen(false)} // ปิด popup หลังจาก checkout
           handleCheckout={handleCheckout}
         />
       )}
