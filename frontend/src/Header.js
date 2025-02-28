@@ -1,8 +1,31 @@
 import React from "react";
 import { Navbar, Button } from "flowbite-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Swal from 'sweetalert2';
+import { useAuth } from './context/AuthContext';
 
 const Header = () => {
+  const { isLoggedIn, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    Swal.fire({
+      title: 'Confirm Logout',
+      text: "Are you sure you want to log out?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0000CC',
+      cancelButtonColor: '#CC0000',
+      confirmButtonText: 'Yes, log out',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        logout();
+        navigate("/login");
+      }
+    });
+  };
+
   return (
     <Navbar fluid className="bg-gradient-to-r from-blue-700 to-cyan-400 text-white py-4 px-6">
       <Navbar.Brand as={Link} to="/">
@@ -33,9 +56,15 @@ const Header = () => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A9 9 0 1118.88 6.197M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </Link>
-          <Link to="/Login">
-          <Button gradientDuoTone="purpleToBlue">Login</Button>
-          </Link>
+          {isLoggedIn ? (
+            <Button gradientDuoTone="purpleToBlue" onClick={handleLogout}>
+              Logout
+            </Button>
+          ) : (
+            <Link to="/Login">
+              <Button gradientDuoTone="purpleToBlue">Login</Button>
+            </Link>
+          )}
         </div>
       </div>
     </Navbar>
