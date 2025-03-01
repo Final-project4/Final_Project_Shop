@@ -31,7 +31,7 @@ const CartItem = ({
             {item.name || "Unknown Product"}
           </h3>
           <p className="text-sm text-gray-500 mt-2">
-            ${(item.price * item.quantity || 0).toFixed(2)}
+            {(item.price * item.quantity || 0).toFixed(2)} Baht
           </p>
         </div>
         <div className="flex items-center gap-4">

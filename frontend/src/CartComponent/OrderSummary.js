@@ -28,15 +28,15 @@ const OrderSummary = ({
               <div className="space-y-4">
                 <div className="flex justify-between text-lg">
                   <span className="text-gray-600">Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>{subtotal.toFixed(2)} Baht</span>
                 </div>
                 <div className="flex justify-between text-lg">
                   <span className="text-gray-600">Shipping Fee</span>
-                  <span>${shippingFee.toFixed(2)}</span>
+                  <span>{shippingFee.toFixed(2)} Baht</span>
                 </div>
                 <div className="flex justify-between text-lg">
                   <span className="text-gray-600">Discount</span>
-                  <span>-${discountAmount.toFixed(2)}</span>
+                  <span>-{discountAmount.toFixed(2)} Baht</span>
                 </div>
               </div>
             </div>
@@ -68,7 +68,7 @@ const OrderSummary = ({
             </div>
             <div className="flex justify-between font-medium text-xl">
               <span>Total</span>
-              <span>${calculateTotal().toFixed(2)}</span>
+              <span>{calculateTotal().toFixed(2)} Baht</span>
             </div>
             <button
               type="button"

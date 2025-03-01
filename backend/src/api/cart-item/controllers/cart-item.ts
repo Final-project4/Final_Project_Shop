@@ -48,7 +48,7 @@ export default factories.createCoreController('api::cart-item.cart-item', ({ str
     // Fetch the author by ID using Strapi's db query API
     const cartItem = await strapi.db.query('api::cart-item.cart-item').findOne({
       where: { id: cartItemId },
-      populate: ['books'], // Populate related data if needed
+      populate: ['item','*'], // Populate related data if needed
     });
 
     if (!cartItem) {

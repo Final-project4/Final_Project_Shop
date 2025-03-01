@@ -43,15 +43,6 @@
       "relation": "oneToMany",
       "target": "api::cart-item.cart-item",
       "mappedBy": "item"
-    },
-    "order_items": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::order-item.order-item",
-      "mappedBy": "item"
-    },
-    "stock": {
-      "type": "json"
     }
   }
 }
