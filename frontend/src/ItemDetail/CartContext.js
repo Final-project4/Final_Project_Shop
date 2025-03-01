@@ -55,7 +55,7 @@ export const CartProvider = ({ children }) => {
         {
           data: {
             cart: cartId,
-            item: productId,
+            item: productId
             // size,
             // color,
             amount: 1,  

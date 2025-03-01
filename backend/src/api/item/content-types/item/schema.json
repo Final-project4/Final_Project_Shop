@@ -31,15 +31,12 @@
     },
     "img": {
       "type": "media",
-      "multiple": true,
+      "multiple": false,
       "required": true,
       "allowedTypes": [
         "images",
         "videos"
-      ],
-      "type": "media",
-      "multiple": false,
-      "required": true
+      ]
     },
     "cart_items": {
       "type": "relation",
@@ -52,6 +49,9 @@
       "relation": "oneToMany",
       "target": "api::order-item.order-item",
       "mappedBy": "item"
+    },
+    "stock": {
+      "type": "json"
     }
   }
 }
