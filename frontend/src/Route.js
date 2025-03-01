@@ -26,6 +26,7 @@ const AppRoutes = () => (
     <Route path="/account" element={<AccountPage />} />
     <Route path="/status" element={<OrderStatus />} />
     <Route path="/product/:id" element={<ItemDetail />} />
+    
 
     {/* Admin Routes */}
     <Route

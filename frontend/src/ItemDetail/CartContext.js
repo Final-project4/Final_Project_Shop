@@ -46,7 +46,7 @@ export const CartProvider = ({ children }) => {
       alert("กรุณาเข้าสู่ระบบก่อนเพิ่มสินค้า");
       return;
     }
-
+    console.log(size, color);
     try {
       const authToken = getAuthToken();
       const cartId = cart ? cart.id : null;
@@ -56,9 +56,9 @@ export const CartProvider = ({ children }) => {
           data: {
             cart: cartId,
             item: productId,
-            // size,
-            // color,
-            amount: 1,  
+            size: size, // เพิ่ม size
+            color: color, // เพิ่ม color
+            amount: 1,
           },
         },
         {
@@ -68,11 +68,13 @@ export const CartProvider = ({ children }) => {
           withCredentials: true,
         }
       );
-
+      
       console.log("เพิ่มสินค้าลงตะกร้าสำเร็จ", response.data);
       fetchUserCart(userInfo.id).then((updatedCart) => setCart(updatedCart));
     } catch (error) {
+      alert("เกิดข้อผิดพลาดในการเพิ่มสินค้าไปยังตะกร้า");
       console.error("เกิดข้อผิดพลาดในการเพิ่มสินค้าไปยังตะกร้า:", error);
+
     }
   };
 

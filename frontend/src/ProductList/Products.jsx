@@ -6,7 +6,7 @@ import ReactSlider from "react-slider";
 
 const Products = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [priceRange, setPriceRange] = useState([0, 10000]); // ตั้งค่าเป็น array เพื่อเก็บราคาต่ำสุดและสูงสุด
+  const [priceRange, setPriceRange] = useState([0, 10000]);
   const [searchQuery, setSearchQuery] = useState("");
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -15,6 +15,8 @@ const Products = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(24);
   const [sortOrder, setSortOrder] = useState("asc");
+  const [sortOrder, setSortOrder] = useState(null); // เปลี่ยนค่าเริ่มต้นเป็น null
+  const colors = ["bg-blue-500", "bg-green-500", "bg-red-500", "bg-yellow-500"];
 
   useEffect(() => {
     axios
@@ -75,8 +77,10 @@ const Products = () => {
   const sortedProducts = filteredProducts.sort((a, b) => {
     if (sortOrder === "asc") {
       return a.price - b.price;
-    } else {
+    } else if (sortOrder === "desc") {
       return b.price - a.price;
+    } else {
+      return 0; // ไม่จัดเรียงถ้า sortOrder เป็น null
     }
   });
 
@@ -100,13 +104,17 @@ const Products = () => {
     );
   }
 
+  const handleSortOrder = (order) => {
+    setSortOrder((prevOrder) => (prevOrder === order ? null : order));
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
-      <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* Sidebar */}
-        <div className="bg-white shadow-xl p-6 rounded-lg">
+    <div className="min-h-screen bg-gray-100 flex">
+      {/* Sidebar */}
+      <div className="w-64 bg-white shadow-xl p-6 rounded-lg sticky top-0 h-screen space-y-12">
+        <div>
           <h2 className="text-xl font-semibold mb-4">หมวดหมู่</h2>
-          <ul>
+          <ul className="space-y-4">
             {categories.map((category) => (
               <li
                 key={category.id}
@@ -183,6 +191,8 @@ const Products = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+        </div>
+      </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             {currentItems.map((item) => (
@@ -222,35 +232,41 @@ const Products = () => {
                       </p>
                     </div>
                   </div>
-                </Link>
-              </div>
-            ))}
-          </div>
+                  
+                  <div className="flex flex-row justify-center items-center mt-2">
+                    <p className="text-[#C9A36B] font-bold text-lg">
+                      ราคา       {item.price} บาท
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          ))}
+        </div>
 
-          {/* Pagination */}
-          <div className="flex justify-center mt-6">
-            <nav>
-              <ul className="flex list-none">
-                {Array.from(
-                  { length: Math.ceil(sortedProducts.length / itemsPerPage) },
-                  (_, i) => (
-                    <li key={i} className="mx-1">
-                      <button
-                        onClick={() => paginate(i + 1)}
-                        className={`px-4 py-2 rounded-lg ${
-                          currentPage === i + 1
-                            ? "bg-blue-500 text-white"
-                            : "bg-white text-blue-500"
-                        }`}
-                      >
-                        {i + 1}
-                      </button>
-                    </li>
-                  )
-                )}
-              </ul>
-            </nav>
-          </div>
+        {/* Pagination */}
+        <div className="flex justify-center mt-6">
+          <nav>
+            <ul className="flex list-none">
+              {Array.from(
+                { length: Math.ceil(sortedProducts.length / itemsPerPage) },
+                (_, i) => (
+                  <li key={i} className="mx-1">
+                    <button
+                      onClick={() => paginate(i + 1)}
+                      className={`px-4 py-2 rounded-lg ${
+                        currentPage === i + 1
+                          ? "bg-blue-500 text-white"
+                          : "bg-white text-blue-500"
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  </li>
+                )
+              )}
+            </ul>
+          </nav>
         </div>
       </div>
     </div>
