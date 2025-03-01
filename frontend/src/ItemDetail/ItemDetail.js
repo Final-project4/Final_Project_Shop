@@ -20,7 +20,6 @@ const ItemDetail = () => {
     axios
       .get(`http://localhost:1337/api/items?filters[id][$eq]=${id}&populate=*`)
       .then((response) => {
-        console.log("API Response:", response.data);
         setProduct(response.data.data[0]);
       })
       .catch((error) => {
@@ -55,7 +54,7 @@ const ItemDetail = () => {
       return;
     }
     setLoading(true);
-    await addToCart(item, selectedSize, selectedColor);
+    await addToCart(item.id, selectedSize, selectedColor);
   };
 
   const toggleDescription = () => {

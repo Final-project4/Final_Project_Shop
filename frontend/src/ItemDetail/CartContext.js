@@ -37,7 +37,10 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
     if (userInfo) {
-      fetchUserCart(userInfo.id).then((userCart) => setCart(userCart));
+      fetchUserCart(userInfo.id).then((userCart
+      ) => {
+        console.log("hee",userCart)
+        setCart(userCart)});
     }
   }, [userInfo]);
 
@@ -46,9 +49,14 @@ export const CartProvider = ({ children }) => {
       alert("กรุณาเข้าสู่ระบบก่อนเพิ่มสินค้า");
       return;
     }
-    console.log(size, color);
+    console.log("user",userInfo);
+    console.log("cart:",cart.id)
+    console.log("item:",productId)
+    console.log("size:",size)
+    console.log("color:",color)
+    console.log("amount:",1)
     try {
-      const authToken = getAuthToken();
+      const authToken = getAuthToken(); 
       const cartId = cart ? cart.id : null;
       const response = await axios.post(
         "http://localhost:1337/api/cart-items",
@@ -56,8 +64,8 @@ export const CartProvider = ({ children }) => {
           data: {
             cart: cartId,
             item: productId,
-            size: size, // เพิ่ม size
-            color: color, // เพิ่ม color
+            size: size,
+            color: color,
             amount: 1,
           },
         },
