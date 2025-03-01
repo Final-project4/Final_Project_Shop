@@ -15,11 +15,9 @@ const Products = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(24);
   const [sortOrder, setSortOrder] = useState("asc");
-  const [sortOrder, setSortOrder] = useState(null); // เปลี่ยนค่าเริ่มต้นเป็น null
-  const colors = ["bg-blue-500", "bg-green-500", "bg-red-500", "bg-yellow-500"];
 
   useEffect(() => {
-    axios
+    axios 
       .get("http://localhost:1337/api/categories")
       .then((response) => {
         setCategories(response.data.data || []);
@@ -179,63 +177,55 @@ const Products = () => {
             </select>
           </div>
         </div>
-
-        {/* Main Content */}
-        <div className="col-span-3">
-          <div className="w-full mb-6 flex justify-center">
-            <input
-              type="text"
-              placeholder="ค้นหาสินค้า..."
-              className="w-full md:w-1/2 lg:w-1/3 px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-        </div>
       </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {currentItems.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300"
-              >
-                <Link to={`/product/${item.id}`}>
-                  <div className="p-4 text-center">
-                    <img
-                      src={`http://localhost:1337${
-                        item.img?.formats?.small?.url ||
-                        item.img?.url ||
-                        "/placeholder.jpg"
-                      }`}
-                      alt={item.name}
-                      className="w-full h-48 object-cover rounded-lg mb-4"
-                    />
-                    <div className="h-18">
-                      <h2 className="text-gray-900 font-medium text-sm">
-                        {item.name}
-                      </h2>
-                    </div>
-                    <div className="flex flex-wrap gap-2 mt-4">
-                      {item.categories.map((category, index) => (
-                        <div
+      {/* Main Content */}
+      <div className="flex-1 p-6">
+        <div className="w-full mb-6 flex justify-center">
+          <input
+            type="text"
+            placeholder="ค้นหาสินค้า..."
+            className="w-full md:w-1/2 lg:w-1/3 px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          {currentItems.map((item) => (
+            <div
+              key={item.id}
+              className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300"
+            >
+              <Link to={`/product/${item.id}`}>
+                <div className="p-4 text-center">
+                  <img
+                    src={`http://localhost:1337${
+                      item.img?.formats?.small?.url ||
+                      item.img?.url ||
+                      "/placeholder.jpg"
+                    }`}
+                    alt={item.name}
+                    className="w-full h-48 object-cover rounded-lg mb-4"
+                  />
+                  <div className="h-18">
+                    <h2 className="text-gray-900 font-medium text-sm">
+                      {item.name}
+                    </h2>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {item.categories.map((category, index) => (
+                      <div
                         key={index}
                         className={`px-2 py-1 text-xs font-medium rounded-md shadow-md border bg-gray-200 border-gray-500 text-gray-100`}
                       >
                         {category.name}
                       </div>
-                      ))}
-                    </div>
-                    <div className="flex flex-row">
-                      <p className="text-[#C9A36B] font-bold text-base mt-2">
-                        {item.price} บาท
-                      </p>
-                    </div>
+                    ))}
                   </div>
-                  
-                  <div className="flex flex-row justify-center items-center mt-2">
-                    <p className="text-[#C9A36B] font-bold text-lg">
-                      ราคา       {item.price} บาท
+                  <div className="flex flex-row">
+                    <p className="text-[#C9A36B] font-bold text-base mt-2">
+                      {item.price} บาท
                     </p>
                   </div>
                 </div>
