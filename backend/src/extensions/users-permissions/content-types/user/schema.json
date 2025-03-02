@@ -74,12 +74,6 @@
       "target": "api::cart.cart",
       "inversedBy": "user"
     },
-    "order": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::order.order",
-      "mappedBy": "user"
-    },
     "coupons": {
       "type": "relation",
       "relation": "manyToMany",
@@ -88,6 +82,12 @@
     },
     "phoneNumber": {
       "type": "string"
+    },
+    "orders": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::order.order",
+      "mappedBy": "user"
     }
   }
 }
