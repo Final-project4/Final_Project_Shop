@@ -15,7 +15,7 @@ export default factories.createCoreController('api::cart-item.cart-item', ({ str
     }
   
     try {
-      // ตรวจสอบว่า cart-item ที่ต้องการลบมีอยู่ในฐานข้อมูลก่อน
+      
       const cartItem = await strapi.db.query('api::cart-item.cart-item').findOne({
         where: { id: cartItemId }
       });
@@ -24,12 +24,12 @@ export default factories.createCoreController('api::cart-item.cart-item', ({ str
         return ctx.notFound('Cart item not found');
       }
   
-      // ลบ cart-item
+      
       await strapi.db.query('api::cart-item.cart-item').delete({
         where: { id: cartItemId },
       });
   
-      // ส่งกลับข้อความหลังจากลบ
+      
       return ctx.send({ message: 'Item deleted successfully' }, 204);
     } catch (error) {
       console.error('Error during deletion:', error);
@@ -95,7 +95,7 @@ export default factories.createCoreController('api::cart-item.cart-item', ({ str
     }
 
     try {
-      // ตรวจสอบว่า cart-item ที่ต้องการอัปเดตมีอยู่ในฐานข้อมูลก่อน
+      
       const cartItem = await strapi.db.query('api::cart-item.cart-item').findOne({
         where: { id: cartItemId }
       });
@@ -104,13 +104,13 @@ export default factories.createCoreController('api::cart-item.cart-item', ({ str
         return ctx.notFound('Cart item not found');
       }
 
-      // อัปเดตจำนวนสินค้า
+      
       await strapi.db.query('api::cart-item.cart-item').update({
         where: { id: cartItemId },
-        data: { amount }, // อัปเดตจำนวนที่ส่งมา
+        data: { amount }, 
       });
 
-      // ส่งกลับข้อมูลที่อัปเดต
+      
       return ctx.send({ message: 'Item updated successfully' }, 200);
     } catch (error) {
       console.error('Error during update:', error);
@@ -119,7 +119,7 @@ export default factories.createCoreController('api::cart-item.cart-item', ({ str
   },
 
   async create(ctx) {
-    const {data} = ctx.request.body; // รับข้อมูลที่ส่งมาจาก request body
+    const {data} = ctx.request.body; 
     const {item,cart,amount,color,size}=data;
     console.log(item,cart,amount,color,size);
     try {

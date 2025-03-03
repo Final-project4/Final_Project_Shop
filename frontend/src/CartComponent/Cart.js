@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useContext } from "react";
-import { Trash2, Search, ShoppingCart, User } from "lucide-react";
+import React, { useEffect, useState,  } from "react";
+import { Trash2, ShoppingCart,  } from "lucide-react";
 import axios from "axios";
 import { Card, CardContent } from "../components/ui/card";
 import Checkbox from "../components/ui/checkbox";

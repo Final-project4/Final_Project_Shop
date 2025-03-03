@@ -67,8 +67,8 @@ const ItemDetail = () => {
   const colors = ["ดำ", "ขาว", "แดง", "น้ำเงิน"];
 
   return (
-    <div className="h-screen bg-gray-200 text-gray-900 py-12 px-6">
-      <div className="max-w-full mx-auto bg-white text-gray-900 rounded-lg shadow-xl p-6">
+    <div className="h-min bg-gray-200 text-gray-900 py-12 px-6">
+      <div className="max-w-4xl mx-auto bg-white text-gray-900 rounded-lg shadow-xl p-6">
         <Link
           to="/products"
           className="flex items-center text-blue-600 hover:text-blue-800 mb-4"
