@@ -479,9 +479,7 @@ export interface ApiCouponCoupon extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    discount_type: Schema.Attribute.Enumeration<
-      ['Percentage', 'fixed_amount', 'free_shiping']
-    >;
+    discount_type: Schema.Attribute.Enumeration<['Percentage', 'free_shiping']>;
     discount_value: Schema.Attribute.Integer;
     is_active: Schema.Attribute.Boolean;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
