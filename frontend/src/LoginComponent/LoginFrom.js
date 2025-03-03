@@ -26,13 +26,28 @@ const {login} =useAuth();
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ identifier: email, password }),
       });
-  
+      
       const data = await response.json();
+      console.log("Login Response:", data)
       if (!response.ok) throw new Error(data.error?.message || "Login failed");
-  
+      const jwt = data.jwt;
+      if (!jwt) throw new Error("JWT token not found");
+
+      localStorage.setItem("jwt", jwt)
+
+      const userResponse = await fetch("http://localhost:1337/api/users/me?populate=role", {
+        headers: { Authorization: `Bearer ${jwt}` },
+      });
+      const userData = await userResponse.json();
+      console.log("User Data:", userData); // ✅ ดูว่ามี role มั้ย
+
+      const userRole = userData?.role?.name || "No role found";
+      console.log("User Role:", userRole);
+
       await login(data.jwt, data.user);
       navigate("/");
     } catch (error) {
+      console.error(error);
       setError(error.message);
     }
   };
@@ -90,12 +105,9 @@ const {login} =useAuth();
       <p className="mt-6 text-center text-sm text-gray-500">
         Don't have an account?{" "}
         <Link to="/signup">
-        <a
           href="#"
           className="font-semibold text-indigo-600 hover:text-indigo-500"
-        >
           Sign up
-        </a>
         </Link>
       </p>
     </div>

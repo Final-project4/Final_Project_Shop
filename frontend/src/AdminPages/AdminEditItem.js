@@ -17,23 +17,34 @@ const AdminEditItem = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const jwt = localStorage.getItem("jwt");
+  
 
   useEffect(() => {
     const fetchItem = async () => {
       try {
-        const response = await axios.get(`${urlPrefix}/api/items/${documentId}?populate=img`);
+        const response = await axios.get(`${urlPrefix}/api/items/${documentId}?populate=img`, {
+          headers: { Authorization: `Bearer ${jwt}`},
+        });
         console.log("API Response:", response.data);
         console.log("Fetched item categories:", item.categories)
   
         if (response.data && response.data.data) {
           const item = response.data.data;
+          console.log("🖼 Images Before Set:", item);
 
           setName(item.name || "");
           setDescription(item.description || "");
           setPrice(item.price || "");
           setSelectedCategories(item.categories || []); // ถ้า categories เป็น array ให้ใช้เลย
-          if (item.img && item.img.length > 0) {
-            setImages(item.img.map(img => `${urlPrefix}${img.url}`));
+          if (item.img) {
+            if (Array.isArray(item.img.data)) {
+              // กรณี img เป็น Array
+              setImages(item.img.data.map(img => `${urlPrefix}${img.attributes.url}`));
+            } else {
+              // กรณี img เป็น Object เดียว
+              setImages([`${urlPrefix}${item.img.url}`]);
+            }
           } else {
             setImages([]);
           }
@@ -45,7 +56,9 @@ const AdminEditItem = () => {
   
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(`${urlPrefix}/api/categories?populate=*`);
+        const response = await axios.get(`${urlPrefix}/api/categories?populate=*`,{
+          headers: { Authorization: `Bearer ${jwt}`}
+        });
         console.log("Fetched categories:", response.data);
   
         if (response.data && response.data.data) {
@@ -61,7 +74,7 @@ const AdminEditItem = () => {
   
     fetchItem();
     fetchCategories();
-  }, [documentId]);
+  }, [documentId, jwt]);
   
 
   const uploadImage = async (file) => {
@@ -70,11 +83,11 @@ const AdminEditItem = () => {
   
     try {
       const response = await axios.post(`${urlPrefix}/api/upload`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { "Content-Type": "multipart/form-data" , Authorization: `Bearer ${jwt}`},
       });
   
       if (response.data && response.data.length > 0) {
-        return response.data[0].id; // คืนค่า ID ของรูปภาพที่อัปโหลดสำเร็จ
+        return response.data[0].id; // คืนค่า ID ของรูปภาพที่อัปโหลดสำเร็จs
       }
     } catch (error) {
       console.error("Upload error:", error);
@@ -122,7 +135,9 @@ const AdminEditItem = () => {
   
       console.log("🚀 Sending Data:", postData);
   
-      const response = await axios.put(`${urlPrefix}/api/items/${documentId}`, postData);
+      const response = await axios.put(`${urlPrefix}/api/items/${documentId}`, postData, {
+        headers: { Authorization: `Bearer ${jwt}`}
+      });
       console.log("✅ Item updated successfully", response.data);
       alert("Item updated successfully");
       navigate("/admin/items");
@@ -156,8 +171,9 @@ const AdminEditItem = () => {
                 // ตรวจสอบว่า image เป็น URL หรือไฟล์ใหม่
                 const imageUrl =
                   typeof image === "string" ? image : 
-                  image.url ? image.url : 
-                  image instanceof File ? URL.createObjectURL(image) : null;
+                  image instanceof File ? URL.createObjectURL(image) :
+                  image?.attributes?.url ? `http://localhost:1337${image.attributes.url}` :
+                  null;
 
                 return imageUrl ? (
                   <img key={index} src={imageUrl} alt="Uploaded Preview" className="w-32 h-32 object-cover rounded-md border shadow-sm" />

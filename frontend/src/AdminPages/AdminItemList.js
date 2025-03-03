@@ -9,7 +9,7 @@ const BASE_URL = urlPrefix; // ใช้ HTTP ปกติ ไม่มี HTTPS
 const ItemList = () => {
   const [items, setItems] = useState([]);
   const navigate = useNavigate();
-
+  console.log("Item Data:", items);
   useEffect(() => {
     axios.get(`${BASE_URL}/api/items?populate=*`)
       .then(response => {
@@ -28,9 +28,9 @@ const ItemList = () => {
       <div className="grid grid-cols-3 gap-6 p-6 flex-1 overflow-auto">
         {items.length > 0 ? (
           items.map((item) => {
-            const imageUrl = item.img?.formats?.small?.url ||
-            item.img?.url ||
-            "/placeholder.jpg"
+            const imageUrl = item.img?.url 
+  ? `http://localhost:1337${item.img.url}` 
+  : "/placeholder.jpg";
 
             return (
               <div key={item.id} className="bg-white shadow-md rounded-lg p-4 flex flex-col items-center">
