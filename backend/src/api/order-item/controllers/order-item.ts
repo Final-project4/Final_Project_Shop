@@ -8,7 +8,7 @@ export default factories.createCoreController('api::order-item.order-item', ({ s
     // ✅ สร้าง Order Item ใหม่
     async create(ctx) {
       try {
-        const {quantity, price, order, size, color} = ctx.request.body.data || ctx.request.body;
+        const {quantity, price, order, size, color, item} = ctx.request.body.data || ctx.request.body;
   
         // ตรวจสอบว่าข้อมูลที่จำเป็นครบหรือไม่
         if (!quantity || !price || !order) {
@@ -22,7 +22,8 @@ export default factories.createCoreController('api::order-item.order-item', ({ s
             price,
             order,
             size,
-            color
+            color,
+            item
           },
         });
   
