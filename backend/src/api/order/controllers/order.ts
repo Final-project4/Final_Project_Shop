@@ -19,7 +19,7 @@ export default factories.createCoreController('api::order.order', ({ strapi }) =
       // ค้นหา Order พร้อมดึงข้อมูลที่เกี่ยวข้อง (populate)
       const order = await strapi.db.query('api::order.order').findOne({
         where: { id: orderId },
-        populate: ['order-items', 'customer', 'slip'], // ✅ เพิ่ม slip เข้าไป
+        populate: ['order_items', 'customer', 'slip'], // ✅ เพิ่ม slip เข้าไป
       });
 
       if (!order) {

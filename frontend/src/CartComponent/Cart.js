@@ -210,7 +210,7 @@ const Cart = () => {
                 size: cartItem.size,
                 color: cartItem.color,
                 order: orderId,
-                cart_item: cartItem.item_cart_id,
+                item: cartItem.id
               },
             },
             {
@@ -472,7 +472,7 @@ const Cart = () => {
                   }))
                 : []
             );
-            // console.log("Fetched items:", items); 
+            console.log("Fetched items:", items); 
             setCartItems(items);
           } else {
             console.error("Invalid data structure:", response.data);
