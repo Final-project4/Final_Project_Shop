@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { FaArrowLeft, FaShoppingCart, FaCheckCircle } from "react-icons/fa";
 import axios from "axios";
 import { useCart } from "./CartContext";
+import urlPrefix from "../conf/config";
 
 const ItemDetail = () => {
   const { id } = useParams();
@@ -15,10 +16,11 @@ const ItemDetail = () => {
   const [success, setSuccess] = useState(false);
   const { addToCart } = useCart();
   
+  
 
   useEffect(() => {
     axios
-      .get(`http://localhost:1337/api/items?filters[id][$eq]=${id}&populate=*`)
+      .get(`${urlPrefix}/api/items?filters[id][$eq]=${id}&populate=*`)
       .then((response) => {
         setProduct(response.data.data[0]);
       })
@@ -77,7 +79,7 @@ const ItemDetail = () => {
         <div className="flex flex-col md:flex-row gap-6">
           <div className="flex-1">
             <img
-              src={`http://localhost:1337${
+              src={`${urlPrefix}${
                 item.img?.formats?.small?.url ||
                 item.img?.url ||
                 "/placeholder.jpg"

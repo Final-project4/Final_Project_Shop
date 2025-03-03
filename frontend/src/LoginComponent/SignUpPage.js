@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import signupImage from "./signup.png";
+import urlPrefix from "../conf/config";
 
 const SignUpPage = () => {
   const [username, setUsername] = useState("");
@@ -20,7 +21,7 @@ const SignUpPage = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:1337/api/auth/local/register", {
+      const response = await fetch(`${urlPrefix}/api/auth/local/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

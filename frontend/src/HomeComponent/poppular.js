@@ -3,6 +3,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Link } from "react-router-dom";
+import urlPrefix from "../conf/config";
 // ตั้งค่าการเลื่อนแบบ Smooth
 const sliderSettings = {
   infinite: true,
@@ -40,7 +41,7 @@ const PopularProducts = ({ products }) => {
               {/* รูปสินค้า */}
               <div className="w-full relative" style={{ paddingTop: "100%" }}>
                 <img
-                  src={`http://localhost:1337${
+                  src={`${urlPrefix}${
                     product.img?.formats?.small?.url ||
                     product.img?.url ||
                     "/placeholder.jpg"

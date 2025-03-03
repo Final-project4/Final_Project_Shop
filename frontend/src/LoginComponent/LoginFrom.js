@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import InputField from "./InputField";
 import SocialLogin from "./SocialLogin";
 import Cookies from "js-cookie";
 import { useAuth } from "../context/AuthContext"; // นำเข้า useAuth
 import { Link } from "react-router-dom";
+import conf from "../conf/config";
 
 const LoginForm = () => {
 const [email, setEmail] = useState("");
@@ -14,12 +15,13 @@ const [error, setError] = useState("");
 const navigate = useNavigate();
 const {login} =useAuth();
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-  
+    
     try {
-      const response = await fetch("http://localhost:1337/api/auth/local", {
+      const response = await fetch(`${conf.urlPrefix}/api/auth/local`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ identifier: email, password }),

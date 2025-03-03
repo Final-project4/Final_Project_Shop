@@ -8,6 +8,7 @@ import CheckoutPopup from "./CheckoutPopup";
 import CartItem from "./CartItem";
 import OrderSummary from "./OrderSummary";
 import { useAuth } from "../context/AuthContext";
+import urlPrefix from "../conf/config";
 
 const Cart = () => {
   const { userInfo, setUser } = useAuth();
@@ -56,7 +57,7 @@ const Cart = () => {
 
         // เรียก API PUT เพื่ออัปเดตจำนวนสินค้า
         const response = await axios.put(
-          `http://localhost:1337/api/cart-items/${itemToUpdate.item_cart_id}`,
+          `${urlPrefix}/api/cart-items/${itemToUpdate.item_cart_id}`,
           {
             amount: itemToUpdate.quantity, // ส่งจำนวนที่อัปเดต
           },
@@ -94,7 +95,7 @@ const Cart = () => {
 
       // เรียก API DELETE เพื่อลบสินค้า
       const response = await axios.delete(
-        `http://localhost:1337/api/cart-items/${itemCartId}`,
+        `${urlPrefix}/api/cart-items/${itemCartId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -132,7 +133,7 @@ const Cart = () => {
   
       // ส่ง request ไปยัง API เพื่อลบ voucher ที่ใช้แล้ว
       const response = await axios.put(
-        `http://localhost:1337/api/users/${userInfo.id}?populate=*`,
+        `${urlPrefix}/api/users/${userInfo.id}?populate=*`,
         {
           coupons: userInfo.coupons.filter((coupon) => coupon.code !== couponCode),
         },
@@ -175,7 +176,7 @@ const Cart = () => {
   
       // สร้างออเดอร์ใหม่
       const orderResponse = await axios.post(
-        "http://localhost:1337/api/orders",
+        `${urlPrefix}/api/orders`,
         {
           data: {
             user: userInfo.id,
@@ -194,7 +195,7 @@ const Cart = () => {
       await Promise.all(
         selectedItems.map((cartItem) =>
           axios.post(
-            "http://localhost:1337/api/order-items",
+            `${urlPrefix}/api/order-items`,
             {
               data: {
                 quantity: cartItem.quantity,
@@ -219,7 +220,7 @@ const Cart = () => {
         formData.append("files", slipFile);
   
         const uploadResponse = await axios.post(
-          "http://localhost:1337/api/upload",
+          `${urlPrefix}/api/upload`,
           formData,
           {
             headers: {
@@ -237,7 +238,7 @@ const Cart = () => {
       // อัปเดตออเดอร์ด้วยสลิป (ถ้ามี)
       if (slipFileId) {
         await axios.put(
-          `http://localhost:1337/api/orders/${orderId}`,
+          `${urlPrefix}/api/orders/${orderId}`,
           {
             data: {
               slip: slipFileId,
@@ -252,7 +253,7 @@ const Cart = () => {
       // ลบสินค้าออกจากตะกร้า
       await Promise.all(
         selectedItems.map((item) =>
-          axios.delete(`http://localhost:1337/api/cart-items/${item.item_cart_id}`, {
+          axios.delete(`${urlPrefix}/api/cart-items/${item.item_cart_id}`, {
             headers: { Authorization: `Bearer ${token}` },
           })
         )
@@ -282,7 +283,7 @@ const Cart = () => {
           return;
         }
         const response = await axios.get(
-          `http://localhost:1337/api/carts?filters[user][id][$eq]=${userInfo.id}&populate=cart_items.item.img`,
+          `${urlPrefix}/api/carts?filters[user][id][$eq]=${userInfo.id}&populate=cart_items.item.img`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -393,7 +394,7 @@ const Cart = () => {
 
       // สร้างคำขอลบสินค้าทั้งหมดที่เลือก
       await Promise.all(selectedItems.map(item =>
-        axios.delete(`http://localhost:1337/api/cart-items/${item.item_cart_id}`, {
+        axios.delete(`${urlPrefix}/api/cart-items/${item.item_cart_id}`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ));
@@ -420,7 +421,7 @@ const Cart = () => {
             return;
           }
           const response = await axios.get(
-            `http://localhost:1337/api/carts?filters[user][id][$eq]=${userInfo.id}&populate=cart_items.item.img`,
+            `${urlPrefix}/api/carts?filters[user][id][$eq]=${userInfo.id}&populate=cart_items.item.img`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,

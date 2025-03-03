@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar"; // นำเข้า Sidebar component
+import urlPrefix from "../conf/config";
 
-const BASE_URL = "http://localhost:1337"; // ใช้ HTTP ปกติ ไม่มี HTTPS ใน Localhost
+const BASE_URL = urlPrefix; // ใช้ HTTP ปกติ ไม่มี HTTPS ใน Localhost
 
 const ItemList = () => {
   const [items, setItems] = useState([]);

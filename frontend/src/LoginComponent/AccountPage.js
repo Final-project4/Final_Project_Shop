@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import urlPrefix from "../conf/config";
 
 const AccountPage = () => {
   const [user, setUser] = useState(null);
@@ -23,7 +24,7 @@ const AccountPage = () => {
       return;
     }
   
-    fetch("http://localhost:1337/api/users/me?populate=*", {
+    fetch(`${urlPrefix}/api/users/me?populate=*`, {
       headers: {
         Authorization: `Bearer ${authToken}`,
       },
@@ -36,7 +37,7 @@ const AccountPage = () => {
         setPhoneNumber(data.phoneNumber);
         setAddress(data.address);
         // แก้ไข URL ของรูปภาพให้สมบูรณ์
-        setProfilePicture(data.Image ? `http://localhost:1337${data.Image.url}` : null);
+        setProfilePicture(data.Image ? `${urlPrefix}${data.Image.url}` : null);
       })
       .catch((error) => console.error("Error fetching user data:", error));
   }, [navigate]);
@@ -55,7 +56,7 @@ const AccountPage = () => {
         const formData = new FormData();
         formData.append("files", imageFile);
 
-        const uploadResponse = await fetch("http://localhost:1337/api/upload", {
+        const uploadResponse = await fetch(`${urlPrefix}/api/upload`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -71,7 +72,7 @@ const AccountPage = () => {
         }
       }
 
-      const response = await fetch(`http://localhost:1337/api/users/${user.id}`, { // ใช้ user.id เพื่ออัปเดตข้อมูลผู้ใช้
+      const response = await fetch(`${urlPrefix}/api/users/${user.id}`, { // ใช้ user.id เพื่ออัปเดตข้อมูลผู้ใช้
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

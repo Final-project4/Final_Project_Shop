@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import urlPrefix from "../conf/config";
 
 const AuthContext = createContext();
 
@@ -15,7 +16,7 @@ export const AuthProvider = ({ children }) => {
     }
   
     try {
-      const response = await fetch("http://localhost:1337/api/users/me?populate=*", {
+      const response = await fetch(`${urlPrefix}/api/users/me?populate=*`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

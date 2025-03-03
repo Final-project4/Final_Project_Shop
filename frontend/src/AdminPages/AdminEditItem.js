@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import urlPrefix from "../conf/config";
 
 
 const AdminEditItem = () => {
@@ -20,7 +21,7 @@ const AdminEditItem = () => {
   useEffect(() => {
     const fetchItem = async () => {
       try {
-        const response = await axios.get(`http://localhost:1337/api/items/${documentId}?populate=img`);
+        const response = await axios.get(`${urlPrefix}/api/items/${documentId}?populate=img`);
         console.log("API Response:", response.data);
         console.log("Fetched item categories:", item.categories)
   
@@ -32,7 +33,7 @@ const AdminEditItem = () => {
           setPrice(item.price || "");
           setSelectedCategories(item.categories || []); // ถ้า categories เป็น array ให้ใช้เลย
           if (item.img && item.img.length > 0) {
-            setImages(item.img.map(img => `http://localhost:1337${img.url}`));
+            setImages(item.img.map(img => `${urlPrefix}${img.url}`));
           } else {
             setImages([]);
           }
@@ -44,7 +45,7 @@ const AdminEditItem = () => {
   
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("http://localhost:1337/api/categories?populate=*");
+        const response = await axios.get(`${urlPrefix}/api/categories?populate=*`);
         console.log("Fetched categories:", response.data);
   
         if (response.data && response.data.data) {
@@ -68,7 +69,7 @@ const AdminEditItem = () => {
     formData.append("files", file);
   
     try {
-      const response = await axios.post("http://localhost:1337/api/upload", formData, {
+      const response = await axios.post(`${urlPrefix}/api/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
   
@@ -121,7 +122,7 @@ const AdminEditItem = () => {
   
       console.log("🚀 Sending Data:", postData);
   
-      const response = await axios.put(`http://localhost:1337/api/items/${documentId}`, postData);
+      const response = await axios.put(`${urlPrefix}/api/items/${documentId}`, postData);
       console.log("✅ Item updated successfully", response.data);
       alert("Item updated successfully");
       navigate("/admin/items");

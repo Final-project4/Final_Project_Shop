@@ -4,13 +4,14 @@ import { Search } from "lucide-react";
 import { TextInput } from "flowbite-react";
 import axios from "axios";
 import PopularProducts from "./poppular";
+import urlPrefix from "../conf/config";
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
     axios
-      .get("http://localhost:1337/api/items?populate=*")
+      .get(`${urlPrefix}/api/items?populate=*`)
       .then((response) => {
         setProducts(response.data.data || []);
       })
@@ -75,7 +76,7 @@ export default function HomePage() {
               className="bg-white p-4 shadow rounded-lg hover:shadow-lg transition transform hover:scale-105"
             >
               <img
-                src={`http://localhost:1337${
+                src={`${urlPrefix}${
                   product.img?.url || "/placeholder.jpg"
                 }`}
                 alt={product.name || "No Title"}
