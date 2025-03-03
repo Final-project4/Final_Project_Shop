@@ -5,8 +5,9 @@ import Swal from 'sweetalert2';
 import { useAuth } from './context/AuthContext';
 
 const Header = () => {
-  const { isLoggedIn, logout,isAdmin,userInfo} = useAuth();
+  const {  logout,isAdmin,userInfo} = useAuth();
   const navigate = useNavigate();
+  console.log("ad",isAdmin)
   const handleLogout = () => {
     Swal.fire({
       title: 'Confirm Logout',

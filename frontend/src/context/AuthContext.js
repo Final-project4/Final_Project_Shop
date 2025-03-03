@@ -20,8 +20,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (authToken) {
       setIsLoggedIn(true);
+      fetchUserInfo(authToken);
     }
-    fetchUserInfo(authToken);
   }, [authToken]);
 
   const fetchUserInfo = async (token) => {
@@ -49,8 +49,10 @@ export const AuthProvider = ({ children }) => {
     setUserInfo(null);
   };
 
+  const isAdmin = userInfo && userInfo.role && userInfo.role.name === "Admin";
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn, userInfo, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, userInfo, isAdmin, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
