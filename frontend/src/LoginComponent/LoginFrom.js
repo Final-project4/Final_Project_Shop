@@ -35,7 +35,7 @@ const {login} =useAuth();
 
       localStorage.setItem("jwt", jwt)
 
-      const userResponse = await fetch("http://localhost:1337/api/users/me?populate=role", {
+      const userResponse = await fetch(`${conf.urlPrefix}/api/users/me?populate=role`, {
         headers: { Authorization: `Bearer ${jwt}` },
       });
       const userData = await userResponse.json();

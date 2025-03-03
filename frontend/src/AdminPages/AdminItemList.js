@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar"; // นำเข้า Sidebar component
-import urlPrefix from "../conf/config";
+import conf from "../conf/config";
 
-const BASE_URL = urlPrefix; // ใช้ HTTP ปกติ ไม่มี HTTPS ใน Localhost
+const BASE_URL = conf.urlPrefix; // ใช้ HTTP ปกติ ไม่มี HTTPS ใน Localhost
 
 const ItemList = () => {
   const [items, setItems] = useState([]);
@@ -29,7 +29,7 @@ const ItemList = () => {
         {items.length > 0 ? (
           items.map((item) => {
             const imageUrl = item.img?.url 
-  ? `http://localhost:1337${item.img.url}` 
+  ? `${BASE_URL}${item.img.url}` 
   : "/placeholder.jpg";
 
             return (

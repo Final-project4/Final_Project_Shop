@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import { getAuthToken } from "../context/auth";
-import urlPrefix from "../conf/config";
+import conf from "../conf/config";
 
 const CartContext = createContext();
 
@@ -13,7 +13,7 @@ export const CartProvider = ({ children }) => {
   const fetchUserCart = async (userId) => {
     try {
       const authToken = getAuthToken();
-      const response = await axios.get(`${urlPrefix}/api/carts`, {
+      const response = await axios.get(`${conf.urlPrefix}/api/carts`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -40,7 +40,7 @@ export const CartProvider = ({ children }) => {
     if (userInfo) {
       fetchUserCart(userInfo.id).then((userCart
       ) => {
-        console.log("hee",userCart)
+        // console.log("hee",userCart)
         setCart(userCart)});
     }
   }, [userInfo]);
@@ -60,7 +60,7 @@ export const CartProvider = ({ children }) => {
       const authToken = getAuthToken(); 
       const cartId = cart ? cart.id : null;
       const response = await axios.post(
-        `${urlPrefix}/api/cart-items`,
+        `${conf.urlPrefixlPrefix}/api/cart-items`,
         {
           data: {
             cart: cartId,

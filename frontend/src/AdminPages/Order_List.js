@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
+import conf from "../conf/config";
 
 const AdminOrderDashboard = () => {
   const [orders, setOrders] = useState([]);
@@ -11,7 +12,7 @@ const AdminOrderDashboard = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch("http://localhost:1337/api/orders?populate=*");
+      const response = await fetch(`${conf.urlPrefix}/api/orders?populate=*`);
       const data = await response.json();
       setOrders(data.data || []);
       setLoading(false);
@@ -31,7 +32,7 @@ const AdminOrderDashboard = () => {
         slip: orderToUpdate.slip,
       };
 
-      await fetch(`http://localhost:1337/api/orders/${orderId}`, {
+      await fetch(`${conf.urlPrefix}/api/orders/${orderId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data: updatedData }),

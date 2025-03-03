@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Sidebar from "./Sidebar";
-import urlPrefix from "../conf/config";
+import conf from "../conf/config";
 
-const API_URL = `${urlPrefix}/api/coupons`; // URL ของ Strapi
+const API_URL = `${conf.urlPrefix}/api/coupons`; // URL ของ Strapi
 
 const AddCoupons = () => {
   const [selectedDiscount, setSelectedDiscount] = useState("");

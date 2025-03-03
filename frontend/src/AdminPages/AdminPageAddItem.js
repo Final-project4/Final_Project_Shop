@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import axios from "axios";
 import { fromJSON } from "postcss";
-import urlPrefix from "../conf/config";
+import conf from "../conf/config";
 
 
 const AdminPage = () => {
@@ -18,7 +18,7 @@ const AdminPage = () => {
   
   useEffect(() => {
     
-    fetch(`${urlPrefix}/api/categories?populate=*`)
+    fetch(`${conf.urlPrefix}/api/categories?populate=*`)
       .then((res) => res.json())
       .then((data) => {
         console.log("Data from API:", data);
@@ -46,7 +46,7 @@ const AdminPage = () => {
 
     try {
       console.log("from",formData)
-      const response = await axios.post(`${urlPrefix}/api/upload`, formData,
+      const response = await axios.post(`${conf.urlPrefix}/api/upload`, formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -107,7 +107,7 @@ const AdminPage = () => {
     console.log("Sending data:", JSON.stringify(postData, null, 2));
 
     const response = await axios.post(
-      `${urlPrefix}/api/items`,
+      `${conf.urlPrefix}/api/items`,
       postData,
       {
         headers: {

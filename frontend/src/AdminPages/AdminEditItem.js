@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import urlPrefix from "../conf/config";
+import conf from "../conf/config";
 
 
 const AdminEditItem = () => {
@@ -23,7 +23,7 @@ const AdminEditItem = () => {
   useEffect(() => {
     const fetchItem = async () => {
       try {
-        const response = await axios.get(`${urlPrefix}/api/items/${documentId}?populate=img`, {
+        const response = await axios.get(`${conf.urlPrefix}/api/items/${documentId}?populate=img`, {
           headers: { Authorization: `Bearer ${jwt}`},
         });
         console.log("API Response:", response.data);
@@ -40,10 +40,10 @@ const AdminEditItem = () => {
           if (item.img) {
             if (Array.isArray(item.img.data)) {
               // กรณี img เป็น Array
-              setImages(item.img.data.map(img => `${urlPrefix}${img.attributes.url}`));
+              setImages(item.img.data.map(img => `${conf.urlPrefix}${img.attributes.url}`));
             } else {
               // กรณี img เป็น Object เดียว
-              setImages([`${urlPrefix}${item.img.url}`]);
+              setImages([`${conf.urlPrefix}${item.img.url}`]);
             }
           } else {
             setImages([]);
@@ -56,7 +56,7 @@ const AdminEditItem = () => {
   
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(`${urlPrefix}/api/categories?populate=*`,{
+        const response = await axios.get(`${conf.urlPrefix}/api/categories?populate=*`,{
           headers: { Authorization: `Bearer ${jwt}`}
         });
         console.log("Fetched categories:", response.data);
@@ -82,7 +82,7 @@ const AdminEditItem = () => {
     formData.append("files", file);
   
     try {
-      const response = await axios.post(`${urlPrefix}/api/upload`, formData, {
+      const response = await axios.post(`${conf.urlPrefix}/api/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" , Authorization: `Bearer ${jwt}`},
       });
   
@@ -135,7 +135,7 @@ const AdminEditItem = () => {
   
       console.log("🚀 Sending Data:", postData);
   
-      const response = await axios.put(`${urlPrefix}/api/items/${documentId}`, postData, {
+      const response = await axios.put(`${conf.urlPrefix}/api/items/${documentId}`, postData, {
         headers: { Authorization: `Bearer ${jwt}`}
       });
       console.log("✅ Item updated successfully", response.data);
@@ -172,7 +172,7 @@ const AdminEditItem = () => {
                 const imageUrl =
                   typeof image === "string" ? image : 
                   image instanceof File ? URL.createObjectURL(image) :
-                  image?.attributes?.url ? `http://localhost:1337${image.attributes.url}` :
+                  image?.attributes?.url ? `${conf.urlPrefix}${image.attributes.url}` :
                   null;
 
                 return imageUrl ? (

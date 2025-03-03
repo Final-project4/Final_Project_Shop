@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { FaSpinner } from "react-icons/fa";
 import ReactSlider from "react-slider";
-import urlPrefix from "../conf/config";
+import conf from "../conf/config";
 
 const Products = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -19,7 +19,7 @@ const Products = () => {
 
   useEffect(() => {
     axios 
-      .get(`${urlPrefix}/api/categories`)
+      .get(`${conf.urlPrefix}/api/categories`)
       .then((response) => {
         setCategories(response.data.data || []);
       })
@@ -31,7 +31,7 @@ const Products = () => {
 
   useEffect(() => {
     axios
-      .get(`${urlPrefix}/api/items?populate=*`)
+      .get(`${conf.urlPrefix}/api/items?populate=*`)
       .then((response) => {
         setProducts(response.data.data || []);
         setLoading(false);
@@ -201,7 +201,7 @@ const Products = () => {
               <Link to={`/product/${item.id}`}>
                 <div className="p-4 text-center">
                   <img
-                    src={`${urlPrefix}${
+                    src={`${conf.urlPrefix}${
                       item.img?.formats?.small?.url ||
                       item.img?.url ||
                       "/placeholder.jpg"

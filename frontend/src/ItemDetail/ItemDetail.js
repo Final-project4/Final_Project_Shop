@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { FaArrowLeft, FaShoppingCart, FaCheckCircle } from "react-icons/fa";
 import axios from "axios";
 import { useCart } from "./CartContext";
-import urlPrefix from "../conf/config";
+import conf from "../conf/config";
 
 const ItemDetail = () => {
   const { id } = useParams();
@@ -20,7 +20,7 @@ const ItemDetail = () => {
 
   useEffect(() => {
     axios
-      .get(`${urlPrefix}/api/items?filters[id][$eq]=${id}&populate=*`)
+      .get(`${conf.urlPrefix}/api/items?filters[id][$eq]=${id}&populate=*`)
       .then((response) => {
         setProduct(response.data.data[0]);
       })
@@ -79,7 +79,7 @@ const ItemDetail = () => {
         <div className="flex flex-col md:flex-row gap-6">
           <div className="flex-1">
             <img
-              src={`${urlPrefix}${
+              src={`${conf.urlPrefix}${
                 item.img?.formats?.small?.url ||
                 item.img?.url ||
                 "/placeholder.jpg"

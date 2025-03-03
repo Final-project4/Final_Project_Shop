@@ -72,7 +72,7 @@ export default factories.createCoreController('api::cart-item.cart-item', ({ str
     });
 
     if (!cartItem) {
-      return ctx.notFound('cartItem not found');
+      return ctx.notFound('cartItem not found');  
     }
 
     //return author;
@@ -123,7 +123,7 @@ export default factories.createCoreController('api::cart-item.cart-item', ({ str
     const {item,cart,amount,color,size}=data;
     console.log(item,cart,amount,color,size);
     try {
-      // สร้าง cart-item ใหม่
+      
       const newCartItem = await strapi.db.query('api::cart-item.cart-item').create({
         data: {
           item,
@@ -134,7 +134,7 @@ export default factories.createCoreController('api::cart-item.cart-item', ({ str
         }, 
       });
 
-      // ส่งกลับข้อมูลที่สร้างใหม่
+      
       return ctx.send({ message: 'Item created successfully', data: newCartItem }, 201);
     } catch (error) {
       console.error('Error during creation:', error);
