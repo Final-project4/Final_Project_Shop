@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 import Swal from "sweetalert2";
 import backgroundImage from "./background1.png";
 import { useAuth } from "../context/AuthContext";
+import conf from "../conf/config";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -34,11 +35,11 @@ const LoginForm = () => {
 
       console.log("Logged in successfully:", data);
       Cookies.set("authToken", data.jwt, { expires: 7, secure: true });
-      login();
+      login(response.jwt);
 
       // ดึงข้อมูล user สำหรับ popup ต้อนรับ
       const userDetailResponse = await fetch(
-        "http://localhost:1337/api/users/me?populate=*",
+        `${conf.urlPrefix}/api/users/me?populate=*`,
         {
           headers: {
             Authorization: `Bearer ${data.jwt}`,
@@ -56,7 +57,7 @@ const LoginForm = () => {
             ? `
             <div class="flex flex-col items-center">
               <img 
-                src="http://localhost:1337${userDetailData.profilePicture[0].url}" 
+                src=${conf.urlPrefix}${userDetailData.profilePicture[0].url}" 
                 alt="Profile" 
                 class="w-24 h-24 rounded-full object-cover mb-4"
               />

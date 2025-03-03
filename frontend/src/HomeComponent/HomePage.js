@@ -37,17 +37,6 @@ export default function HomePage() {
         </h1>
       </div>
 
-      {/* Search */}
-      <div className="container mx-auto px-4 mb-12 text-center py-12">
-        <div className="relative max-w-md mx-auto">
-          <TextInput
-            type="search"
-            placeholder="ค้นหา..."
-            className="pl-10 bg-[#e9e3ed] rounded-full focus:ring-[#c4a484] focus:border-[#c4a484]"
-          />
-          <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
-        </div>
-      </div>
 
         <PopularProducts products={products} />
 

@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import Cookies from 'js-cookie';
+import conf from '../conf/config';
 
 const AuthContext = createContext(null);
 
@@ -13,23 +14,43 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
+  const authToken = Cookies.get('authToken');
 
   useEffect(() => {
-    const authToken = Cookies.get('authToken');
-    setIsLoggedIn(!!authToken);
-  }, []);
+    if (authToken) {
+      setIsLoggedIn(true);
+    }
+    fetchUserInfo(authToken);
+  }, [authToken]);
 
-  const login = () => {
+  const fetchUserInfo = async (token) => {
+    try {
+      const response = await fetch(`${conf.urlPrefix}/api/users/me?populate=*`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      setUserInfo(data);
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+    }
+  };
+
+  const login = (token) => {
     setIsLoggedIn(true);
+    fetchUserInfo(token);
   };
 
   const logout = () => {
     Cookies.remove('authToken');
     setIsLoggedIn(false);
+    setUserInfo(null);
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, userInfo, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

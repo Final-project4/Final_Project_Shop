@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import signupImage from "./signup.png";
 import backgroundImage from "./background1.png";
 import Swal from 'sweetalert2';
+import conf from "../conf/config";
 
 const SignUpPage = () => {
   const [username, setUsername] = useState("");

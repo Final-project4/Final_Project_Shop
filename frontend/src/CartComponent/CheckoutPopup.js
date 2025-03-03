@@ -23,7 +23,7 @@ const CheckoutPopup = ({
     }
     return generatePayload(promptPayID, { amount: parseFloat(amount) });
   };
-  console.log("total",total)
+  // console.log("total",total)
   const qrData = generatePromptPayQR(promptPayID, total); // ต้องมีค่าแน่นอน
 
   const handleFileChange = (event) => {
@@ -44,9 +44,7 @@ const CheckoutPopup = ({
     const jsonBody = {
       data: orderItems.length === 1 ? orderItems[0] : orderItems, // ปรับสำหรับสินค้าชิ้นเดียว
     };
-
-    console.log("JSON Body:", jsonBody); // ตรวจสอบ JSON body
-
+    
     await handleCheckout(file, jsonBody); // ✅ ส่ง JSON body พร้อมกับไฟล์
     setUploading(false);
   };

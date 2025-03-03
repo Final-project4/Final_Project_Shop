@@ -456,7 +456,7 @@ const Cart = () => {
               },
             }
           );
-          console.log("API Response:", response.data);
+          // console.log("API Response:", response.data);
 
           
           if (response.data.data && Array.isArray(response.data.data)) {
@@ -472,7 +472,7 @@ const Cart = () => {
                   }))
                 : []
             );
-            console.log("Fetched items:", items); 
+            // console.log("Fetched items:", items); 
             setCartItems(items);
           } else {
             console.error("Invalid data structure:", response.data);

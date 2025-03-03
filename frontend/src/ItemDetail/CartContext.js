@@ -39,7 +39,7 @@ export const CartProvider = ({ children }) => {
     if (userInfo) {
       fetchUserCart(userInfo.id).then((userCart
       ) => {
-        console.log("hee",userCart)
+        // console.log("hop",userCart)
         setCart(userCart)});
     }
   }, [userInfo]);

@@ -5,9 +5,8 @@ import Swal from 'sweetalert2';
 import { useAuth } from './context/AuthContext';
 
 const Header = () => {
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout,isAdmin,userInfo} = useAuth();
   const navigate = useNavigate();
-
   const handleLogout = () => {
     Swal.fire({
       title: 'Confirm Logout',
@@ -105,7 +104,6 @@ const Header = () => {
           </Link>
 
           {userInfo ? (
-            <Link to="/login">
               <Button
                 style={{
                   backgroundColor: "#020d29",
@@ -125,7 +123,6 @@ const Header = () => {
               >
                 Logout
               </Button>
-            </Link>
           ) : (
             <Link to="/login">
               <Button

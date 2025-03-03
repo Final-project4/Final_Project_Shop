@@ -14,7 +14,7 @@ const sliderSettings = {
   autoplay: true,
   autoplaySpeed: 500, // ทุก 3 วิ
   arrows: true, // มีปุ่มลูกศร
-  dots: true, // แสดง Indicator จุดข้างล่าง
+  dots: false , // แสดง Indicator จุดข้างล่าง
   responsive: [
     {
       breakpoint: 1024,
