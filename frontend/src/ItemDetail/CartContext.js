@@ -35,12 +35,11 @@ export const CartProvider = ({ children }) => {
       return null;
     }
   };
-
   useEffect(() => {
     if (userInfo) {
       fetchUserCart(userInfo.id).then((userCart
       ) => {
-        // console.log("hee",userCart)
+        console.log("hee",userCart)
         setCart(userCart)});
     }
   }, [userInfo]);
@@ -60,11 +59,11 @@ export const CartProvider = ({ children }) => {
       const authToken = getAuthToken(); 
       const cartId = cart ? cart.id : null;
       const response = await axios.post(
-        `${conf.urlPrefixlPrefix}/api/cart-items`,
+        `${conf.urlPrefix}/api/cart-items`,
         {
           data: {
             cart: cartId,
-            item: productId,
+            item: productId,  
             size: size,
             color: color,
             amount: 1,

@@ -1,17 +1,31 @@
 import React from "react";
 import { Navbar, Button } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "./context/AuthContext";
+import Swal from 'sweetalert2';
+import { useAuth } from './context/AuthContext';
 
 const Header = () => {
-  const { userInfo, logout,isAdmin } = useAuth();
+  const { isLoggedIn, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
-    navigate("/");
+    Swal.fire({
+      title: 'Confirm Logout',
+      text: "Are you sure you want to log out?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0000CC',
+      cancelButtonColor: '#CC0000',
+      confirmButtonText: 'Yes, log out',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        logout();
+        navigate("/login");
+      }
+    });
   };
-  
+
   return (
     <Navbar
       fluid

@@ -1,60 +1,36 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import Cookies from "js-cookie";
-import conf from "../conf/config";
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import Cookies from 'js-cookie';
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 export const AuthProvider = ({ children }) => {
-  const [userInfo, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const token = Cookies.get("authToken");
-
-  const fetchUser = async () => {
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-  
-    try {
-      const response = await fetch(`${conf.urlPrefix}/api/users/me?populate=*`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch user data");
-      }
-
-      const userData = await response.json();
-      setUser(userData);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      setUser(null); // Reset user state to null on error
-      Cookies.remove("authToken");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    fetchUser();
-  }, [token]);
+    const authToken = Cookies.get('authToken');
+    setIsLoggedIn(!!authToken);
+  }, []);
 
-  const login = async (token, userData) => {
-    Cookies.set("authToken", token, { expires: 7, secure: true });
-    setUser(userData); 
+  const login = () => {
+    setIsLoggedIn(true);
   };
 
   const logout = () => {
-    setUser(null);
-    Cookies.remove("authToken");
+    Cookies.remove('authToken');
+    setIsLoggedIn(false);
   };
 
   return (
-    <AuthContext.Provider value={{ userInfo, setUser, login, logout, isAdmin: userInfo?.role?.name === "Admin", loading }}>
+    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
-
-export const useAuth = () => useContext(AuthContext);
