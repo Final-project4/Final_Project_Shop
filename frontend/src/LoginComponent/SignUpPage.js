@@ -42,8 +42,20 @@ const SignUpPage = () => {
       }
 
       console.log("Signed up successfully:", data);
-      
-      // แสดง Popup แจ้งเตือนการสมัครสำเร็จ
+
+      await fetch(`${conf.urlPrefix}/api/carts`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${data.jwt}`,
+        },
+        body: JSON.stringify({
+          data: {
+            user: data.user.id
+          },
+        }),
+      });
+
       await Swal.fire({
         title: 'Sign up successful!',
         html: `

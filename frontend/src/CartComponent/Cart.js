@@ -174,7 +174,7 @@ const Cart = () => {
       alert("กรุณาเลือกสินค้าอย่างน้อย 1 ชิ้น");
       return;
     }
-
+    
     try {
       const token = Cookies.get("authToken");
 
@@ -197,7 +197,7 @@ const Cart = () => {
       );
 
       const orderId = orderResponse.data.data.id;
-
+      console.log(selectedItems)
       // สร้าง order items
       await Promise.all(
         selectedItems.map((cartItem) =>
