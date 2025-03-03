@@ -20,7 +20,7 @@
       "type": "enumeration",
       "enum": [
         "Percentage",
-        "free_shiping"
+        "Free Shipping"
       ]
     },
     "discount_value": {

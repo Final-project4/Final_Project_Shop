@@ -21,14 +21,14 @@
     "price": {
       "type": "integer"
     },
-    "item": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::item.item",
-      "inversedBy": "order_items"
-    },
     "quantity": {
       "type": "integer"
+    },
+    "size": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string"
     }
   }
 }

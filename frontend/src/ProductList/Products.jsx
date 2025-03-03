@@ -6,18 +6,18 @@ import ReactSlider from "react-slider";
 
 const Products = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [priceRange, setPriceRange] = useState([0, 10000]); // ตั้งค่าเป็น array เพื่อเก็บราคาต่ำสุดและสูงสุด
+  const [priceRange, setPriceRange] = useState([0, 10000]);
   const [searchQuery, setSearchQuery] = useState("");
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(24);
   const [sortOrder, setSortOrder] = useState("asc");
 
   useEffect(() => {
-    axios
+    axios 
       .get("http://localhost:1337/api/categories")
       .then((response) => {
         setCategories(response.data.data || []);
@@ -75,8 +75,10 @@ const Products = () => {
   const sortedProducts = filteredProducts.sort((a, b) => {
     if (sortOrder === "asc") {
       return a.price - b.price;
-    } else {
+    } else if (sortOrder === "desc") {
       return b.price - a.price;
+    } else {
+      return 0; // ไม่จัดเรียงถ้า sortOrder เป็น null
     }
   });
 
@@ -100,13 +102,17 @@ const Products = () => {
     );
   }
 
+  const handleSortOrder = (order) => {
+    setSortOrder((prevOrder) => (prevOrder === order ? null : order));
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
-      <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* Sidebar */}
-        <div className="bg-white shadow-xl p-6 rounded-lg">
+    <div className="min-h-screen bg-gray-100 flex">
+      {/* Sidebar */}
+      <div className="w-64 bg-white shadow-xl p-6 rounded-lg sticky top-0 h-screen space-y-12">
+        <div>
           <h2 className="text-xl font-semibold mb-4">หมวดหมู่</h2>
-          <ul>
+          <ul className="space-y-4">
             {categories.map((category) => (
               <li
                 key={category.id}
@@ -135,7 +141,7 @@ const Products = () => {
                 <div
                   key={key}
                   {...restProps}
-                  className={`flex-1 h-2 rounded-full bg-blue-200 ${
+                  className={`flex-1 h-3 rounded-md bg-blue-200 ${
                     state.index === 1 ? "bg-blue-500" : ""
                   }`}
                 />
@@ -147,7 +153,7 @@ const Products = () => {
                 <div
                   key={key}
                   {...restProps}
-                  className="w-6 h-6 bg-gray-500 rounded-full cursor-pointer"
+                  className="w-3 h-3 bg-gray-500 rounded-full cursor-pointer"
                 />
               );
             }}
@@ -171,86 +177,86 @@ const Products = () => {
             </select>
           </div>
         </div>
+      </div>
 
-        {/* Main Content */}
-        <div className="col-span-3">
-          <div className="w-full mb-6 flex justify-center">
-            <input
-              type="text"
-              placeholder="ค้นหาสินค้า..."
-              className="w-2/3 md:w-1/2 lg:w-1/3 px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+      {/* Main Content */}
+      <div className="flex-1 p-6">
+        <div className="w-full mb-6 flex justify-center">
+          <input
+            type="text"
+            placeholder="ค้นหาสินค้า..."
+            className="w-full md:w-1/2 lg:w-1/3 px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {currentItems.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300"
-              >
-                <Link to={`/product/${item.id}`}>
-                  <div className="p-4 text-center">
-                    <img
-                      src={`http://localhost:1337${
-                        item.img?.formats?.small?.url ||
-                        item.img?.url ||
-                        "/placeholder.jpg"
-                      }`}
-                      alt={item.name}
-                      className="w-full h-48 object-cover rounded-lg mb-4"
-                    />
-                    <div className="h-18">
-                      <h2 className="text-gray-900 font-medium text-sm">
-                        {item.name}
-                      </h2>
-                    </div>
-                    <div className="flex flex-wrap gap-2 mt-4">
-                      {item.categories.map((category, index) => (
-                        <div
-                          key={index}
-                          className={`px-4 py-2 text-white rounded-full shadow-md text-sm font-medium bg-gray-400 `}
-                        >
-                          {category.name}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex flex-row">
-                      <p className="text-[#C9A36B] font-bold text-base mt-2">
-                        {item.price} บาท
-                      </p>
-                    </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          {currentItems.map((item) => (
+            <div
+              key={item.id}
+              className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300"
+            >
+              <Link to={`/product/${item.id}`}>
+                <div className="p-4 text-center">
+                  <img
+                    src={`http://localhost:1337${
+                      item.img?.formats?.small?.url ||
+                      item.img?.url ||
+                      "/placeholder.jpg"
+                    }`}
+                    alt={item.name}
+                    className="w-full h-48 object-cover rounded-lg mb-4"
+                  />
+                  <div className="h-18">
+                    <h2 className="text-gray-900 font-medium text-sm">
+                      {item.name}
+                    </h2>
                   </div>
-                </Link>
-              </div>
-            ))}
-          </div>
-
-          {/* Pagination */}
-          <div className="flex justify-center mt-6">
-            <nav>
-              <ul className="flex list-none">
-                {Array.from(
-                  { length: Math.ceil(sortedProducts.length / itemsPerPage) },
-                  (_, i) => (
-                    <li key={i} className="mx-1">
-                      <button
-                        onClick={() => paginate(i + 1)}
-                        className={`px-4 py-2 rounded-lg ${
-                          currentPage === i + 1
-                            ? "bg-blue-500 text-white"
-                            : "bg-white text-blue-500"
-                        }`}
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {item.categories.map((category, index) => (
+                      <div
+                        key={index}
+                        className={`px-2 py-1 text-xs font-medium rounded-md shadow-md border bg-gray-200 border-gray-500 text-gray-100`}
                       >
-                        {i + 1}
-                      </button>
-                    </li>
-                  )
-                )}
-              </ul>
-            </nav>
-          </div>
+                        {category.name}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex flex-row">
+                    <p className="text-[#C9A36B] font-bold text-base mt-2">
+                      {item.price} บาท
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            </div>
+          ))}
+        </div>
+
+        {/* Pagination */}
+        <div className="flex justify-center mt-6">
+          <nav>
+            <ul className="flex list-none">
+              {Array.from(
+                { length: Math.ceil(sortedProducts.length / itemsPerPage) },
+                (_, i) => (
+                  <li key={i} className="mx-1">
+                    <button
+                      onClick={() => paginate(i + 1)}
+                      className={`px-4 py-2 rounded-lg ${
+                        currentPage === i + 1
+                          ? "bg-blue-500 text-white"
+                          : "bg-white text-blue-500"
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  </li>
+                )
+              )}
+            </ul>
+          </nav>
         </div>
       </div>
     </div>

@@ -21,7 +21,7 @@
     "step": {
       "type": "enumeration",
       "enum": [
-        "pendding",
+        "pending",
         "paid",
         "completed",
         "cancelled"
@@ -45,5 +45,6 @@
     "total_price": {
       "type": "decimal"
     }
+    
   }
 }

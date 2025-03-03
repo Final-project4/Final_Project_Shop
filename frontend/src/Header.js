@@ -92,13 +92,46 @@ const Header = () => {
 
           {userInfo ? (
             <Link to="/login">
-              <Button gradientDuoTone="purpleToBlue" onClick={handleLogout}>
+              <Button
+                style={{
+                  backgroundColor: "#020d29",
+                  color: "white",
+                  padding: "1px 1px",
+                  border: "1px solid #555",
+                  borderRadius: "4px",
+                  fontSize: "12px",
+                  fontWeight: "300",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  transition: "all 0.3s ease",
+                }}
+                onMouseOver={(e) => (e.target.style.backgroundColor = "#444")}
+                onMouseOut={(e) => (e.target.style.backgroundColor = "#020d29")}
+                onClick={handleLogout}
+              >
                 Logout
               </Button>
             </Link>
           ) : (
             <Link to="/login">
-              <Button gradientDuoTone="purpleToBlue">Login</Button>
+              <Button
+                style={{
+                  backgroundColor: "#020d29",
+                  color: "white",
+                  padding: "1px 1px",
+                  border: "1px solid #555",
+                  borderRadius: "4px",
+                  fontSize: "12px",
+                  fontWeight: "300",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  transition: "all 0.3s ease",
+                }}
+                onMouseOver={(e) => (e.target.style.backgroundColor = "#444")}
+                onMouseOut={(e) => (e.target.style.backgroundColor = "#020d29")}
+              >
+                Login
+              </Button>
             </Link>
           )}
         </div>
