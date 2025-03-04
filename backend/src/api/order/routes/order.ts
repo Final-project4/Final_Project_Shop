@@ -37,7 +37,6 @@ export default {
         path: '/orders/:id',  
         handler: 'api::order.order.findOne',  
           auth: false,  
-        },
       },
     ],
   };

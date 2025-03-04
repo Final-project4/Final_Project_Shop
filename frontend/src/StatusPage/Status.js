@@ -131,7 +131,7 @@ const OrderStatus = () => {
                           }}
                         >
                           <img
-                            src={item.item.img.formats.small.url}
+                            src={item.item.img.formats.url}
                             alt={item.item.name}
                             width={50}
                             height={50}
