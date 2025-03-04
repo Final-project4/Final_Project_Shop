@@ -13,7 +13,6 @@ function App() {
         <CartProvider>
           <AppRoutes />
         </CartProvider>
-        
       </Router>
     </AuthProvider>
   );
