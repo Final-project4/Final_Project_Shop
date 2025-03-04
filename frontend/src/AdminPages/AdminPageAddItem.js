@@ -125,7 +125,7 @@ const AdminPage = () => {
           name: name,
           description: description,
           price: parseFloat(price),
-          categories: selectedCategories.map((cat) => cat.id),
+          categories: selectedCategories.map((cat) => cat.id-1),
           size: sizes, // เพิ่มข้อมูล size
           img: imageIds.map((id) => ({ id })),
         },
