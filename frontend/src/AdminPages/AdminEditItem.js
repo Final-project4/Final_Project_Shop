@@ -69,7 +69,7 @@ const AdminEditItem = () => {
   
         if (response.data && response.data.data) {
           setCategories(response.data.data.map(cat => ({
-            id: cat.id - 1,
+            id: cat.id -1,
             name: cat.name || "Unknown"
           })));
         }
@@ -159,18 +159,20 @@ const AdminEditItem = () => {
           name,
           description,
           price: parseFloat(price),
-          categories: selectedCategories.map(cat => cat.id-1),
+          categories: selectedCategories.map(cat => cat.id),
           size: sizes,
           ...(filteredImageIds.length > 0 && { img: filteredImageIds.map(id => ({ id })) })
         }
       };
   
       console.log("🚀 Sending Data:", postData);
-  
-      const response = await axios.put(`${conf.urlPrefix}/api/items?filters[id][$eq]=${documentId}`, postData, {
-        headers: { Authorization: `Bearer ${token}`,
-                  "Content-Type": "application/json"
-                }
+      
+      
+
+      const response = await axios.patch(`${conf.urlPrefix}/api/items/$${documentId}`, postData, {
+        headers: { Authorization: `Bearer ${token}`, 
+        "Content-Type": "application/json",
+        "Accept": "application/json",}
       });
       console.log("✅ Item updated successfully", response.data);
       alert("Item updated successfully");
