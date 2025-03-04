@@ -55,17 +55,22 @@ const ItemDetail = () => {
     }
     setLoading(true);
     await addToCart(item.id, selectedSize, selectedColor);
+    setShowModal(true); // Show modal after adding to cart
   };
 
   const toggleDescription = () => {
     setShowFullDescription(!showFullDescription);
   };
 
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
   const colors = ["ดำ", "ขาว", "แดง", "น้ำเงิน"];
   const sizes = item?.size ? Object.entries(item.size) : [];
 
   return (
-    <div className="h-min bg-gray-200 text-gray-900 py-12 px-6">
+    <div className="min-h-screen bg-gray-200 text-gray-900 py-12 px-6">
       <div className="max-w-4xl mx-auto bg-white text-gray-900 rounded-lg shadow-xl p-6">
         <Link
           to="/products"
@@ -129,7 +134,7 @@ const ItemDetail = () => {
               </div>
             </div>
 
-            {/* <div className="mt-4">
+            <div className="mt-4">
               <h2 className="text-lg font-medium text-gray-700">สี (Color)</h2>
               <div className="flex flex-wrap gap-2 mt-2">
                 {colors.map((color) => (
@@ -146,7 +151,7 @@ const ItemDetail = () => {
                   </button>
                 ))}
               </div>
-            </div> */}
+            </div>
 
             <button
               onClick={handleAddToCart}
@@ -157,6 +162,21 @@ const ItemDetail = () => {
           </div>
         </div>
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-2xl font-bold mb-4">เพิ่มลงตะกร้าสำเร็จ</h2>
+            <p className="mb-4">สินค้าของคุณถูกเพิ่มลงในตะกร้าเรียบร้อยแล้ว</p>
+            <button
+              onClick={closeModal}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg"
+            >
+              ปิด
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

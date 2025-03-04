@@ -187,11 +187,11 @@ const AdminEditItem = () => {
   
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-full bg-gray-100">
       <Sidebar />
-      <div className="flex-1 p-10 flex flex-col items-center overflow-auto">
+      <div className="flex-1 p-10 flex flex-col items-center overflow-auto h-full">
         <h1 className="text-4xl font-bold mb-6 text-[#daa520]">EDIT ITEM</h1>
-        <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-5xl grid grid-cols-2 gap-6">
+        <div className="bg-white rounded-xl shadow-lg w-full h-full mr-4 ml-4 max-w-5xl grid grid-cols-2 gap-6">
           <div className="bg-gray-100 p-5 rounded-lg">
             <h2 className="text-lg font-semibold">General Information</h2>
             <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} className="w-full p-3 mt-3 border rounded-md bg-gray-200" />
@@ -288,14 +288,14 @@ const AdminEditItem = () => {
             ) : (
               <p className="text-gray-500 text-sm mt-3">ยังไม่มีไซส์</p>
             )}
-          </div>
-
-          
           <button 
             onClick={handleSaveItem}
             className="col-span-2 bg-yellow-500 text-black font-bold py-3 rounded-lg shadow-md hover:bg-yellow-600 transition">
             UPDATE ITEM
           </button>
+          </div>
+
+          
         </div>
       </div>
   );

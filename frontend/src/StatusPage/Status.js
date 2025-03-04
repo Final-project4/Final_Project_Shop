@@ -85,12 +85,12 @@ const OrderStatus = () => {
   };
   
   return (
-    <div style={{ maxWidth: 1200, margin: "50px auto" }}>
-      <Card title="Your Orders Status">
+    <div style={{ width: "100%", height: "100vh", margin: "50px auto" }}>
+      <Card title="Your Orders Status" style={{ height: "100%" }}>
         {loading && <Spin style={{ marginTop: 20 }} />}
 
         {error && (
-          <Alert
+          <Alert    
             message={error}
             type="error"
             showIcon

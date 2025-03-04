@@ -21,7 +21,7 @@ const AddCoupons = () => {
 
   useEffect(() => {
     fetchCoupons();
-  }, []);
+  }, [couponCode]);
 
   const fetchCoupons = async () => {
     try {
@@ -83,8 +83,8 @@ const AddCoupons = () => {
   
       // อัปเดตคูปองให้ทุกคน
       const userIds = users.map((user) => user.id);
-      console.log(userIds)
-      await axios.put(`${API_URL}?filters[id][$eq]=${newCoupon.id}`,
+      console.log("ss",newCoupon)
+      await axios.put(`${API_URL}/${newCoupon.documentId}`,
         {
           data: {
             user_restrictions: userIds,
