@@ -35,7 +35,7 @@ const Header = () => {
         margin: 0,
         padding: '1rem 0'
       }}>
-      <Navbar.Brand as={Link} to="/">
+      <Navbar.Brand as={Link} to="/" className="ml-6">
         <span className="self-center text-xl font-semibold whitespace-nowrap">
           {isAdmin ? "Admin Dashboard" : "MyShop"}
         </span>
@@ -74,7 +74,7 @@ const Header = () => {
             </Navbar.Link>
           )}
         </Navbar.Collapse>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 mr-2">
           <Link to="/cart">
             <svg
               className="w-6 h-6 text-white hover:text-gray-200"

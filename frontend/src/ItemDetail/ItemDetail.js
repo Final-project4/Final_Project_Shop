@@ -15,8 +15,6 @@ const ItemDetail = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const { addToCart } = useCart();
-  
-  
 
   useEffect(() => {
     axios
@@ -63,8 +61,8 @@ const ItemDetail = () => {
     setShowFullDescription(!showFullDescription);
   };
 
-  const sizes = ["S", "M", "L", "XL", "2XL"];
   const colors = ["ดำ", "ขาว", "แดง", "น้ำเงิน"];
+  const sizes = item?.size ? Object.entries(item.size) : [];
 
   return (
     <div className="h-min bg-gray-200 text-gray-900 py-12 px-6">
@@ -112,18 +110,20 @@ const ItemDetail = () => {
 
             <div className="mt-4">
               <h2 className="text-lg font-medium text-gray-700">ขนาด (Size)</h2>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {sizes.map((size) => (
+              <div className="flex flex-col gap-2 mt-2">
+                {sizes.map(([size, stock]) => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`px-4 py-2 border rounded-lg ${
+                    disabled={stock === 0}
+                    className={`px-4 py-2 border rounded-lg flex justify-between items-center w-full ${
                       selectedSize === size
                         ? "bg-blue-500 text-white"
                         : "bg-white text-gray-700"
-                    } hover:bg-blue-500 hover:text-white transition duration-300`}
+                    } hover:bg-blue-500 hover:text-white transition duration-300 ${stock === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
-                    {size}
+                    <span>{size}</span>
+                    <span className="text-sm text-gray-500">{stock} ชิ้น</span>
                   </button>
                 ))}
               </div>
@@ -157,43 +157,6 @@ const ItemDetail = () => {
           </div>
         </div>
       </div>
-
-      {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm mx-auto animate-bounce">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">แจ้งเตือน</h2>
-            <p className="text-gray-700 mb-4">กรุณาเลือกขนาดและสี</p>
-            <button
-              onClick={() => setShowModal(false)}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105"
-            >
-              ปิด
-            </button>
-          </div>
-        </div>
-      )}
-
-      {loading && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm mx-auto">
-            <div className="flex items-center justify-center mb-4">
-              <FaShoppingCart className="text-blue-600 text-3xl animate-spin" />
-            </div>
-            <p className="text-gray-700 mb-4">กำลังเพิ่มสินค้าในตะกร้า...</p>
-          </div>
-        </div>
-      )}
-
-      {success && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm mx-auto">
-            <div className="flex items-center justify-center mb-4">
-              <FaCheckCircle className="text-green-500 text-3xl" />
-            </div>
-            <p className="text-gray-700 mb-4">เพิ่มสินค้าไปในตะกร้าเรียบร้อยแล้ว</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
