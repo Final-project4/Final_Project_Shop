@@ -129,7 +129,7 @@ const ItemDetail = () => {
               </div>
             </div>
 
-            <div className="mt-4">
+            {/* <div className="mt-4">
               <h2 className="text-lg font-medium text-gray-700">สี (Color)</h2>
               <div className="flex flex-wrap gap-2 mt-2">
                 {colors.map((color) => (
@@ -146,7 +146,7 @@ const ItemDetail = () => {
                   </button>
                 ))}
               </div>
-            </div>
+            </div> */}
 
             <button
               onClick={handleAddToCart}

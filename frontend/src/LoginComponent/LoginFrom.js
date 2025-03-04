@@ -92,7 +92,7 @@ const LoginForm = () => {
 
   return (
     <div
-      className="flex flex-col w-full bg-white p-8 rounded-lg shadow-lg"
+      className="flex flex-col w-full h-full bg-white p-8 rounded-lg shadow-lg"
       style={{
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: "cover",

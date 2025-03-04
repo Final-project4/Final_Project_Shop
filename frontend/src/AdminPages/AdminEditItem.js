@@ -23,7 +23,7 @@ const AdminEditItem = () => {
   useEffect(() => {
     const fetchItem = async () => {
       try {
-        const response = await axios.get(`${conf.urlPrefix}/api/items/${documentId}?populate=img`, {
+        const response = await axios.get(`${conf.urlPrefix}/api/items?filters[id][$eq]=${documentId}&populate=img`, {
           headers: { Authorization: `Bearer ${jwt}`},
         });
         console.log("API Response:", response.data);
@@ -135,7 +135,7 @@ const AdminEditItem = () => {
   
       console.log("🚀 Sending Data:", postData);
   
-      const response = await axios.put(`${conf.urlPrefix}/api/items/${documentId}`, postData, {
+      const response = await axios.put(`${conf.urlPrefix}/api/items?filters[id][$eq]=${documentId}`, postData, {
         headers: { Authorization: `Bearer ${jwt}`}
       });
       console.log("✅ Item updated successfully", response.data);

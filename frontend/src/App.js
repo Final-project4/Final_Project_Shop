@@ -10,15 +10,12 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="flex flex-col min-h-screen overflow-hidden">
+        <div className="overflow-hidden"
           <Header />
-          <main className="flex-grow">
             <CartProvider>
               <AppRoutes />
             </CartProvider>
-          </main>
           <Footer />
-        </div>
       </Router>
     </AuthProvider>
   );
