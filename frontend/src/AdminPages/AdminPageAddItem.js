@@ -25,7 +25,7 @@ const AdminPage = () => {
         if (data && data.data) {
           const formattedCategories = data.data.map((cat) => ({
             id: cat.id,
-            name: cat.attributes.name || "Unknown",
+            name: cat.name || "Unknown",
           }));
           setCategories(formattedCategories);
         } else {
@@ -124,7 +124,7 @@ const AdminPage = () => {
           name: name,
           description: description,
           price: parseFloat(price),
-          categories: selectedCategories.map((cat) => cat.id),
+          categories: selectedCategories.map((cat) => cat.id-1),
           size: sizes, // เพิ่มข้อมูล size
           img: imageIds.map((id) => ({ id })),
         },

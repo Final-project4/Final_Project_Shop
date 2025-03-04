@@ -10,7 +10,6 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="overflow-hidden"
           <Header />
             <CartProvider>
               <AppRoutes />
