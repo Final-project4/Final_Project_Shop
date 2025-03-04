@@ -209,7 +209,7 @@ const Cart = () => {
                 size: cartItem.size,
                 color: cartItem.color,
                 order: orderId,
-                cart_item: cartItem.id
+                item: cartItem.id
               },
             },
             {

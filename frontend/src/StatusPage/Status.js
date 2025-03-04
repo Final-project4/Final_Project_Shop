@@ -3,12 +3,15 @@ import { Spin, Alert, Card, List, Row, Col } from "antd";
 import { ClockCircleOutlined } from "@ant-design/icons";
 import conf from "../conf/config";
 import { useAuth } from "../context/AuthContext";
+import { getAuthToken } from "../context/auth";
 
 const OrderStatus = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [orders, setOrders] = useState([]);
   const { userInfo } = useAuth();
+  const token = getAuthToken();
+  console.log(userInfo)
 
   useEffect(() => {
     const fetchOrderItems = async (orders) => {
@@ -16,7 +19,14 @@ const OrderStatus = () => {
         const updatedOrders = await Promise.all(
           orders.map(async (order) => {
             const response = await fetch(
-              `${conf.urlPrefix}/api/orders/${order.id}?populate=orderItems`
+              `${conf.urlPrefix}/api/orders/${order.id}?populate=orderItems`,
+              {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              },
+              credentials: 'include'
+              }
             );
             if (!response.ok) {
               throw new Error(
@@ -39,9 +49,8 @@ const OrderStatus = () => {
       setLoading(false);
       return;
     }
-
     fetchOrderItems(userInfo.orders);
-  }, [userInfo]);
+  }, [userInfo]);  
 
   // Helper function to determine the appropriate dot based on order status
   const getStatusDot = (status) => {
@@ -74,7 +83,7 @@ const OrderStatus = () => {
         return <ClockCircleOutlined />;
     }
   };
-
+  
   return (
     <div style={{ maxWidth: 1200, margin: "50px auto" }}>
       <Card title="Your Orders Status">
@@ -131,7 +140,7 @@ const OrderStatus = () => {
                           }}
                         >
                           <img
-                            src={item.item.img.formats.url}
+                            src={`${conf.urlPrefix}${item.item.img.url}`}
                             alt={item.item.name}
                             width={50}
                             height={50}

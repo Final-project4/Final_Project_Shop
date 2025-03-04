@@ -6,7 +6,7 @@ const InputField = ({ label, type, id, value, onChange, placeholder, style }) =>
       <label htmlFor={id} className="block text-sm font-light text-gray-900 text-center">
         {label}
       </label>
-      <div className="mt-2 flex justify-center">
+      <div className="mt-5 flex justify-center">
         <input
           id={id}
           name={id}

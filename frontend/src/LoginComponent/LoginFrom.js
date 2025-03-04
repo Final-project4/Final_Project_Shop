@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import InputField from "./InputField";
-import SocialLogin from "./SocialLogin";
 import Cookies from "js-cookie";
 import Swal from "sweetalert2";
 import backgroundImage from "./background1.png";
@@ -57,7 +56,7 @@ const LoginForm = () => {
             ? `
             <div class="flex flex-col items-center">
               <img 
-                src=${conf.urlPrefix}${userDetailData.profilePicture[0].url}" 
+                src="${conf.urlPrefix}${userDetailData.profilePicture[0].url}" 
                 alt="Profile" 
                 class="w-24 h-24 rounded-full object-cover mb-4"
               />
@@ -114,7 +113,7 @@ const LoginForm = () => {
         )}
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-2 mt-8">
+      <form onSubmit={handleSubmit} className="space-y-2 mt-8 pt-8">
         <InputField
           label="Email address"
           type="email"
@@ -135,7 +134,7 @@ const LoginForm = () => {
           style={{ backgroundColor: color }}
         />
 
-        <div className=" mt-6 pt-3">
+        <div className=" mt-8 pt-3">
           <button
             type="submit"
             className="flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold text-gray-500 shadow-sm hover:bg-yellow-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-500"
@@ -160,19 +159,13 @@ const LoginForm = () => {
         </div>
         <div className="mt-8 pt-2"></div>
 
-        <SocialLogin />
 
         <div className="mt-7 pt-8 text-center">
-          <a
-            href="#"
-            className="font-semibold text-indigo-600 hover:text-indigo-500"
-          >
-            Forgot password?
-          </a>
+         
         </div>
       </form>
 
-      <p className="mt-4 text-center text-sm text-gray-500">
+      <p className="mt-8 text-center text-sm text-gray-500">
         Don't have an account?{" "}
         <button
           onClick={handleSignUp}

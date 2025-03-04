@@ -28,10 +28,13 @@ const Header = () => {
   return (
     <Navbar
       fluid
-      className={`bg-gradient-to-r ${
-        isAdmin ? "from-blue-700 to-cyan-400" : "from-green-700 to-yellow-400"
-      } text-white py-4 px-6`}
-    >
+      style={{ 
+        width: '100%', 
+        background: 'linear-gradient(to right,rgb(0, 10, 43),rgb(0, 11, 134))',
+        color: 'white',
+        margin: 0,
+        padding: '1rem 0'
+      }}>
       <Navbar.Brand as={Link} to="/">
         <span className="self-center text-xl font-semibold whitespace-nowrap">
           {isAdmin ? "Admin Dashboard" : "MyShop"}
