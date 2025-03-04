@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar"; // นำเข้า Sidebar component
 import conf from "../conf/config";
+
 
 const BASE_URL = conf.urlPrefix; // ใช้ HTTP ปกติ ไม่มี HTTPS ใน Localhost
 
@@ -11,6 +12,7 @@ const AdminItemList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { documentId } = useParams();
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -26,7 +28,20 @@ const AdminItemList = () => {
     };
 
     fetchItems();
-  }, []);
+  }, [items]);
+
+  const handleDelete = async (itemId) => {
+    if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบสินค้านี้?")) {
+      try {
+        await axios.delete(`${BASE_URL}/api/items/${itemId.documentId}`);
+        setItems(items.filter(item => item.id !== itemId));
+      } catch (error) {
+        console.error("Error deleting item:", error);
+        alert("ไม่สามารถลบสินค้าได้");
+      }
+    }
+  };
+
 
   return (
     <div className="flex h-full w-screen">
@@ -65,14 +80,20 @@ const AdminItemList = () => {
                   ราคา: {item.price ? `${item.price} Baht` : "N/A Baht"}
                 </p>
                 {/* ปุ่ม Edit */}
-                <button
-                  onClick={() =>
-                    navigate(`/admin/items/edit/${item.id}`)
-                  }
-                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-                >
-                  Edit
-                </button>
+                <div className="flex gap-2 mt-3">
+                  <button
+                    onClick={() => navigate(`/admin/items/edit/${item.id}`)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(item)}
+                    className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             );
           })
@@ -85,3 +106,4 @@ const AdminItemList = () => {
 };
 
 export default AdminItemList;
+
