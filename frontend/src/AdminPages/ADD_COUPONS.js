@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Sidebar from "./Sidebar";
 import conf from "../conf/config";
+import { getAuthToken } from "../context/auth";
 
 const API_URL = `${conf.urlPrefix}/api/coupons`; // URL ของ Strapi
 
@@ -15,6 +16,7 @@ const AddCoupons = () => {
   const [validUntil, setValidUntil] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [coupons, setCoupons] = useState([]);
+  const token=getAuthToken();
  
 
   useEffect(() => {
@@ -38,47 +40,77 @@ const AddCoupons = () => {
 
   const addCoupon = async () => {
     if (!couponCode || !discountValue || !validFrom || !validUntil) {
-        alert("Please fill in all required fields.");
-        return;
+      alert("Please fill in all required fields.");
+      return;
     }
     try {
-        const response = await axios.post(
-            API_URL,
-            {
-                data: {
-                    code: couponCode,
-                    discount_type: discountType === "Percentage" ? "Percentage" : "Free Shipping",
-                    discount_value: parseFloat(discountValue),
-                    minimum_order: parseFloat(minimumOrder) || 0,
-                    max_discount: parseFloat(maxDiscount) || 0,
-                    valid_from: validFrom,
-                    valid_until: validUntil,
-                    is_active: isActive,
-                },
-            },
-            { headers: { "Content-Type": "application/json" } }
-        );
-
-        console.log("API Response:", response.data);
-
-        if (response.data && response.data.data) {
-            setCoupons([...coupons, response.data.data]);
-        }
-
-        // รีเซ็ตค่าในฟอร์ม
-        setCouponCode("");
-        setDiscountType("Percentage");
-        setDiscountValue("");
-        setMinimumOrder("");
-        setMaxDiscount("");
-        setValidFrom("");
-        setValidUntil("");
-        setIsActive(true);
+      // สร้างคูปองใหม่
+      const couponResponse = await axios.post(
+        API_URL,
+        {
+          data: {
+            code: couponCode,
+            discount_type: discountType === "Percentage" ? "Percentage" : "Free Shipping",
+            discount_value: parseFloat(discountValue),
+            minimum_order: parseFloat(minimumOrder) || 0,
+            max_discount: parseFloat(maxDiscount) || 0,
+            valid_from: validFrom,
+            valid_until: validUntil,
+            is_active: isActive,
+          },
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      if (!couponResponse.data || !couponResponse.data.data) {
+        console.error("Failed to create coupon");
+        return;
+      }
+  
+      const newCoupon = couponResponse.data.data;
+      console.log("New Coupon:", newCoupon);
+  
+      // ดึงรายชื่อผู้ใช้ทั้งหมดจาก Strapi
+      const usersResponse = await axios.get(`${conf.urlPrefix}/api/users`, {
+        headers: { Authorization: `Bearer ${token}` }, // ใช้ Token
+      });
+      const users = usersResponse.data;
+  
+      if (!users || users.length === 0) {
+        console.error("No users found");
+        return;
+      }
+  
+      // อัปเดตคูปองให้ทุกคน
+      const userIds = users.map((user) => user.id);
+      console.log(userIds)
+      await axios.put(`${API_URL}?filters[id][$eq]=${newCoupon.id}`,
+        {
+          data: {
+            user_restrictions: userIds,
+          },
+        },
+        { headers: { Authorization: `Bearer ${token}`  } }
+      );
+  
+      // อัปเดตรายการคูปองใน state
+      setCoupons([...coupons, newCoupon]);
+  
+      // รีเซ็ตค่าในฟอร์ม
+      setCouponCode("");
+      setDiscountType("percentage");
+      setDiscountValue("");
+      setMinimumOrder("");
+      setMaxDiscount("");
+      setValidFrom("");
+      setValidUntil("");
+      setIsActive(true);
     } catch (error) {
-        console.error("Error adding coupon:", error);
-        console.log("Server response:", error.response?.data);
+      console.error("Error adding coupon:", error);
+      console.log("Server response:", error.response?.data);
     }
-};
+  };
+  
 
 const removeCoupon = async (documentId) => {
   try {

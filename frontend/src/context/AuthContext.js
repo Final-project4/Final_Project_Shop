@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import conf from '../conf/config';
+import { getAuthToken } from './auth';
 
 const AuthContext = createContext(null);
 
@@ -15,7 +16,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
-  const authToken = Cookies.get('authToken');
+  const authToken = getAuthToken();
 
   useEffect(() => {
     if (authToken) {

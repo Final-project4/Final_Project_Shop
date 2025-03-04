@@ -116,8 +116,8 @@ const OrderStatus = () => {
                 style={{ marginBottom: 20 }}
               >
                 <div>
-                  <strong>Created At:</strong>{" "}
-                  {new Date(order.createdAt).toLocaleString()}
+                  <strong>Update At:</strong>{" "}
+                  {new Date(order.updatedAt).toLocaleString()}
                 </div>
                 <div>
                   <strong>Status:</strong> {order.step || "Pending"}

@@ -25,7 +25,7 @@ const AdminPage = () => {
         if (data && data.data) {
           const formattedCategories = data.data.map((cat) => ({
             id: cat.id,
-            name: cat.attributes.name || "Unknown",
+            name: cat.name || "Unknown",
           }));
           setCategories(formattedCategories);
         } else {
@@ -88,7 +88,8 @@ const AdminPage = () => {
     setSizes((prev) => ({
       ...prev,
       [size]: parseInt(value) || 0, // แปลงเป็นตัวเลข ถ้าเป็นค่าว่างให้เป็น 0
-    }));
+    }
+  ));
   };
 
   const handleImageUpload = (event) => {
@@ -118,7 +119,7 @@ const AdminPage = () => {
         alert("บางรูปอัปโหลดไม่สำเร็จ");
         return;
       }
-
+      console.log(sizes)
       const postData = {
         data: {
           name: name,
