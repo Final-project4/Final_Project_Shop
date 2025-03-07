@@ -43,13 +43,13 @@ const OrderStatus = () => {
   const getStatusDot = (status) => {
     switch (status) {
       case "pending":
-        return <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: 'red' }} />;
+        return <ClockCircleOutlined style={{ color: 'gray' }} />;  // นาฬิกาสำหรับ pending
       case "paid":
-        return <ClockCircleOutlined />;
+        return <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: 'orange' }} />;  // วงกลมสีเหลืองสำหรับ paid
       case "completed":
-        return <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: 'green' }} />;
+        return <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: 'green' }} />;  // วงกลมสีเขียวสำหรับ completed
       default:
-        return <ClockCircleOutlined />;
+        return <ClockCircleOutlined style={{ color: 'gray' }} />;  // ค่าเริ่มต้นเป็นนาฬิกาสำหรับสถานะอื่น
     }
   };
 
