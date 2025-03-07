@@ -4,13 +4,14 @@ import { Search } from "lucide-react";
 import { TextInput } from "flowbite-react";
 import axios from "axios";
 import PopularProducts from "./poppular";
+import conf from "../conf/config";
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
     axios
-      .get("http://localhost:1337/api/items?populate=*")
+      .get(`${conf.urlPrefix}/api/items?populate=*`)
       .then((response) => {
         setProducts(response.data.data || []);
       })
@@ -20,7 +21,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#faf7f7]">
+    <div className="h-full w-screen bg-[#faf7f7]">
       {/* Header */}
       <div className="container mx-auto py-8 flex items-center justify-center space-x-4 text-center">
         <Link to="/">
@@ -36,22 +37,7 @@ export default function HomePage() {
         </h1>
       </div>
 
-      {/* Search */}
-      <div className="container mx-auto px-4 mb-12 text-center py-12">
-        <div className="relative max-w-md mx-auto">
-          <TextInput
-            type="search"
-            placeholder="ค้นหา..."
-            className="pl-10 bg-[#e9e3ed] rounded-full focus:ring-[#c4a484] focus:border-[#c4a484]"
-          />
-          <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
-        </div>
-      </div>
-
-
-      <div>
       <PopularProducts products={products} />
-      </div>
 
       {/* Banner */}
       <div className="my-8 text-center relative">
@@ -73,25 +59,24 @@ export default function HomePage() {
         <h2 className="text-2xl italic mt-8">🎨 Collection</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
           {products.map((product) => (
-            <div
-              key={product.id}
-              className="bg-white p-4 shadow rounded-lg hover:shadow-lg transition transform hover:scale-105"
-            >
-              <img
-                src={`http://localhost:1337${
-                  product.img?.url || "/placeholder.jpg"
-                }`}
-                alt={product.name || "No Title"}
-                className="w-full h-48 object-cover rounded-md"
-              />
-              <p className="mt-2 font-medium text-lg">
-                {product.name || "No Title"}
-              </p>
-              <p className="text-gray-600">{product.price ?? "N/A"} บาท</p>
-              <button className="bg-gradient-to-r from-purple-500 to-blue-500 text-white px-4 py-2 mt-3 rounded-full shadow-md transition-all duration-300 hover:from-purple-600 hover:to-blue-600">
-                🛍 สั่งซื้อ
-              </button>
-            </div>
+            <Link to={`/product/${product.id}`}>
+              <div
+                key={product.id}
+                className="bg-white p-4 shadow rounded-lg hover:shadow-lg transition transform hover:scale-105"
+              >
+                <img
+                  src={`${conf.urlPrefix}${
+                    product.img?.url || "/placeholder.jpg"
+                  }`}
+                  alt={product.name || "No Title"}
+                  className="w-full h-48 object-cover rounded-md"
+                />
+                <p className="mt-2 font-medium text-lg">
+                  {product.name || "No Title"}
+                </p>
+                <p className="text-gray-600">{product.price ?? "N/A"} บาท</p>
+              </div>
+            </Link>
           ))}
         </div>
       </section>

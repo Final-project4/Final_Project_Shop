@@ -16,7 +16,7 @@ const OrderSummary = ({
   isCheckoutButtonActive,
 }) => {
   return (
-      <Card className="bg-gray-50 top-4">
+      <Card className="bg-gray-50 top-4 ">
         <CardContent className="p-8">
           <div className="bg-gray-100 p-6 rounded-lg space-y-8">
             <div className="flex items-center gap-4">

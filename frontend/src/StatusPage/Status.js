@@ -1,68 +1,146 @@
-import React, { useState } from "react";
-import { Input, Button, Spin, Alert, Timeline, Card } from "antd";
-import { SearchOutlined, ClockCircleOutlined } from "@ant-design/icons";
+import React, { useState, useEffect } from "react";
+import { Spin, Alert, Card, List, Row, Col } from "antd";
+import { ClockCircleOutlined } from "@ant-design/icons";
+import conf from "../conf/config";
+import { useAuth } from "../context/AuthContext";
+import { getAuthToken } from "../context/auth";
 
 const OrderStatus = () => {
-  const [orderId, setOrderId] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [orderStatus, setOrderStatus] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const { userInfo } = useAuth();
+  const token = getAuthToken();
+  console.log(userInfo)
 
-
-  const fetchOrderStatus = async () => {
-    setLoading(true);
-    setError("");
-    setOrderStatus(null);
-
-    setTimeout(() => {
-      const mockData = {
-        1001: ["Order Placed", "Processing", "Shipped", "Delivered"],
-        1002: ["Order Placed", "Processing"],
-      };
-
-      if (mockData[orderId]) {
-        setOrderStatus(mockData[orderId]);
-      } else {
-        setError("Order not found! Please check your Order ID.");
+  useEffect(() => {
+    const fetchOrderItems = async (orders) => {
+      try {
+        const updatedOrders = await Promise.all(
+          orders.map(async (order) => {
+            const response = await fetch(
+              `${conf.urlPrefix}/api/orders/${order.id}?populate=orderItems`,
+              {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              },
+              credentials: 'include'
+              }
+            );
+            if (!response.ok) {
+              throw new Error(
+                `Failed to fetch order items for order ${order.id}`
+              );
+            }
+            const data = await response.json();
+            return { ...order, order_items: data.order_items };
+          })
+        );
+        setOrders(updatedOrders);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
       }
+    };
 
+    if (!userInfo || !userInfo.orders) {
       setLoading(false);
-    }, 1500);
+      return;
+    }
+    fetchOrderItems(userInfo.orders);
+  }, [userInfo]);  
+
+  // Helper function to determine the appropriate dot based on order status
+  const getStatusDot = (status) => {
+    switch (status) {
+      case "pending":
+        return <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: 'red' }} />;
+      case "paid":
+        return <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: 'orange' }} />;  // วงกลมสีเหลืองสำหรับ paid
+      case "completed":
+        return <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: 'green' }} />;
+      default:
+        return <ClockCircleOutlined style={{ color: 'gray' }} />;  // ค่าเริ่มต้นเป็นนาฬิกาสำหรับสถานะอื่น
+    }
   };
-
+  
   return (
-    <div style={{ maxWidth: 500, margin: "50px auto", textAlign: "center" }}>
-      <Card title="Check Order Status" bordered={false}>
-        <Input
-          placeholder="Enter Order ID"
-          value={orderId}
-          onChange={(e) => setOrderId(e.target.value)}
-          style={{ marginBottom: 10 }}
-        />
-        <Button
-          type="primary"
-          icon={<SearchOutlined />}
-          onClick={fetchOrderStatus}
-          disabled={!orderId}
-        >
-          Check Status
-        </Button>
-
+    <div style={{ width: "100%", height: "100vh", margin: "50px auto" }}>
+      <Card title="Your Orders Status" style={{ height: "100%" }}>
         {loading && <Spin style={{ marginTop: 20 }} />}
 
         {error && (
-          <Alert message={error} type="error" showIcon style={{ marginTop: 20 }} />
+          <Alert    
+            message={error}
+            type="error"
+            showIcon
+            style={{ marginTop: 20 }}
+          />
         )}
 
-        {orderStatus && (
-          <Timeline style={{ marginTop: 20 }}>
-            {orderStatus.map((status, index) => (
-              <Timeline.Item key={index} dot={<ClockCircleOutlined />}>
-                {status}
-              </Timeline.Item>
-            ))}
-          </Timeline>
+        {orders.length === 0 && !loading && !error && (
+          <Alert
+            message="No orders found."
+            type="info"
+            showIcon
+            style={{ marginTop: 20 }}
+          />
         )}
+
+        <Row gutter={[16, 16]} style={{ marginTop: 20 }}>
+          {orders.map((order) => (
+            <Col span={8} key={order.id}>
+              <Card
+                title={`Order ID: ${order.id}`}
+                extra={getStatusDot(order.step)}
+                style={{ marginBottom: 20 }}
+              >
+                <div>
+                  <strong>Update At:</strong>{" "}
+                  {new Date(order.updatedAt).toLocaleString()}
+                </div>
+                <div>
+                  <strong>Status:</strong> {order.step || "Pending"}
+                </div>
+                <div>
+                  <strong>Total Price:</strong> {order.total_price} THB
+                </div>
+                <div style={{ marginTop: 10, textAlign: "left" }}>
+                  <strong>Order Items:</strong>
+                  <List
+                    bordered
+                    dataSource={order.order_items || []}
+                    renderItem={(item) => (
+                      <List.Item>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                          }}
+                        >
+                          <img
+                            src={`${conf.urlPrefix}${item.item.img.url}`}
+                            alt={item.item.name}
+                            width={50}
+                            height={50}
+                            style={{ borderRadius: "10px" }}
+                          />
+                          <div>
+                            <strong>{item.item.name}</strong> - {item.quantity}{" "}
+                            pcs {item.price} THB
+                          </div>
+                        </div>
+                      </List.Item>
+                    )}
+                  />
+                </div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
       </Card>
     </div>
   );

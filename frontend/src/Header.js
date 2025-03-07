@@ -1,25 +1,41 @@
 import React from "react";
 import { Navbar, Button } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "./context/AuthContext";
+import Swal from 'sweetalert2';
+import { useAuth } from './context/AuthContext';
 
 const Header = () => {
-  const { userInfo, logout,isAdmin } = useAuth();
+  const {  logout,isAdmin,userInfo} = useAuth();
   const navigate = useNavigate();
-
   const handleLogout = () => {
-    logout();
-    navigate("/");
+    Swal.fire({
+      title: 'Confirm Logout',
+      text: "Are you sure you want to log out?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0000CC',
+      cancelButtonColor: '#CC0000',
+      confirmButtonText: 'Yes, log out',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        logout();
+        navigate("/login");
+      }
+    });
   };
-  
+
   return (
     <Navbar
       fluid
-      className={`bg-gradient-to-r ${
-        isAdmin ? "from-blue-700 to-cyan-400" : "from-green-700 to-yellow-400"
-      } text-white py-4 px-6`}
-    >
-      <Navbar.Brand as={Link} to="/">
+      style={{ 
+        width: '100%', 
+        background: 'linear-gradient(to right,rgb(0, 10, 43),rgb(0, 11, 134))',
+        color: 'white',
+        margin: 0,
+        padding: '1rem 0'
+      }}>
+      <Navbar.Brand as={Link} to="/" className="ml-6">
         <span className="self-center text-xl font-semibold whitespace-nowrap">
           {isAdmin ? "Admin Dashboard" : "MyShop"}
         </span>
@@ -58,7 +74,7 @@ const Header = () => {
             </Navbar.Link>
           )}
         </Navbar.Collapse>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 mr-2">
           <Link to="/cart">
             <svg
               className="w-6 h-6 text-white hover:text-gray-200"
@@ -91,14 +107,45 @@ const Header = () => {
           </Link>
 
           {userInfo ? (
-            <Link to="/login">
-              <Button gradientDuoTone="purpleToBlue" onClick={handleLogout}>
+              <Button
+                style={{
+                  backgroundColor: "#020d29",
+                  color: "white",
+                  padding: "1px 1px",
+                  border: "1px solid #555",
+                  borderRadius: "4px",
+                  fontSize: "12px",
+                  fontWeight: "300",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  transition: "all 0.3s ease",
+                }}
+                onMouseOver={(e) => (e.target.style.backgroundColor = "#444")}
+                onMouseOut={(e) => (e.target.style.backgroundColor = "#020d29")}
+                onClick={handleLogout}
+              >
                 Logout
               </Button>
-            </Link>
           ) : (
             <Link to="/login">
-              <Button gradientDuoTone="purpleToBlue">Login</Button>
+              <Button
+                style={{
+                  backgroundColor: "#020d29",
+                  color: "white",
+                  padding: "1px 1px",
+                  border: "1px solid #555",
+                  borderRadius: "4px",
+                  fontSize: "12px",
+                  fontWeight: "300",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  transition: "all 0.3s ease",
+                }}
+                onMouseOver={(e) => (e.target.style.backgroundColor = "#444")}
+                onMouseOut={(e) => (e.target.style.backgroundColor = "#020d29")}
+              >
+                Login
+              </Button>
             </Link>
           )}
         </div>

@@ -1,83 +1,114 @@
+import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
-import { useState, } from "react";
+import conf from "../conf/config";
 
-export default function OrderList() {
-  const [orders, setOrders] = useState([
-    { id: "A001", date: "2025-02-09", name: "S. Nann", total: "360 Baht", status: "กำลังสั่ง", slip: "" },
-    { id: "A002", date: "2025-02-10", name: "S. Nann", total: "400 Baht", status: "ยังไม่จ่าย", slip: "" },
-    { id: "A003", date: "2025-02-09", name: "S. Nann", total: "500 Baht", status: "ยังไม่จ่าย", slip: "" },
-  ]);
+const AdminOrderDashboard = () => {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const updateStatus = (index, newStatus) => {
-    const updatedOrders = [...orders];
-    updatedOrders[index].status = newStatus;
-    setOrders(updatedOrders);
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      const response = await fetch(`${conf.urlPrefix}/api/orders?populate=*`);
+      const data = await response.json();
+      setOrders(data.data || []);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      setLoading(false);
+    }
+  };
+
+  const updateOrderStatus = async (orderId, newStep) => {
+    try {
+      const orderToUpdate = orders.find((order) => order.id === orderId);
+      if (!orderToUpdate) return;
+
+      const updatedData = {
+        step: newStep,
+        slip: orderToUpdate.slip,
+      };
+
+      await fetch(`${conf.urlPrefix}/api/orders/${orderId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: updatedData }),
+      });
+
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.id === orderId ? { ...order, step: newStep } : order
+        )
+      );
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
+  };
+
+  if (loading) return <p>Loading...</p>;
+
+  const formatDate = (isoString) => {
+    const date = new Date(isoString);
+    return date.toLocaleString("th-TH", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <Sidebar /> 
+      <Sidebar />
 
-      {/* Main Content */}
-      <div className="flex-1 p-10">
-        <h2 className="text-3xl font-bold mb-5 text-center">Order List</h2>
-        
-        <div className="bg-white shadow-md rounded-lg p-5">
-          <table className="w-full border-collapse">
+      {/* Content */}
+      <div className="flex-1 p-6">
+        <h1 className="text-2xl font-semibold mb-4">Admin Order Dashboard</h1>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse border border-gray-300 text-center">
             <thead>
-              <tr className="border-b text-left">
-                <th className="p-2">Order #</th>
-                <th className="p-2">Date</th>
-                <th className="p-2">Name</th>
-                <th className="p-2">Total</th>
-                <th className="p-2">Status</th>
-                <th className="p-2">Slip</th>
-                <th className="p-2">Actions</th>
+              <tr className="bg-gray-200">
+                <th className="p-3 border border-gray-300">วันที่สั่งซื้อ</th>
+                <th className="p-3 border border-gray-300">สถานะ</th>
+                <th className="p-3 border border-gray-300">ราคารวม</th>
+                <th className="p-3 border border-gray-300">สลิปการจ่ายเงิน</th>
+                <th className="p-3 border border-gray-300">อัปเดตสถานะ</th>
               </tr>
             </thead>
             <tbody>
-              {orders.map((order, index) => (
-                <tr key={order.id} className="border-b">
-                  <td className="p-2">#{order.id}</td>
-                  <td className="p-2">{order.date}</td>
-                  <td className="p-2">{order.name}</td>
-                  <td className="p-2">{order.total}</td>
-                  <td className="p-2 font-semibold">
-                    {order.status === "จ่ายแล้ว" ? (
-                      <span className="text-green-600">จ่ายแล้ว</span>
-                    ) : order.status === "ถูกยกเลิก" ? (
-                      <span className="text-red-600">ถูกยกเลิก</span>
+              {orders.map((order) => (
+                <tr key={order.id} className="border-b border-gray-300 h-14">
+                  <td className="p-3">{formatDate(order.createdAt)}</td>
+                  <td className="p-3">{order.step || "ไม่มีสถานะ"}</td>
+                  <td className="p-3">{order.total_price ? `${order.total_price} บาท` : "ไม่มีราคา"}</td>
+                  <td className="p-3">
+                    {order.slip && order.slip.length > 0 ? (
+                      <a href={`http://localhost:1337${order.slip[0].url}`} target="_blank" rel="noopener noreferrer">
+                        <img
+                          src={`http://localhost:1337${order.slip[0].formats.thumbnail.url}`}
+                          alt="สลิปการจ่ายเงิน"
+                          className="w-24 rounded-lg mx-auto cursor-pointer"
+                        />
+                      </a>
                     ) : (
-                      <span className="text-gray-600">{order.status}</span>
+                      <span className="text-gray-500">ไม่มีสลิป</span>
                     )}
                   </td>
-                  <td className="p-2">
-                    {order.slip ? (
-                      <img src={order.slip} alt="Slip" className="w-20 h-20 object-cover rounded-md" />
-                    ) : (
-                      <span className="text-gray-500">No Slip</span>
-                    )}
-                  </td>
-                  <td className="p-2 flex space-x-2">
-                    <button
-                      onClick={() => updateStatus(index, "จ่ายแล้ว")}
-                      className="bg-green-500 text-white px-3 py-1 rounded"
+                  <td className="p-3">
+                    <select
+                      onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                      defaultValue={order.step || "pending"}
+                      className="p-2 border border-gray-300 rounded-md"
                     >
-                      Confirmed
-                    </button>
-                    <button
-                      onClick={() => updateStatus(index, "ถูกยกเลิก")}
-                      className="bg-red-500 text-white px-3 py-1 rounded"
-                    >
-                      Canceled
-                    </button>
-                    <button
-                      onClick={() => updateStatus(index, "กำลังสั่ง")}
-                      className="bg-yellow-500 text-white px-3 py-1 rounded"
-                    >
-                      Pending
-                    </button>
+                      <option value="pending">Pending</option>
+                      <option value="paid">Paid</option>
+                      <option value="completed">Completed</option>
+                    </select>
                   </td>
                 </tr>
               ))}
@@ -87,4 +118,6 @@ export default function OrderList() {
       </div>
     </div>
   );
-}
+};
+
+export default AdminOrderDashboard;

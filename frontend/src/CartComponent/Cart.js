@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useContext } from "react";
-import { Trash2, Search, ShoppingCart, User } from "lucide-react";
+import React, { useEffect, useState,  } from "react";
+import { Trash2, ShoppingCart,  } from "lucide-react";
 import axios from "axios";
 import { Card, CardContent } from "../components/ui/card";
 import Checkbox from "../components/ui/checkbox";
@@ -8,6 +8,7 @@ import CheckoutPopup from "./CheckoutPopup";
 import CartItem from "./CartItem";
 import OrderSummary from "./OrderSummary";
 import { useAuth } from "../context/AuthContext";
+import conf from "../conf/config";
 
 const Cart = () => {
   const { userInfo, setUser } = useAuth();
@@ -33,6 +34,7 @@ const Cart = () => {
       .reduce((sum, item) => sum + item.price * item.quantity, 0);
     const shippingFee = subtotal > 500 ? 0 : 40;
     const total = subtotal + shippingFee - discountAmount;
+    // console.log("taotat",total)
     return total < 0 ? 0 : total;
   };
 
@@ -55,7 +57,7 @@ const Cart = () => {
 
         // เรียก API PUT เพื่ออัปเดตจำนวนสินค้า
         const response = await axios.put(
-          `http://localhost:1337/api/cart-items/${itemToUpdate.item_cart_id}`,
+          `${conf.urlPrefix}/api/cart-items/${itemToUpdate.item_cart_id}`,
           {
             amount: itemToUpdate.quantity, // ส่งจำนวนที่อัปเดต
           },
@@ -93,7 +95,7 @@ const Cart = () => {
 
       // เรียก API DELETE เพื่อลบสินค้า
       const response = await axios.delete(
-        `http://localhost:1337/api/cart-items/${itemCartId}`,
+        `${conf.urlPrefix}/api/cart-items/${itemCartId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -128,12 +130,14 @@ const Cart = () => {
         console.error("No authToken found");
         return;
       }
-  
+
       // ส่ง request ไปยัง API เพื่อลบ voucher ที่ใช้แล้ว
       const response = await axios.put(
-        `http://localhost:1337/api/users/${userInfo.id}?populate=*`,
+        `${conf.urlPrefix}/api/users/${userInfo.id}?populate=*`,
         {
-          coupons: userInfo.coupons.filter((coupon) => coupon.code !== couponCode),
+          coupons: userInfo.coupons.filter(
+            (coupon) => coupon.code !== couponCode
+          ),
         },
         {
           headers: {
@@ -141,13 +145,15 @@ const Cart = () => {
           },
         }
       );
-  
+
       if (response.status === 200) {
         console.log("Voucher removed successfully");
         // อัปเดตข้อมูลผู้ใช้ใน state
         setUser((prevUserInfo) => ({
           ...prevUserInfo,
-          coupons: prevUserInfo.coupons.filter((coupon) => coupon.code !== couponCode),
+          coupons: prevUserInfo.coupons.filter(
+            (coupon) => coupon.code !== couponCode
+          ),
         }));
       } else {
         console.error("Failed to remove voucher:", response.data);
@@ -156,29 +162,32 @@ const Cart = () => {
       console.error("Error removing voucher:", error.response?.data || error);
     }
   };
-  
+
   const handleCheckout = async (slipFile) => {
     if (!userInfo) {
       alert("กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อ");
       return;
     }
-  
+
     const selectedItems = cartItems.filter((item) => item.selected);
     if (selectedItems.length === 0) {
       alert("กรุณาเลือกสินค้าอย่างน้อย 1 ชิ้น");
       return;
     }
-  
+    
     try {
       const token = Cookies.get("authToken");
-  
+
       // สร้างออเดอร์ใหม่
       const orderResponse = await axios.post(
-        "http://localhost:1337/api/orders",
+        `${conf.urlPrefix}/api/orders`,
         {
           data: {
             user: userInfo.id,
-            total_price: selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+            total_price: selectedItems.reduce(
+              (sum, item) => sum + item.price * item.quantity,
+              0
+            ),
             step: "pending",
           },
         },
@@ -186,14 +195,13 @@ const Cart = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-  
+
       const orderId = orderResponse.data.data.id;
-  
       // สร้าง order items
       await Promise.all(
         selectedItems.map((cartItem) =>
           axios.post(
-            "http://localhost:1337/api/order-items",
+            `${conf.urlPrefix}/api/order-items`,
             {
               data: {
                 quantity: cartItem.quantity,
@@ -201,7 +209,7 @@ const Cart = () => {
                 size: cartItem.size,
                 color: cartItem.color,
                 order: orderId,
-                cart_item: cartItem.item_cart_id,
+                item: cartItem.id
               },
             },
             {
@@ -210,15 +218,15 @@ const Cart = () => {
           )
         )
       );
-  
+
       // อัปโหลดสลิปการชำระเงิน (ถ้ามี)
       let slipFileId = null;
       if (slipFile) {
         const formData = new FormData();
         formData.append("files", slipFile);
-  
+
         const uploadResponse = await axios.post(
-          "http://localhost:1337/api/upload",
+          `${conf.urlPrefix}/api/upload`,
           formData,
           {
             headers: {
@@ -227,16 +235,16 @@ const Cart = () => {
             },
           }
         );
-  
+
         if (uploadResponse.data.length > 0) {
           slipFileId = uploadResponse.data[0].id;
         }
       }
-  
+
       // อัปเดตออเดอร์ด้วยสลิป (ถ้ามี)
       if (slipFileId) {
         await axios.put(
-          `http://localhost:1337/api/orders/${orderId}`,
+          `${conf.urlPrefix}/api/orders/${orderId}`,
           {
             data: {
               slip: slipFileId,
@@ -247,13 +255,16 @@ const Cart = () => {
           }
         );
       }
-  
+
       // ลบสินค้าออกจากตะกร้า
       await Promise.all(
         selectedItems.map((item) =>
-          axios.delete(`http://localhost:1337/api/cart-items/${item.item_cart_id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          })
+          axios.delete(
+            `${conf.urlPrefix}/api/cart-items/${item.item_cart_id}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          )
         )
       );
       if (selectedCoupon) {
@@ -265,7 +276,10 @@ const Cart = () => {
       setIsCheckoutPopupOpen(false);
       setCartItems([]);
     } catch (error) {
-      console.error("Error processing checkout:", error.response?.data || error);
+      console.error(
+        "Error processing checkout:",
+        error.response?.data || error
+      );
       alert("เกิดข้อผิดพลาดในการสั่งซื้อ กรุณาลองใหม่อีกครั้ง");
     }
   };
@@ -281,7 +295,7 @@ const Cart = () => {
           return;
         }
         const response = await axios.get(
-          `http://localhost:1337/api/carts?filters[user][id][$eq]=${userInfo.id}&populate=cart_items.item.img`,
+          `${conf.urlPrefix}/api/carts?filters[user][id][$eq]=${userInfo.id}&populate=cart_items.item.img`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -291,16 +305,16 @@ const Cart = () => {
         console.log("API Response:", response.data);
 
         if (response.data.data && Array.isArray(response.data.data)) {
-          const items = response.data.data.flatMap(cart =>
+          const items = response.data.data.flatMap((cart) =>
             cart.cart_items && Array.isArray(cart.cart_items)
-              ? cart.cart_items.map(cartItem => ({
-                ...cartItem.item,
-                quantity: cartItem.amount,
-                selected: false,
-                item_cart_id: cartItem.id,
-                size: cartItem.size,
-                color: cartItem.color
-              }))
+              ? cart.cart_items.map((cartItem) => ({
+                  ...cartItem.item,
+                  quantity: cartItem.amount,
+                  selected: false,
+                  item_cart_id: cartItem.id,
+                  size: cartItem.size,
+                  color: cartItem.color,
+                }))
               : []
           );
           console.log("Fetched items:", items); // ตรวจสอบข้อมูล
@@ -309,13 +323,15 @@ const Cart = () => {
           console.error("Invalid data structure:", response.data);
         }
       } catch (error) {
-        console.error("Error fetching cart items:", error.response?.data || error);
+        console.error(
+          "Error fetching cart items:",
+          error.response?.data || error
+        );
       }
     } else {
       console.log("No user info available to fetch cart items");
     }
   };
-
 
   const toggleItemSelection = (id) => {
     setCartItems(
@@ -354,7 +370,7 @@ const Cart = () => {
         if (coupon.discount_type === "Percentage") {
           const discount = (subtotal * coupon.discount_value) / 100;
           setDiscountAmount(discount);
-          console.log("disco", discount)
+          console.log("disco", discount);
         } else if (coupon.discount_type === "fixed_amount") {
           setDiscountAmount(coupon.discount_value);
         }
@@ -391,14 +407,26 @@ const Cart = () => {
       }
 
       // สร้างคำขอลบสินค้าทั้งหมดที่เลือก
-      await Promise.all(selectedItems.map(item =>
-        axios.delete(`http://localhost:1337/api/cart-items/${item.item_cart_id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-      ));
+      await Promise.all(
+        selectedItems.map((item) =>
+          axios.delete(
+            `${conf.urlPrefix}/api/cart-items/${item.item_cart_id}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          )
+        )
+      );
 
       // อัปเดต state เพื่อลบสินค้าที่ถูกลบออกจาก cartItems
-      setCartItems(prevItems => prevItems.filter(item => !selectedItems.some(selected => selected.item_cart_id === item.item_cart_id)));
+      setCartItems((prevItems) =>
+        prevItems.filter(
+          (item) =>
+            !selectedItems.some(
+              (selected) => selected.item_cart_id === item.item_cart_id
+            )
+        )
+      );
       alert("ลบสินค้าที่เลือกเรียบร้อยแล้ว");
     } catch (error) {
       console.error(
@@ -412,6 +440,7 @@ const Cart = () => {
   useEffect(() => {
     if (userInfo) {
       const fetchCartItems = async () => {
+        // console.log(userInfo)
         try {
           const token = Cookies.get("authToken");
           if (!token) {
@@ -419,7 +448,7 @@ const Cart = () => {
             return;
           }
           const response = await axios.get(
-            `http://localhost:1337/api/carts?filters[user][id][$eq]=${userInfo.id}&populate=cart_items.item.img`,
+            `${conf.urlPrefix}/api/carts?filters[user][id][$eq]=${userInfo.id}&populate=cart_items.item.img`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -428,21 +457,21 @@ const Cart = () => {
           );
           // console.log("API Response:", response.data);
 
-          // ตรวจสอบโครงสร้างของข้อมูล
+          
           if (response.data.data && Array.isArray(response.data.data)) {
             const items = response.data.data.flatMap((cart) =>
               cart.cart_items && Array.isArray(cart.cart_items)
                 ? cart.cart_items.map((cartItem) => ({
-                  ...cartItem.item, // ดึงข้อมูลจาก item
-                  quantity: cartItem.amount, // ใช้ amount เป็น quantity
-                  selected: false, // เพิ่มค่าเริ่มต้นสำหรับ selected
-                  item_cart_id: cartItem.id, // เพิ่ม item_cart_id ที่ตรงกับ id ของ cartItem
-                  size: cartItem.size,
-                  color: cartItem.color
-                }))
+                    ...cartItem.item,
+                    quantity: cartItem.amount, 
+                    selected: false,
+                    item_cart_id: cartItem.id, 
+                    size: cartItem.size,
+                    color: cartItem.color,
+                  }))
                 : []
             );
-            // console.log("Fetched items:", items); // ตรวจสอบข้อมูลผลิตภัณฑ์ที่ดึงมา
+            // console.log("Fetched items:", items); 
             setCartItems(items);
           } else {
             console.error("Invalid data structure:", response.data);
@@ -566,7 +595,7 @@ const Cart = () => {
           </div>
         </div>
       </div>
-      {isCheckoutPopupOpen &&  (
+      {isCheckoutPopupOpen && (
         <CheckoutPopup
           items={cartItems.filter((item) => item.selected)}
           total={calculateTotal()}

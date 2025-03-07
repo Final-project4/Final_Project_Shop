@@ -411,7 +411,7 @@ export interface ApiCartCart extends Struct.CollectionTypeSchema {
     singularName: 'cart';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     cart_items: Schema.Attribute.Relation<
@@ -482,7 +482,7 @@ export interface ApiCouponCoupon extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     discount_type: Schema.Attribute.Enumeration<
-      ['Percentage', 'fixed_amount', 'free_shiping']
+      ['Percentage', 'Free Shipping']
     >;
     discount_value: Schema.Attribute.Integer;
     is_active: Schema.Attribute.Boolean;
@@ -537,10 +537,15 @@ export interface ApiItemItem extends Struct.CollectionTypeSchema {
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::item.item'> &
       Schema.Attribute.Private;
     name: Schema.Attribute.String;
+    order_items: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::order-item.order-item'
+    >;
     price: Schema.Attribute.Integer &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<0>;
     publishedAt: Schema.Attribute.DateTime;
+    size: Schema.Attribute.JSON;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -563,6 +568,7 @@ export interface ApiOrderItemOrderItem extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    item: Schema.Attribute.Relation<'manyToOne', 'api::item.item'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -1102,6 +1108,7 @@ export interface PluginUsersPermissionsUser
         minLength: 6;
       }>;
     phoneNumber: Schema.Attribute.String;
+    profilePicture: Schema.Attribute.Media<'files' | 'images', true>;
     provider: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     resetPasswordToken: Schema.Attribute.String & Schema.Attribute.Private;

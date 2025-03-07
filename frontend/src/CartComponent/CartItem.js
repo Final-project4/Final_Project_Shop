@@ -1,6 +1,7 @@
 import React from "react";
 import { Trash2 } from "lucide-react";
 import Checkbox from "../components/ui/checkbox";
+import conf from "../conf/config";
 
 const CartItem = ({
   item,
@@ -17,7 +18,7 @@ const CartItem = ({
         />
         <div className="w-24 h-24 flex-shrink-0">
           <img
-            src={`http://localhost:1337${
+            src={`${conf.urlPrefix}${
               item.img?.formats?.small?.url ||
               item.img?.url ||
               "/placeholder.jpg"

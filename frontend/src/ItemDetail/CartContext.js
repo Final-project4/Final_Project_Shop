@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import { getAuthToken } from "../context/auth";
+import conf from "../conf/config";
 
 const CartContext = createContext();
 
@@ -12,7 +13,7 @@ export const CartProvider = ({ children }) => {
   const fetchUserCart = async (userId) => {
     try {
       const authToken = getAuthToken();
-      const response = await axios.get("http://localhost:1337/api/carts", {
+      const response = await axios.get(`${conf.urlPrefix}/api/carts`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -34,10 +35,12 @@ export const CartProvider = ({ children }) => {
       return null;
     }
   };
-
   useEffect(() => {
     if (userInfo) {
-      fetchUserCart(userInfo.id).then((userCart) => setCart(userCart));
+      fetchUserCart(userInfo.id).then((userCart
+      ) => {
+        // console.log("hop",userCart)
+        setCart(userCart)});
     }
   }, [userInfo]);
 
@@ -46,19 +49,24 @@ export const CartProvider = ({ children }) => {
       alert("กรุณาเข้าสู่ระบบก่อนเพิ่มสินค้า");
       return;
     }
-
+    console.log("user",userInfo);
+    console.log("cart:",cart.id)
+    console.log("item:",productId)
+    console.log("size:",size)
+    console.log("color:",color)
+    console.log("amount:",1)
     try {
-      const authToken = getAuthToken();
+      const authToken = getAuthToken(); 
       const cartId = cart ? cart.id : null;
       const response = await axios.post(
-        "http://localhost:1337/api/cart-items",
+        `${conf.urlPrefix}/api/cart-items`,
         {
           data: {
             cart: cartId,
-            item: productId,
-            // size,
-            // color,
-            amount: 1,  
+            item: productId,  
+            size: size,
+            color: color,
+            amount: 1,
           },
         },
         {
@@ -68,11 +76,13 @@ export const CartProvider = ({ children }) => {
           withCredentials: true,
         }
       );
-
+      
       console.log("เพิ่มสินค้าลงตะกร้าสำเร็จ", response.data);
       fetchUserCart(userInfo.id).then((updatedCart) => setCart(updatedCart));
     } catch (error) {
+      alert("เกิดข้อผิดพลาดในการเพิ่มสินค้าไปยังตะกร้า");
       console.error("เกิดข้อผิดพลาดในการเพิ่มสินค้าไปยังตะกร้า:", error);
+
     }
   };
 
