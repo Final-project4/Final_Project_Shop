@@ -1,5 +1,6 @@
+// add testcase for CheckoutPopup
 import { render, screen, fireEvent } from '@testing-library/react';
-import CheckoutPopup from './CheckoutPopup'; // Adjust the path if necessary
+import CheckoutPopup from './CheckoutPopup';
 
 const mockHandleCheckout = jest.fn();
 const mockOnClose = jest.fn();
