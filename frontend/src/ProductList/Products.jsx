@@ -110,7 +110,7 @@ const Products = () => {
   return (
     <div className="min-h-screen bg-gray-100 flex">
       {/* Sidebar */}
-      <div className="w-64 bg-white shadow-xl p-6 rounded-lg sticky top-0 h-screen space-y-12">
+      <div className="w-64 bg-white shadow-xl p-6 rounded-lg sticky top-0 h-full space-y-12">
         <div>
           <h2 className="text-xl font-semibold mb-4">หมวดหมู่</h2>
           <ul className="space-y-4">

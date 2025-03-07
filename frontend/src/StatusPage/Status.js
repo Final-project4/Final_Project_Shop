@@ -3,24 +3,38 @@ import { Spin, Alert, Card, List, Row, Col } from "antd";
 import { ClockCircleOutlined } from "@ant-design/icons";
 import conf from "../conf/config";
 import { useAuth } from "../context/AuthContext";
+import { getAuthToken } from "../context/auth";
 
 const OrderStatus = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [orders, setOrders] = useState([]);
   const { userInfo } = useAuth();
+  const token = getAuthToken();
+  console.log(userInfo)
 
   useEffect(() => {
     const fetchOrderItems = async (orders) => {
       try {
         const updatedOrders = await Promise.all(
           orders.map(async (order) => {
-            const response = await fetch(`${conf.urlPrefix}/api/orders/${order.id}?populate=orderItems`);
+            const response = await fetch(
+              `${conf.urlPrefix}/api/orders/${order.id}?populate=orderItems`,
+              {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              },
+              credentials: 'include'
+              }
+            );
             if (!response.ok) {
-              throw new Error(`Failed to fetch order items for order ${order.id}`);
+              throw new Error(
+                `Failed to fetch order items for order ${order.id}`
+              );
             }
             const data = await response.json();
-            return { ...order, orderItems: data.orderItems || [] };
+            return { ...order, order_items: data.order_items };
           })
         );
         setOrders(updatedOrders);
@@ -35,31 +49,35 @@ const OrderStatus = () => {
       setLoading(false);
       return;
     }
-
     fetchOrderItems(userInfo.orders);
-  }, [userInfo]);
+  }, [userInfo]);  
 
   // Helper function to determine the appropriate dot based on order status
   const getStatusDot = (status) => {
     switch (status) {
       case "pending":
-        return <ClockCircleOutlined style={{ color: 'gray' }} />;  // นาฬิกาสำหรับ pending
+        return <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: 'red' }} />;
       case "paid":
         return <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: 'orange' }} />;  // วงกลมสีเหลืองสำหรับ paid
       case "completed":
-        return <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: 'green' }} />;  // วงกลมสีเขียวสำหรับ completed
+        return <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: 'green' }} />;
       default:
         return <ClockCircleOutlined style={{ color: 'gray' }} />;  // ค่าเริ่มต้นเป็นนาฬิกาสำหรับสถานะอื่น
     }
   };
-
+  
   return (
-    <div style={{ maxWidth: 1200, margin: "50px auto" }}>
-      <Card title="Your Orders Status" bordered={false}>
+    <div style={{ width: "100%", height: "100vh", margin: "50px auto" }}>
+      <Card title="Your Orders Status" style={{ height: "100%" }}>
         {loading && <Spin style={{ marginTop: 20 }} />}
 
         {error && (
-          <Alert message={error} type="error" showIcon style={{ marginTop: 20 }} />
+          <Alert    
+            message={error}
+            type="error"
+            showIcon
+            style={{ marginTop: 20 }}
+          />
         )}
 
         {orders.length === 0 && !loading && !error && (
@@ -76,12 +94,12 @@ const OrderStatus = () => {
             <Col span={8} key={order.id}>
               <Card
                 title={`Order ID: ${order.id}`}
-                bordered={true}
                 extra={getStatusDot(order.step)}
                 style={{ marginBottom: 20 }}
               >
                 <div>
-                  <strong>Created At:</strong> {new Date(order.createdAt).toLocaleString()}
+                  <strong>Update At:</strong>{" "}
+                  {new Date(order.updatedAt).toLocaleString()}
                 </div>
                 <div>
                   <strong>Status:</strong> {order.step || "Pending"}
@@ -93,11 +111,27 @@ const OrderStatus = () => {
                   <strong>Order Items:</strong>
                   <List
                     bordered
-                    dataSource={order.orderItems || []}
+                    dataSource={order.order_items || []}
                     renderItem={(item) => (
                       <List.Item>
-                        <div>
-                          <strong>{item.productName}</strong> - {item.quantity} pcs @ {item.price} THB
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                          }}
+                        >
+                          <img
+                            src={`${conf.urlPrefix}${item.item.img.url}`}
+                            alt={item.item.name}
+                            width={50}
+                            height={50}
+                            style={{ borderRadius: "10px" }}
+                          />
+                          <div>
+                            <strong>{item.item.name}</strong> - {item.quantity}{" "}
+                            pcs {item.price} THB
+                          </div>
                         </div>
                       </List.Item>
                     )}

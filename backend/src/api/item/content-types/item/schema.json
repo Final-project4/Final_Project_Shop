@@ -49,6 +49,9 @@
       "relation": "oneToMany",
       "target": "api::order-item.order-item",
       "mappedBy": "item"
+    },
+    "size": {
+      "type": "json"
     }
   }
 }

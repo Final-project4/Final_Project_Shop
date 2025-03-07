@@ -197,7 +197,6 @@ const Cart = () => {
       );
 
       const orderId = orderResponse.data.data.id;
-      console.log(selectedItems)
       // สร้าง order items
       await Promise.all(
         selectedItems.map((cartItem) =>
@@ -472,7 +471,7 @@ const Cart = () => {
                   }))
                 : []
             );
-            console.log("Fetched items:", items); 
+            // console.log("Fetched items:", items); 
             setCartItems(items);
           } else {
             console.error("Invalid data structure:", response.data);

@@ -21,7 +21,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#faf7f7]">
+    <div className="h-full w-screen bg-[#faf7f7]">
       {/* Header */}
       <div className="container mx-auto py-8 flex items-center justify-center space-x-4 text-center">
         <Link to="/">

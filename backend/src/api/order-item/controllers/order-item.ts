@@ -34,5 +34,36 @@ export default factories.createCoreController('api::order-item.order-item', ({ s
         return ctx.internalServerError('Something went wrong while creating the order item');
       }
     },
+    async find(ctx) {
+      try {
+        
+        ctx.query = {
+          ...ctx.query,
+          populate: ['order', 'item', 'size', 'color','*'], // เพิ่ม field ที่ต้องการ populate
+        };
+  
+        const { data, meta } = await super.find(ctx);
+        return { data, meta };
+      } catch (error) {
+        console.error('Error fetching order items:', error);
+        return await super.find(ctx);
+      }
+    },
+  
+    async findOne(ctx) {
+      try {
+        
+        ctx.query = {
+          ...ctx.query,
+          populate: ['order', 'item', 'size', 'color','*'],
+        };
+  
+        const { data } = await super.findOne(ctx);
+        return { data };  
+      } catch (error) {
+        console.error('Error fetching order item:', error);
+        return await super.findOne(ctx);
+      }
+    },
   }));
   

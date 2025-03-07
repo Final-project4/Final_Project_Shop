@@ -7,7 +7,6 @@ import { useAuth } from './context/AuthContext';
 const Header = () => {
   const {  logout,isAdmin,userInfo} = useAuth();
   const navigate = useNavigate();
-  console.log("ad",isAdmin)
   const handleLogout = () => {
     Swal.fire({
       title: 'Confirm Logout',
@@ -29,11 +28,14 @@ const Header = () => {
   return (
     <Navbar
       fluid
-      className={`bg-gradient-to-r ${
-        isAdmin ? "from-blue-700 to-cyan-400" : "from-green-700 to-yellow-400"
-      } text-white py-4 px-6`}
-    >
-      <Navbar.Brand as={Link} to="/">
+      style={{ 
+        width: '100%', 
+        background: 'linear-gradient(to right,rgb(0, 10, 43),rgb(0, 11, 134))',
+        color: 'white',
+        margin: 0,
+        padding: '1rem 0'
+      }}>
+      <Navbar.Brand as={Link} to="/" className="ml-6">
         <span className="self-center text-xl font-semibold whitespace-nowrap">
           {isAdmin ? "Admin Dashboard" : "MyShop"}
         </span>
@@ -72,7 +74,7 @@ const Header = () => {
             </Navbar.Link>
           )}
         </Navbar.Collapse>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 mr-2">
           <Link to="/cart">
             <svg
               className="w-6 h-6 text-white hover:text-gray-200"

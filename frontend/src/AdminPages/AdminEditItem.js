@@ -3,7 +3,7 @@ import Sidebar from "./Sidebar";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import conf from "../conf/config";
-
+import { getAuthToken } from "../context/auth";
 
 const AdminEditItem = () => {
   const { documentId } = useParams(); // ใช้ documentId แทน id
@@ -18,25 +18,30 @@ const AdminEditItem = () => {
   const [categories, setCategories] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const jwt = localStorage.getItem("jwt");
+  const [sizes, setSizes] = useState({});
+  const [newSize, setNewSize] = useState("");
+  const token = getAuthToken();
+
   
 
   useEffect(() => {
     const fetchItem = async () => {
       try {
-        const response = await axios.get(`${conf.urlPrefix}/api/items/${documentId}?populate=img`, {
-          headers: { Authorization: `Bearer ${jwt}`},
+        const response = await axios.get(`${conf.urlPrefix}/api/items?filters[id][$eq]=${documentId}&populate=*`, {
+          headers: { Authorization: `Bearer ${token}`},
         });
         console.log("API Response:", response.data);
         console.log("Fetched item categories:", item.categories)
   
         if (response.data && response.data.data) {
-          const item = response.data.data;
-          console.log("🖼 Images Before Set:", item);
+          const item = response.data.data[0];
+          console.log("Fetched item data:", item);
 
           setName(item.name || "");
           setDescription(item.description || "");
           setPrice(item.price || "");
           setSelectedCategories(item.categories || []); // ถ้า categories เป็น array ให้ใช้เลย
+          console.log(item)
           if (item.img) {
             if (Array.isArray(item.img.data)) {
               // กรณี img เป็น Array
@@ -48,6 +53,7 @@ const AdminEditItem = () => {
           } else {
             setImages([]);
           }
+          setSizes(item.size || {size: "", stock: ""})
         }
       } catch (error) {
         console.error("Error fetching item:", error);
@@ -57,13 +63,13 @@ const AdminEditItem = () => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(`${conf.urlPrefix}/api/categories?populate=*`,{
-          headers: { Authorization: `Bearer ${jwt}`}
+          headers: { Authorization: `Bearer ${token}`}
         });
         console.log("Fetched categories:", response.data);
   
         if (response.data && response.data.data) {
           setCategories(response.data.data.map(cat => ({
-            id: cat.id - 1,
+            id: cat.id -1,
             name: cat.name || "Unknown"
           })));
         }
@@ -75,6 +81,23 @@ const AdminEditItem = () => {
     fetchItem();
     fetchCategories();
   }, [documentId, jwt]);
+
+  const handleAddSize = () => {
+    if (!newSize.trim()) return; // ป้องกันการเพิ่มค่าว่าง
+    if (sizes[newSize]) {
+      alert("ไซส์นี้มีอยู่แล้ว!");
+      return;
+    }
+    setSizes((prev) => ({ ...prev, [newSize]: 0 }));
+    setNewSize(""); // ล้างค่า input
+  };
+
+  const handleSizeChange = (size, value) => {
+    setSizes((prev) => ({
+      ...prev,
+      [size]: parseInt(value) || 0, // แปลงเป็นตัวเลข ถ้าเป็นค่าว่างให้เป็น 0
+    }));
+  };
   
 
   const uploadImage = async (file) => {
@@ -83,7 +106,7 @@ const AdminEditItem = () => {
   
     try {
       const response = await axios.post(`${conf.urlPrefix}/api/upload`, formData, {
-        headers: { "Content-Type": "multipart/form-data" , Authorization: `Bearer ${jwt}`},
+        headers: { "Content-Type": "multipart/form-data" , Authorization: `Bearer ${token}`},
       });
   
       if (response.data && response.data.length > 0) {
@@ -108,6 +131,14 @@ const AdminEditItem = () => {
     );
   };
 
+  const handleRemoveSize = (size) => {
+    setSizes((prev) => {
+      const updatedSizes = { ...prev };
+      delete updatedSizes[size]; // ลบ key ออกจาก Object
+      return updatedSizes;
+    });
+  };
+
   const handleSaveItem = async () => {
     try {
       console.log("🔹 ก่อนอัปโหลดรูปภาพ Images:", images);
@@ -129,14 +160,19 @@ const AdminEditItem = () => {
           description,
           price: parseFloat(price),
           categories: selectedCategories.map(cat => cat.id),
+          size: sizes,
           ...(filteredImageIds.length > 0 && { img: filteredImageIds.map(id => ({ id })) })
         }
       };
   
       console.log("🚀 Sending Data:", postData);
-  
-      const response = await axios.put(`${conf.urlPrefix}/api/items/${documentId}`, postData, {
-        headers: { Authorization: `Bearer ${jwt}`}
+      
+      
+
+      const response = await axios.patch(`${conf.urlPrefix}/api/items/$${documentId}`, postData, {
+        headers: { Authorization: `Bearer ${token}`, 
+        "Content-Type": "application/json",
+        "Accept": "application/json",}
       });
       console.log("✅ Item updated successfully", response.data);
       alert("Item updated successfully");
@@ -153,11 +189,11 @@ const AdminEditItem = () => {
   
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-full bg-gray-100">
       <Sidebar />
-      <div className="flex-1 p-10 flex flex-col items-center overflow-auto">
+      <div className="flex-1 p-10 flex flex-col items-center overflow-auto h-full">
         <h1 className="text-4xl font-bold mb-6 text-[#daa520]">EDIT ITEM</h1>
-        <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-5xl grid grid-cols-2 gap-6">
+        <div className="bg-white rounded-xl shadow-lg w-full h-full mr-4 ml-4 max-w-5xl grid grid-cols-2 gap-6">
           <div className="bg-gray-100 p-5 rounded-lg">
             <h2 className="text-lg font-semibold">General Information</h2>
             <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} className="w-full p-3 mt-3 border rounded-md bg-gray-200" />
@@ -210,14 +246,60 @@ const AdminEditItem = () => {
               ))}
             </div>
           </div>
+          
+          {/* Input เพิ่มไซส์ใหม่ */}
+          <div className="flex mt-3 gap-2">
+              <input
+                type="text"
+                value={newSize}
+                onChange={(e) => setNewSize(e.target.value)}
+                placeholder="เพิ่มไซส์ใหม่..."
+                className="p-2 border rounded-md w-full"
+              />
+              <button
+                onClick={handleAddSize}
+                className="bg-green-500 text-white px-3 py-2 rounded-md"
+              >
+                ➕ เพิ่มไซส์
+              </button>
+            </div>
+
+            {/* แสดงไซส์ที่เพิ่ม */}
+            <div className="mt-3"></div>
+            {Object.keys(sizes).length > 0 ? (
+              Object.keys(sizes).map((size) => (
+                <div
+                  key={size}
+                  className="flex justify-between items-center mt-2"
+                >
+                  <span className="font-medium">{size}</span>
+                  <input
+                    type="number"
+                    value={sizes[size]}
+                    onChange={(e) => handleSizeChange(size, e.target.value)}
+                    className="w-20 p-2 border rounded-md bg-gray-200 text-center"
+                  />
+                  <button
+                    onClick={() => handleRemoveSize(size)}
+                    className="ml-2 text-red-500"
+                  >
+                    ❌
+                  </button>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500 text-sm mt-3">ยังไม่มีไซส์</p>
+            )}
           <button 
             onClick={handleSaveItem}
             className="col-span-2 bg-yellow-500 text-black font-bold py-3 rounded-lg shadow-md hover:bg-yellow-600 transition">
             UPDATE ITEM
           </button>
+          </div>
+
+          
         </div>
       </div>
-    </div>
   );
 }
 
