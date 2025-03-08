@@ -8,7 +8,7 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
@@ -23,9 +23,15 @@
     },
     "item": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "manyToOne",
       "target": "api::item.item",
-      "inversedBy": "cart_item"
+      "inversedBy": "cart_items"
+    },
+    "size": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string"
     }
   }
 }

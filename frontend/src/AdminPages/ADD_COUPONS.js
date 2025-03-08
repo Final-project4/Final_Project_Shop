@@ -1,63 +1,162 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import Sidebar from "./Sidebar";
+import conf from "../conf/config";
+import { getAuthToken } from "../context/auth";
+
+const API_URL = `${conf.urlPrefix}/api/coupons`; // URL ของ Strapi
 
 const AddCoupons = () => {
+  const [couponCode, setCouponCode] = useState("");
+  const [discountType, setDiscountType] = useState("percentage");
+  const [discountValue, setDiscountValue] = useState("");
+  const [minimumOrder, setMinimumOrder] = useState("");
+  const [maxDiscount, setMaxDiscount] = useState("");
+  const [validFrom, setValidFrom] = useState("");
+  const [validUntil, setValidUntil] = useState("");
+  const [isActive, setIsActive] = useState(true);
+  const [coupons, setCoupons] = useState([]);
+  const token=getAuthToken();
+ 
+
+  useEffect(() => {
+    fetchCoupons();
+  }, [couponCode]);
+
+  const fetchCoupons = async () => {
+    try {
+      const response = await axios.get(API_URL);
+      if (response.data && response.data.data) {
+        setCoupons(response.data.data);
+      } else {
+        setCoupons([]);
+        console.error("Invalid data structure:", response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching coupons:", error);
+      setCoupons([]);
+    }
+  };
+
+  const addCoupon = async () => {
+    if (!couponCode || !discountValue || !validFrom || !validUntil) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+    try {
+      // สร้างคูปองใหม่
+      const couponResponse = await axios.post(
+        API_URL,
+        {
+          data: {
+            code: couponCode,
+            discount_type: discountType === "Percentage" ? "Percentage" : "Free Shipping",
+            discount_value: parseFloat(discountValue),
+            minimum_order: parseFloat(minimumOrder) || 0,
+            max_discount: parseFloat(maxDiscount) || 0,
+            valid_from: validFrom,
+            valid_until: validUntil,
+            is_active: isActive,
+          },
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      if (!couponResponse.data || !couponResponse.data.data) {
+        console.error("Failed to create coupon");
+        return;
+      }
+  
+      const newCoupon = couponResponse.data.data;
+      console.log("New Coupon:", newCoupon);
+  
+      // ดึงรายชื่อผู้ใช้ทั้งหมดจาก Strapi
+      const usersResponse = await axios.get(`${conf.urlPrefix}/api/users`, {
+        headers: { Authorization: `Bearer ${token}` }, // ใช้ Token
+      });
+      const users = usersResponse.data;
+  
+      if (!users || users.length === 0) {
+        console.error("No users found");
+        return;
+      }
+  
+      // อัปเดตคูปองให้ทุกคน
+      const userIds = users.map((user) => user.id);
+      console.log("ss",newCoupon)
+      await axios.put(`${API_URL}/${newCoupon.documentId}`,
+        {
+          data: {
+            user_restrictions: userIds,
+          },
+        },
+        { headers: { Authorization: `Bearer ${token}`  } }
+      );
+  
+      // อัปเดตรายการคูปองใน state
+      setCoupons([...coupons, newCoupon]);
+  
+      // รีเซ็ตค่าในฟอร์ม
+      setCouponCode("");
+      setDiscountType("percentage");
+      setDiscountValue("");
+      setMinimumOrder("");
+      setMaxDiscount("");
+      setValidFrom("");
+      setValidUntil("");
+      setIsActive(true);
+    } catch (error) {
+      console.error("Error adding coupon:", error);
+      console.log("Server response:", error.response?.data);
+    }
+  };
+  
+
+const removeCoupon = async (documentId) => {
+  try {
+      await axios.delete(`${API_URL}/${documentId}`);
+      setCoupons(coupons.filter((coupon) => coupon.id !== documentId));
+  } catch (error) {
+      console.error("Error deleting coupon:", error);
+  }
+};
+
   return (
     <div className="flex h-screen">
-      {/* Sidebar */}
       <Sidebar />
-
-
-      {/* Main Content - Center Screen */}
       <div className="flex flex-1 justify-center items-center min-h-screen">
         <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-4xl">
-
-          {/* Header */}
-          <div className="flex items-center space-x-3 mb-5">
-          <div className="w-10 h-10 border-2 rounded-full flex items-center justify-center text-lg font-bold">
-            FS
+          <h2 className="text-2xl font-semibold mb-4 text-center">Manage Coupons</h2>
+          <div className="flex flex-wrap gap-4 mb-6">
+            {coupons?.map((coupon) => (
+              <div>
+              <h3>Code: {coupon.code}</h3>
+              <p>Discount: {coupon.discount_value}%</p>
+              <p>Valid From: {new Date(coupon.valid_from).toLocaleDateString()}</p>
+              <p>Valid Until: {new Date(coupon.valid_until).toLocaleDateString()}</p>
+              <button
+                  onClick={() => removeCoupon(coupon.documentId)}
+                  className="bg-red-600 text-white px-4 py-2 mt-2 rounded-md hover:bg-red-700"
+                >
+                  Delete
+                </button>
+            </div>
+            ))}
           </div>
-          <h1 className="text-3xl font-bold">
-            <span className="text-[#daa520]">FASHION</span> SHOP
-          </h1>
-        </div>
 
-
-          {/* Coupon Section */}
-          <div className="mt-6 text-center">
-            <h2 className="text-2xl font-semibold mb-4">Coupons</h2>
-
-            {/* Existing Coupons */}
-            <div className="space-y-4">
-              <div className="flex justify-between bg-gray-100 p-3 rounded-md">
-                <span className="font-medium">30% Off</span>
-                <span className="text-gray-700">Code: 12357</span>
-              </div>
-              <div className="flex justify-between bg-gray-100 p-3 rounded-md">
-                <span className="font-medium">Free Shipping</span>
-                <span className="text-gray-700">Code: ZLERP</span>
-              </div>
-            </div>
-
-            {/* Add New Coupon */}
-            <div className="mt-6 bg-gray-200 p-4 rounded-md">
-              <h3 className="text-lg font-medium mb-2">Add New Coupon</h3>
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  placeholder="Insert coupon here"
-                  className="w-2/3 p-2 border rounded-md"
-                />
-                <input
-                  type="text"
-                  placeholder="Input code here"
-                  className="w-1/3 p-2 border rounded-md"
-                />
-              </div>
-              <button className="mt-3 bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-800 w-full">
-                Add Coupon
-              </button>
-            </div>
+          <div className="bg-gray-200 p-4 rounded-md">
+            <h3 className="text-lg font-medium mb-2">Add New Coupon</h3>
+            <input type="text" placeholder="Coupon Code" value={couponCode} onChange={(e) => setCouponCode(e.target.value)} className="w-full p-2 border rounded-md mb-3" />
+            <select value={discountType} onChange={(e) => setDiscountType(e.target.value)} className="w-full p-2 border rounded-md mb-3">
+              <option value="percentage">Percentage</option>
+              <option value="free_shipping">Free Shipping</option>
+            </select>
+            <input type="number" placeholder="Discount Value" value={discountValue} onChange={(e) => setDiscountValue(e.target.value)} className="w-full p-2 border rounded-md mb-3" />
+            <input type="number" placeholder="Minimum Order" value={minimumOrder} onChange={(e) => setMinimumOrder(e.target.value)} className="w-full p-2 border rounded-md mb-3" />
+            <input type="number" placeholder="Max Discount" value={maxDiscount} onChange={(e) => setMaxDiscount(e.target.value)} className="w-full p-2 border rounded-md mb-3" />
+            <input type="date" value={validFrom} onChange={(e) => setValidFrom(e.target.value)} className="w-full p-2 border rounded-md mb-3" />
+            <input type="date" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} className="w-full p-2 border rounded-md mb-3" />
+            <button onClick={addCoupon} className="bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-800 w-full">Add Coupon</button>
           </div>
         </div>
       </div>

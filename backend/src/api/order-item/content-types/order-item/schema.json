@@ -8,7 +8,7 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
@@ -18,14 +18,23 @@
       "target": "api::order.order",
       "inversedBy": "order_items"
     },
+    "price": {
+      "type": "integer"
+    },
+    "quantity": {
+      "type": "integer"
+    },
+    "size": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string"
+    },
     "item": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "manyToOne",
       "target": "api::item.item",
-      "inversedBy": "order_item"
-    },
-    "amount": {
-      "type": "integer"
+      "inversedBy": "order_items"
     }
   }
 }

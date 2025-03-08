@@ -1,18 +1,56 @@
 services:
-  mysql:
-    image: mysql:8
+  strapi:
+    container_name: strapi
+    build: 
+      context: ../server
+      dockerfile: Dockerfile
+    image: strapi:latest
+    restart: unless-stopped
+    env_file: .env
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: strapi
-      MYSQL_USER: strapiuser
-      MYSQL_PASSWORD: strapipassword
-    ports:
-      - "3306:3306"
+      DATABASE_CLIENT: ${DATABASE_CLIENT}
+      DATABASE_HOST: strapiDB
+      DATABASE_PORT: 3306
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+      APP_KEYS: ${APP_KEYS}
+      NODE_ENV: ${NODE_ENV}
     volumes:
-      - ./mysql-data:/var/lib/mysql  
+      - ../server/config:/opt/app/config
+      - ../server/src:/opt/app/src
+      - ../server/package.json:/opt/package.json
+      - ../server/package-lock.json:/opt/package-lock.json      
+      - /opt/app/public/uploads:/opt/app/public/uploads
+    ports:
+      - "127.0.0.1:1337:1337"
     networks:
-      - strapi-network
+      - strapi
+    depends_on:
+      - strapiDB
 
+  strapiDB:
+    image: mysql/mysql-server
+    container_name: strapiDB
+    platform: linux/amd64
+    restart: unless-stopped
+    env_file: .env
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: ${DATABASE_USERNAME}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - ../mysql-data:/var/lib/mysql
+    networks:
+      - strapi
+volumes:
+  strapi-data
 networks:
   strapi-network:
     driver: bridge

@@ -8,20 +8,20 @@
     "description": ""
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
-    "user": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "plugin::users-permissions.user",
-      "inversedBy": "cart"
-    },
     "cart_items": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::cart-item.cart-item",
+      "mappedBy": "cart"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user",
       "mappedBy": "cart"
     }
   }

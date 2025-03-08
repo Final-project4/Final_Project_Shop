@@ -72,13 +72,34 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::cart.cart",
-      "mappedBy": "user"
+      "inversedBy": "user"
     },
-    "order": {
+    "coupons": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "manyToMany",
+      "target": "api::coupon.coupon",
+      "mappedBy": "user_restrictions"
+    },
+    "phoneNumber": {
+      "type": "string"
+    },
+    "orders": {
+      "type": "relation",
+      "relation": "oneToMany",
       "target": "api::order.order",
       "mappedBy": "user"
+    },
+    "profilePicture": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "files",
+        "images"
+      ]
+    },
+    "phoneNumber": {
+      "type": "string"
     }
   }
 }
