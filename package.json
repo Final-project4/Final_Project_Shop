@@ -1,0 +1,17 @@
+{
+  "name": "final_project_shop",
+  "version": "1.0.0",
+  "description": "**USE GIT BASH**\r type \"chmod +x start.sh\"\r start project with \"./start.sh\"",
+  "main": "index.js",
+  "dependencies": {
+    "sweetalert2": "^11.17.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.0",
+    "@types/node": "^22.13.10"
+  },
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
