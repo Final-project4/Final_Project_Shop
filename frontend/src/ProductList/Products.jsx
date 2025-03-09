@@ -17,6 +17,8 @@ const Products = () => {
   const [itemsPerPage] = useState(24);
   const [sortOrder, setSortOrder] = useState("asc");
 
+
+  
   useEffect(() => {
     axios 
       .get(`${conf.urlPrefix}/api/categories`)
