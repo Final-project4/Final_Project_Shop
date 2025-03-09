@@ -52,7 +52,7 @@ const OrderStatus = () => {
     fetchOrderItems(userInfo.orders);
   }, [userInfo]);  
 
-  // Helper function to determine the appropriate dot based on order status
+  
   const getStatusDot = (status) => {
     switch (status) {
       case "pending":

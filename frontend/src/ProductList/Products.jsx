@@ -79,7 +79,7 @@ const Products = () => {
     } else if (sortOrder === "desc") {
       return b.price - a.price;
     } else {
-      return 0; // ไม่จัดเรียงถ้า sortOrder เป็น null
+      return 0;
     }
   });
 
